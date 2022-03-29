@@ -22,7 +22,7 @@ If plot.dist = TRUE, it returns the plots to a file.
 
 #LOAD HABITAT PREVIOUSLY CREATED
 #hab <- readRDS(file="hab_justYT.RDS") #finer resolution
-hab <- readRDS(file="hab_justYT.RDS") #courser resolution
+hab <- readRDS(file="hab_justYT2.RDS") #courser resolution
 
 
 #plot strata
