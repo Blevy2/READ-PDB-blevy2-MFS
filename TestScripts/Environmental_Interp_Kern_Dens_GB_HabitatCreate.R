@@ -11,20 +11,110 @@ invisible(lapply(loadedPackages, library, character.only = TRUE))
 
 
 
-#load habitat matrices previously created and store values in hab
+# 
+# #load habitat matrices previously created and store values in hab
+# 
+# #haddock
+# Had_mat <- readRDS(file="TestScripts/Habitat_plots/Haddock/Haddock_Weighted_AdaptFalse_MATRIX.RDS")
+# fields::image.plot(Had_mat)
+# 
+# #cod
+# Cod_mat <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_MATRIX.RDS")
+# fields::image.plot(Cod_mat)
+# 
+# #yellowtail
+# Yell_mat <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/YellowtailFlounder_Weighted_AdaptFalse_MATRIX.RDS")
+# fields::image.plot(Yell_mat)
+
+
+
+
+
+#load habitat raster previously created and increase resolution
+library(raster)
 
 #haddock
-Had_mat <- readRDS(file="TestScripts/Habitat_plots/Haddock/Haddock_Weighted_AdaptFalse_MATRIX.RDS")
-fields::image.plot(Had_mat)
+Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Haddock_Weighted_AdaptFalse_RASTER.RDS")
+plot(Had_ras)
 
 #cod
-Cod_mat <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_MATRIX.RDS")
-fields::image.plot(Cod_mat)
+Cod_ras <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_RASTER.RDS")
+plot(Cod_ras)
 
 #yellowtail
-Yell_mat <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/YellowtailFlounder_Weighted_AdaptFalse_MATRIX.RDS")
-fields::image.plot(Yell_mat)
+Yell_ras <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/YellowtailFlounder_Weighted_AdaptFalse_RASTER.RDS")
+plot(Yell_ras)
 
+
+#alter resolution. 
+#Yell_ras1 <- raster::aggregate(Yell_ras,fact=2) #can only use interger factor
+
+res_factor <- .65  #amount to increase resolution
+r <- raster(extent(Yell_ras), nrow = round(res_factor*nrow(Yell_ras)), ncol = round(res_factor*ncol(Yell_ras)) , crs = crs(Yell_ras))
+nrow(r)
+
+#Yellowtail
+Yell_ras1 <- resample(x=Yell_ras, y=r, method="ngb")
+nrow(Yell_ras1)
+plot(Yell_ras1)
+plot(Yell_ras)
+fields::image.plot(as.matrix(Yell_ras1))
+
+#total cells
+ncol(as.matrix(Yell_ras))*nrow(as.matrix(Yell_ras))
+ncol(as.matrix(Yell_ras1))*nrow(as.matrix(Yell_ras1))
+
+
+#see how many zero and nonzero values there are
+sum(colSums(as.matrix(Yell_ras1)==0,na.rm = T)) #zero
+sum(colSums(as.matrix(Yell_ras1)>0,na.rm = T)) #nonzero
+length(as.matrix(Yell_ras1)[,1])*length(as.matrix(Yell_ras1)[1,]) #total cells including NAs
+
+#see how many zero and nonzero values there are
+sum(colSums(as.matrix(Yell_ras)==0,na.rm = T)) #zero
+sum(colSums(as.matrix(Yell_ras)>0,na.rm = T)) #nonzero
+length(as.matrix(Yell_ras)[,1])*length(as.matrix(Yell_ras)[1,]) #total cells including NAs
+
+
+#Cod
+Cod_ras1 <- resample(x=Cod_ras, y=r, method="ngb")
+plot(Cod_ras)
+plot(Cod_ras1)
+
+#see how many zero and nonzero values there are
+sum(colSums(as.matrix(Cod_ras1)==0,na.rm = T)) #zero
+sum(colSums(as.matrix(Cod_ras1)>0,na.rm = T)) #nonzero
+length(as.matrix(Cod_ras1)[,1])*length(as.matrix(Cod_ras1)[1,]) #total cells including NAs
+
+#see how many zero and nonzero values there are
+sum(colSums(as.matrix(Cod_ras)==0,na.rm = T)) #zero
+sum(colSums(as.matrix(Cod_ras)>0,na.rm = T)) #nonzero
+length(as.matrix(Cod_ras)[,1])*length(as.matrix(Cod_ras)[1,]) #total cells including NAs
+
+
+#Haddock
+Had_ras1 <- resample(x=Had_ras, y=r, method="ngb")
+plot(Had_ras)
+plot(Had_ras1)
+
+#see how many zero and nonzero values there are
+sum(colSums(as.matrix(Had_ras1)==0,na.rm = T)) #zero
+sum(colSums(as.matrix(Had_ras1)>0,na.rm = T)) #nonzero
+length(as.matrix(Had_ras1)[,1])*length(as.matrix(Had_ras1)[1,]) #total cells including NAs
+
+#see how many zero and nonzero values there are
+sum(colSums(as.matrix(Had_ras)==0,na.rm = T)) #zero
+sum(colSums(as.matrix(Had_ras)>0,na.rm = T)) #nonzero
+length(as.matrix(Had_ras)[,1])*length(as.matrix(Had_ras)[1,]) #total cells including NAs
+
+
+
+Had_mat <- as.matrix(Had_ras1)
+
+Cod_mat <- as.matrix(Cod_ras1)
+
+Yell_mat <- as.matrix(Yell_ras1)
+  
 hab<- list()
 hab[["hab"]][["spp1"]] <- Had_mat / sum(Had_mat,na.rm = T) #normalize like MFS does
 hab[["hab"]][["spp2"]] <- Cod_mat / sum(Cod_mat, na.rm=T)
