@@ -94,6 +94,9 @@ We can plot the starting distributions for each population as a check.
 
 ```{r pop_init}
 
+#rebuild package
+devtools::build()
+
 #load rcpp exports
 Rcpp::sourceCpp(file= "src/Movement.cpp")
 Rcpp::sourceCpp(file= "src/RcppExports.cpp")
