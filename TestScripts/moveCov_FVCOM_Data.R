@@ -5,10 +5,24 @@ library(MixFishSim)
 library(raster)
 
 #read into GB temp data
-WeeklyTempData <- readRDS(file="TestScripts/FVCOM_GB/YearlyTemp_GB.RDS")
+WeeklyTempData <- readRDS(file="C:\\Users\\benjamin.levy\\Desktop\\Github\\READ-PDB-blevy2-toy\\TestScripts\\FVCOM_GB\\YearlyTemp_GB.RDS")
 
 
+#resample temp gradients in same way as habitat maps
+res_factor <- .65 
+r <- raster(extent(WeeklyTempData$`05`[[1]]), nrow = round(res_factor*nrow(WeeklyTempData$`05`[[1]])), ncol = round(res_factor*ncol(WeeklyTempData$`05`[[1]])) , crs = crs(WeeklyTempData$`05`[[1]]))
+nrow(r)
 
+temp <- WeeklyTempData
+
+for(i in seq(length(WeeklyTempData))){
+  for(j in seq(length(WeeklyTempData[[i]]))){
+  
+  WeeklyTempData[[i]][[j]] <- resample(x=temp[[i]][[j]],crs=crs(WeeklyTempData$`05`[[1]]), y=r, method="ngb")
+  
+  }
+  
+}
 
 
 #plot results

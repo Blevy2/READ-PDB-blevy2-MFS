@@ -347,10 +347,29 @@ hab[["spwn_hab"]][["spp3"]] <- YT_spwn_hab
 
 
 
+
+
+
+
+#resample temp gradients in same way
+r <- raster(extent(Yell_ras), nrow = round(res_factor*nrow(Yell_ras)), ncol = round(res_factor*ncol(Yell_ras)) , crs = crs(Yell_ras))
+nrow(r)
+
+temp <- moveCov$cov.matrix
+
+for(i in seq(length(moveCov$cov.matrix))){
+  
+  moveCov$cov.matrix[[i]] <- resample(x=raster::raster(temp[[i]],ext=extent(Yell_ras),crs=crs(Yell_ras)), y=r, method="ngb")
+
+  
+}
+
+
 #INTEGRATE WITH TEMP GRADIENT
 
 #constant temp gradient
 moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+
 
 #add temp tolerances order: had, cod, yellow
 moveCov[["spp_tol"]] <- list() #just in case
