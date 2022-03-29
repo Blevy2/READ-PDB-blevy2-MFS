@@ -338,8 +338,8 @@ hab[["spwn_hab"]][["spp3"]] <- YT_spwn_hab
 # hab$strata <- temp$strata
 # hab$stratas <- temp$stratas
 # hab$spwn_hab <- temp$spwn_hab$spp3
-# saveRDS(hab, file="hab_justYT.RDS")
-
+# saveRDS(hab, file="hab_justYT2.RDS")
+# 
 
 
 
