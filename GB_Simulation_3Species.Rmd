@@ -72,7 +72,7 @@ The object returned is used internally by MixFishSim a list with two levels:
 
 #NEW VERSION that has week breaks for entire simulation and allows fishing on just 1 day per week
 source("R/init_sim_Bens_nofish.R")
-sim <- init_sim_Bens_nofish(nrows = nrow(hab$hab$spp1), ncols = ncol(hab$hab$spp1), n_years = 22, n_tows_day = 1,n_days_wk_fished = 1, n_fleets = 1, n_vessels = 1, n_species = 1,
+sim <- init_sim_Bens_nofish(nrows = nrow(hab$hab$spp1), ncols = ncol(hab$hab$spp1), n_years = 22, n_tows_day = 1,n_days_wk_fished = 1, n_fleets = 1, n_vessels = 1, n_species = 3,
                             move_freq = 1)
 
 class(sim)
@@ -119,18 +119,21 @@ names(nonzero_idx) <- paste("spp",seq_len(sim$idx[["n.spp"]]), sep ="")
  source("R/init_pop_Bens.R")
 # profvis({
 
+#YELLOWTAIL, COD, HADDOCK
+
+STILL NEED: START CELL, REC PARAMS, K GROWTH PARAMS
+
 #decreasing population settings
-Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194), #CHANGE
+Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
                      hab = hab[["hab"]], start_cell = c(42,155),
-                     lambda = c("spp1" = 0), #set at 0 first, change after initial population set
+                     lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
                      init_move_steps = 20,
                      rec_params = list("spp1" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0)), #CHANGE
-                     rec_wk = list("spp1" = 9:12),
-                     spwn_wk = list("spp1" = 9:12), #CORRECT FOR YTF
-                     M = c("spp1" = 0.275), #CHANGE
-                     K = c("spp1" = 0.3, "spp2" = 0.3), #CHANGE
-                     nz = nonzero_idx
-)
+                     rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
+                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), #CORRECT FOR YTF
+                     M = c("spp1" = 0.25+0, "spp2" = 0.35+0, "spp3" = 0.2+.05), #CHANGE
+                     K = c("spp1" = 0.3, "spp2" = 0.3, "spp3" = 0.3), #CHANGE
+                     nz = nonzero_idx)
 
 #})
 

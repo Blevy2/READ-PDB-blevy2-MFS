@@ -121,10 +121,19 @@ Yell_ras <- Yell_ras1
 
 
 hab<- list()
-hab[["hab"]][["spp1"]] <- Had_mat / sum(Had_mat,na.rm = T) #normalize like MFS does
+hab[["hab"]][["spp1"]] <- Yell_mat / sum(Yell_mat, na.rm=T)
 hab[["hab"]][["spp2"]] <- Cod_mat / sum(Cod_mat, na.rm=T)
-hab[["hab"]][["spp3"]] <- Yell_mat / sum(Yell_mat, na.rm=T)
+hab[["hab"]][["spp3"]] <- Had_mat / sum(Had_mat,na.rm = T) #normalize like MFS does
 
+#save new rasters and matrices
+
+saveRDS(Yell_ras, file="Yell_Weighted_AdaptFalse_RASTER_res2.RDS")
+saveRDS(Cod_ras, file="Cod_Weighted_AdaptFalse_RASTER_res2.RDS")
+saveRDS(Had_ras, file="Had_Weighted_AdaptFalse_RASTER_res2.RDS")
+
+saveRDS(Yell_mat, file="Yell_Weighted_AdaptFalse_MATRIX_res2.RDS")
+saveRDS(Cod_mat, file="Cod_Weighted_AdaptFalse_MATRIX_res2.RDS")
+saveRDS(Had_mat, file="Had_Weighted_AdaptFalse_MATRIX_res2.RDS")
 
 
 
@@ -295,38 +304,94 @@ source("R/define_spawn_Bens.R")
 #yellowtail in May (weeks 9, 10, 11, 12)
 
 
-max(hab$hab$spp3,na.rm=T)  #max is 0.0006653
+max(hab$hab$spp1,na.rm=T)  #max is 0.0006653
 
-YT_spwn_ind <-which(hab$hab$spp3 >= 0 , arr.ind=T) #4,279 total non NA cells
-YT_spwn_ind <-which(hab$hab$spp3 > 0 , arr.ind=T)  #3,110 are >0
-YT_spwn_ind <-which(hab$hab$spp3 >= .0006 , arr.ind=T) #832 are above .0006
+YT_spwn_ind <-which(hab$hab$spp1 >= 0 , arr.ind=T) #4,279 total non NA cells
+YT_spwn_ind <-which(hab$hab$spp1 > 0 , arr.ind=T)  #3,110 are >0
+YT_spwn_ind <-which(hab$hab$spp1 >= .0006 , arr.ind=T) #832 are above .0006
 
 #will use southwest red area and northeast red area for spawning
 #northeast between rows 40-80 and columns 155-196 
 #use .0002 in NE corner 
-YT_spwn_ind <-which(hab$hab$spp3 >= .0006 , arr.ind=T) #832 are above .0006
+YT_spwn_ind <-which(hab$hab$spp1 >= .0006 , arr.ind=T) #832 are above .0006
 YT_spwn_NE <- YT_spwn_ind[(YT_spwn_ind[,1]>=res_factor*40) & (YT_spwn_ind[,1]<=res_factor*80) & (YT_spwn_ind[,2]>=res_factor*155) & (YT_spwn_ind[,2]<=res_factor*196), ]
 
 
 #will use southwest red area and northeast red area for spawning
 #SW between rows 96 to 127 and columns 50 to 82 
 #use .0001 in SW corner 
-YT_spwn_ind <-which(hab$hab$spp3 >= .0004 , arr.ind=T) #3,833 are above .0001
+YT_spwn_ind <-which(hab$hab$spp1 >= .0004 , arr.ind=T) #3,833 are above .0001
 YT_spwn_SW <- YT_spwn_ind[(YT_spwn_ind[,1]>=res_factor*96) & (YT_spwn_ind[,1]<=res_factor*127) & (YT_spwn_ind[,2]>=res_factor*50) & (YT_spwn_ind[,2]<=res_factor*82), ]
 
 YT_spwn <- rbind(YT_spwn_NE,YT_spwn_SW)
 
 spwn_mult <- 10
-YT_spwn_hab <- create_spawn_hab_Bens(hab = hab$hab$spp3, spwnareas = YT_spwn, mult = spwn_mult)
+YT_spwn_hab <- create_spawn_hab_Bens(hab = hab$hab$spp1, spwnareas = YT_spwn, mult = spwn_mult)
 fields::image.plot(YT_spwn_hab)
+
+
+
+#cod in weeks 8-13
+
+max(hab$hab$spp2,na.rm=T)  #max is 0.000713
+
+Cod_spwn_ind <-which(hab$hab$spp2 >= 0 , arr.ind=T) #5,999 total non NA cells
+Cod_spwn_ind <-which(hab$hab$spp2 > 0 , arr.ind=T)  #3,710 are >0
+Cod_spwn_ind <-which(hab$hab$spp2 >= .0007 , arr.ind=T) #514 are above .0007
+
+#will use northeast area between rows 0-44 and columns 60-144
+#use .0002 in NE corner 
+Cod_spwn_ind <-which(hab$hab$spp2 >= .0007 , arr.ind=T) #832 are above .0006
+Cod_spwn_NE <- Cod_spwn_ind[(Cod_spwn_ind[,1]>=0) & (Cod_spwn_ind[,1]<=44) & (Cod_spwn_ind[,2]>=60) & (Cod_spwn_ind[,2]<=144), ]
+
+
+spwn_mult <- 10
+Cod_spwn_hab <- create_spawn_hab_Bens(hab = hab$hab$spp2, spwnareas = Cod_spwn_NE, mult = spwn_mult)
+fields::image.plot(Cod_spwn_hab)
+
+
+
+#haddock in weeks 11-14
+
+max(hab$hab$spp3,na.rm=T)  #max is 0.000355
+
+Had_spwn_ind <-which(hab$hab$spp3 >= 0 , arr.ind=T) #7,557 total non NA cells
+Had_spwn_ind <-which(hab$hab$spp3 > 0 , arr.ind=T)  #5,830 are >0
+Had_spwn_ind <-which(hab$hab$spp3 >= .0003 , arr.ind=T) #1431 are above .0003
+
+#will use northeast area between rows 0-44 and columns 60-144
+#use .0002 in NE corner 
+Had_spwn_ind <-which(hab$hab$spp3 >= .0003 , arr.ind=T) 
+Had_spwn_NE <- Had_spwn_ind[(Had_spwn_ind[,1]>=0) & (Had_spwn_ind[,1]<=44) & (Had_spwn_ind[,2]>=60) & (Had_spwn_ind[,2]<=144), ]
+
+
+#will use great south channel
+#SW between rows 20 to 50  and columns 25 to 45 
+
+Had_spwn_ind <-which(hab$hab$spp3 >= .0003 , arr.ind=T) 
+Had_spwn_SW <- Had_spwn_ind[(Had_spwn_ind[,1]>=20) & (Had_spwn_ind[,1]<=50) & (Had_spwn_ind[,2]>=20) & (Had_spwn_ind[,2]<=45), ]
+
+Had_spwn <- rbind(Had_spwn_NE,Had_spwn_SW)
+
+
+spwn_mult <- 10
+Had_spwn_hab <- create_spawn_hab_Bens(hab = hab$hab$spp3, spwnareas = Had_spwn, mult = spwn_mult)
+fields::image.plot(Had_spwn_hab)
+
+
 
 
 
 
 hab[["spwn_hab"]] <- list()
-hab[["spwn_hab"]][["spp1"]] <- YT_spwn_hab #CHANGE THIS
-hab[["spwn_hab"]][["spp2"]] <- YT_spwn_hab #CHANGE THIS
-hab[["spwn_hab"]][["spp3"]] <- YT_spwn_hab  
+hab[["spwn_hab"]][["spp1"]] <- YT_spwn_hab 
+hab[["spwn_hab"]][["spp2"]] <- Cod_spwn_hab 
+hab[["spwn_hab"]][["spp3"]] <- Had_spwn_hab  
+
+
+
+#save for later use
+saveRDS(hab, file="hab_GB_3species.RDS")
 
 
 # 
@@ -350,25 +415,12 @@ hab[["spwn_hab"]][["spp3"]] <- YT_spwn_hab
 
 
 
-
-#resample temp gradients in same way
-r <- raster(extent(Yell_ras), nrow = round(res_factor*nrow(Yell_ras)), ncol = round(res_factor*ncol(Yell_ras)) , crs = crs(Yell_ras))
-nrow(r)
-
-temp <- moveCov$cov.matrix
-
-for(i in seq(length(moveCov$cov.matrix))){
-  
-  moveCov$cov.matrix[[i]] <- resample(x=raster::raster(temp[[i]],ext=extent(Yell_ras),crs=crs(Yell_ras)), y=r, method="ngb")
-
-  
-}
-
-
 #INTEGRATE WITH TEMP GRADIENT
 
 #constant temp gradient
-moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
 
 
 #add temp tolerances order: had, cod, yellow
@@ -442,6 +494,11 @@ spp_names_short <- c("HAD","COD","YTF")
 month_nm <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
 
+#deifne spawning weeks (made up for now)
+spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ),
+
+
+
 #order: Haddock, Cod, Yellowtail
 tol_list <- list("spp1" = list("mu" = 9, "va" = 4),  #Haddock
                  "spp2" = list("mu" = 8.75, "va" = 4.25),  #Cod
@@ -458,7 +515,9 @@ tol_list <- list("spp1" = list("mu" = 9, "va" = 4),  #Haddock
 
 
 #constant temp gradient
-moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
 
 #add temp tolerances order: had, cod, yellow
 moveCov[["spp_tol"]] <- list() #just in case
@@ -471,12 +530,6 @@ yearscut <- 2
 
 #function to rotate image before plotting because image.plot rotates it
 rotate <- function(x) t(apply(x, 2, rev))
-
-
-
-
-#deifne spawning weeks (made up for now)
-spwn_wk = list("spp1" = 15:18, "spp2" = 15:18, "spp3" = 15:18) #CHANGE THINS
 
 
 
@@ -593,7 +646,9 @@ dev.off()
 
 #load increasing temp gradient
 #constant temp gradient
-moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata")
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata")
+
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
 
 #add temp tolerances order: had, cod, yellow
 moveCov[["spp_tol"]] <- list() #just in case
@@ -613,11 +668,6 @@ zmax <- c(.25,.25,.26)
 zmin <- c(0,0,0)
 
 pdf(file=paste0('testfolder/Monthly_species_temp_plots_IncrTemp','.pdf'))
-
-
-
-#deifne spawning weeks (made up for now)
-spwn_wk = list("spp1" = 15:18, "spp2" = 15:18, "spp3" = 15:18)
 
 
 
@@ -687,7 +737,11 @@ dev.off()
 
 #load increasing temp gradient
 #constant temp gradient
-moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+
+
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
+
 
 #add temp tolerances order: had, cod, yellow
 moveCov[["spp_tol"]] <- list() #just in case
@@ -708,10 +762,6 @@ rotate <- function(x) t(apply(x, 2, rev))
 
 pdf(file=paste0('testfolder/Monthly_species_temp_plots_HabTemp_ConstTemp','.pdf'))
 
-
-
-#deifne spawning weeks (made up for now)
-spwn_wk = list("spp1" = 15:18, "spp2" = 15:18, "spp3" = 15:18)
 
 
 maxtemp1 <-vector()
@@ -845,7 +895,9 @@ dev.off()
 
 #load increasing temp gradient
 #constant temp gradient
-moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata")
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata")
+
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
 
 #add temp tolerances order: had, cod, yellow
 moveCov[["spp_tol"]] <- list() #just in case
@@ -866,9 +918,6 @@ rotate <- function(x) t(apply(x, 2, rev))
 pdf(file=paste0('testfolder/Monthly_species_temp_plots_HabTemp_IncrTemp','.pdf'))
 
 
-
-#deifne spawning weeks (made up for now)
-spwn_wk = list("spp1" = 15:18, "spp2" = 15:18, "spp3" = 15:18)
 
 
 
