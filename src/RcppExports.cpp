@@ -11,13 +11,14 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // norm_mat
-NumericMatrix norm_mat(NumericMatrix M);
-RcppExport SEXP _MixFishSim_norm_mat(SEXP MSEXP) {
+NumericMatrix norm_mat(NumericMatrix M, NumericVector MM);
+RcppExport SEXP _MixFishSim_norm_mat(SEXP MSEXP, SEXP MMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type M(MSEXP);
-    rcpp_result_gen = Rcpp::wrap(norm_mat(M));
+    Rcpp::traits::input_parameter< NumericVector >::type MM(MMSEXP);
+    rcpp_result_gen = Rcpp::wrap(norm_mat(M, MM));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -77,7 +78,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_MixFishSim_norm_mat", (DL_FUNC) &_MixFishSim_norm_mat, 1},
+    {"_MixFishSim_norm_mat", (DL_FUNC) &_MixFishSim_norm_mat, 2},
     {"_MixFishSim_distance_calc", (DL_FUNC) &_MixFishSim_distance_calc, 4},
     {"_MixFishSim_move_prob", (DL_FUNC) &_MixFishSim_move_prob, 4},
     {"_MixFishSim_move_prob_Lst", (DL_FUNC) &_MixFishSim_move_prob_Lst, 3},

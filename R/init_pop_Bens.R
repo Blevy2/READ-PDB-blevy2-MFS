@@ -81,7 +81,7 @@ Pop <- lapply(names(Bio), function(x) {
 
 		      ## Initial distribution
 		      PopIn <- matrix(nc = ncol(hab[[x]]), nr = nrow(hab[[x]]), 0)
-		      PopIn[start_cell[1], start_cell[2]] <- Bio[[x]] 
+		      PopIn[start_cell[[x]][1], start_cell[[x]][2]] <- Bio[[x]] 
 	      #1b. pull out nonzero indices
 		      NZi <- nz[[x]]
 		      # Move the population around a bit

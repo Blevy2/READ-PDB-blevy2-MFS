@@ -19,9 +19,9 @@ using namespace Rcpp;
 //' @export
 //  [[Rcpp::export]]
 
-NumericMatrix norm_mat(NumericMatrix M) {
+NumericMatrix norm_mat(NumericMatrix M, NumericVector MM) {
   //NumericMatrix MM = M(! is_na(M));
-  NumericMatrix S = M / sum(M);
+  NumericMatrix S = M / sum(MM);
   return S;
 }
 

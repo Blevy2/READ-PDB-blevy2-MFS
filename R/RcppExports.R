@@ -12,8 +12,8 @@
 #' @examples sum_mat(M)
 #'
 #' @export
-norm_mat <- function(M) {
-    .Call('_MixFishSim_norm_mat', PACKAGE = 'MixFishSim', M)
+norm_mat <- function(M, MM) {
+    .Call('_MixFishSim_norm_mat', PACKAGE = 'MixFishSim', M, MM)
 }
 
 #' @title distance calculation

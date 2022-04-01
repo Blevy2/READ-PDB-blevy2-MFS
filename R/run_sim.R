@@ -55,6 +55,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
   ###################################
   
   Rec  <- vector("list", n_spp) # For storing spatial recruitment, is overwritten
+  names(Rec) <- paste0("spp", seq_len(n_spp))
   for(s in paste0("spp",seq_len(n_spp))) { Rec[[s]] <- 0 }
   B    <- pop_init[["Start_pop"]]  # For storing current biomass, is overwritten
   Bm1  <- pop_init[["Start_pop"]]  # For storing last time-step biomass, is overwritten
@@ -164,12 +165,36 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     
     ## first tow in a week where any of the stocks recruit
     
+    #old method (same recruit and spawning weeks for all species)
+    
     #CHANGED THIS SO REC IS TRUE ON FIRST WEEK OF REC/SPAWN ONLY
-    Recruit  <- ifelse(t > 1, ifelse(week.breaks[t] != week.breaks[t-1] &
-                                       #IF IN FIRST SPAWN WEEK OR IN LAST SPAWN WEEK IN FIRST YEAR    
-                                       (( week.breaks[t] %in% unlist(sapply(pop_init$dem_params, function(x) x[["spwn_wk"]][[1]])))
-                                        | ( t %in% unlist(sapply(pop_init$dem_params, function(x) tail(x[["spwn_wk"]],n=1))))),
-                                     TRUE, FALSE), FALSE) 
+    # Recruit  <- ifelse(t > 1, ifelse(week.breaks[t] != week.breaks[t-1] &
+    #                                    #IF IN FIRST SPAWN WEEK OR IN LAST SPAWN WEEK IN FIRST YEAR    
+    #                                    (( week.breaks[t] %in% unlist(sapply(pop_init$dem_params, function(x) x[["spwn_wk"]][[1]])))
+    #                                     | ( t %in% unlist(sapply(pop_init$dem_params, function(x) tail(x[["spwn_wk"]],n=1))))),
+    #                                  TRUE, FALSE), FALSE) 
+    # 
+    
+    #new method (allows for different recruit and spawn weeks for each species)
+    
+    Recruit  <- lapply(paste0("spp", seq_len(n_spp)), function(s) {   
+     
+      recr <-  ifelse(t > 1, ifelse(week.breaks[t] != week.breaks[t-1] &
+                                      #IF IN FIRST RECRUIT WEEK OR IN LAST RECRUIT WEEK IN FIRST YEAR    
+                                      (( week.breaks[t] == pop_init$dem_params[[s]]$rec_wk[1] )
+                                       | ( t == tail(pop_init$dem_params[[s]]$rec_wk,n=1))),
+                                    TRUE, FALSE), FALSE) 
+      
+      
+    })
+    
+  
+    print(Recruit[[1]])
+    
+    print(Recruit[[2]])
+    
+    print(Recruit[[3]])
+    
     
     if(t != ntow) {
       Pop_dyn  <- ifelse(day.breaks[t] != day.breaks[t+1], TRUE, FALSE) ## weekly delay diff
@@ -212,29 +237,38 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     # but occurs throughout the spawning period
     # Different spawning periods for different pops, so we need to handle this...
     #print("Recruit?")
-    #print(Recruit)
-    if(Recruit) { # Check for new week
-      
+    #print(Recruit) 
+    
+    # #with species no longer having overlapping weeks need new
+    #   if(week.breaks[t] == pop_init[["dem_params"]][[s]][["rec_wk"]][1]) {
+ 
+
+    lapply(seq_len(n_spp), function(s) {
+      print(s)
+
+      #set as matrix of zeros and override if needed
+    Rec[[paste0("spp", s)]] <- matrix(0, ncol = ncols, nrow = nrows)
+View(Rec)
+  
+    if(Recruit[[s]]) { # Check for new week
+
     #  print("Recruiting")
-      
-      ## Check if its a recruitment week for the population
-      Rec <- lapply(paste0("spp", seq_len(n_spp)), function(s) {
-        
+
         if(week.breaks[t] %in% pop_init[["dem_params"]][[s]][["rec_wk"]]) {
-          
+
        #   print(t)
         #  print(s)
           #View(B[[s]])
           #print(sum(B[[s]]))
-          
+
           if(year.breaks[t]==1){  #NEED TO ACCOUNT FOR FIRST YEAR
-            
-            #IN FIRST YEAR BLAST OUT ALL OF IT IN LAST REC WEEK SO THAT 
-            
+
+            #IN FIRST YEAR BLAST OUT ALL OF IT IN LAST REC WEEK SO THAT
+
             ifelse( t == tail(pop_init[["dem_params"]][[s]][["rec_wk"]],n=1),
-                    
+
                     #NEED TO ACCOUNT FOR ALPHA IN POP DYNMAICS BY SCALING UP RECRUITMENT FOR 1 WEEK
-                    
+
                     rec <- length(pop_init[["dem_params"]][[s]][["rec_wk"]])*Recr_mat(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
                                                                                       params = c("a" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["a"]]),
                                                                                                  "b" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["b"]])),
@@ -242,40 +276,65 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
                                                                                       cv = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["cv"]])),
                     rec <- matrix(0, ncol = ncols, nrow = nrows)
             )
-            
+
           }
-          
+
           if(year.breaks[t]>1){
-            
+
             last_spwn <- tail(pop_init[["dem_params"]][[s]][["rec_wk"]],n=1)
-            
+
             rec <- Recr_mat(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
                             params = c("a" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["a"]]),
                                        "b" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["b"]])),
-                            B = pop_bios[[year.breaks[t]-1, week.breaks[last_spwn]]][[s]], #THIS IS NEW. USING PREVIOUS YEARS POPULATION VALUE AT END OF RECRUITMENT TO MAKE PULSE IN SPAWNING GROUND 
+                            B = pop_bios[[year.breaks[t]-1, week.breaks[last_spwn]]][[s]], #THIS IS NEW. USING PREVIOUS YEARS POPULATION VALUE AT END OF RECRUITMENT TO MAKE PULSE IN SPAWNING GROUND
                             cv = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["cv"]]))
-            
+
           }
         }
-        
+
         if(!week.breaks[t] %in% pop_init[["dem_params"]][[s]][["rec_wk"]]) {
-          
-          print("THIS IS AN ERROR. SHOULD NOT HAPPEN. SEE RECRUITMENT SECTION IN RUN_SIM")
-          
-          stop() #writing this to force a stop
-          
-          
-          
+          #print(t)
+         # print(s)
+        #  print(pop_init[["dem_params"]][[s]][["rec_wk"]])
+
+          print("no rec for this species in this week")
+
+          # print("THIS IS AN ERROR. SHOULD NOT HAPPEN. SEE RECRUITMENT SECTION IN RUN_SIM")
+
+         # stop() #writing this to force a stop
+          rec <- matrix(0, ncol = ncols, nrow = nrows)
+
+
         }
-        
-        rec
-        
-      })
-      names(Rec) <- paste0("spp", seq_len(n_spp))
-      
-      
+
+      Rec[[paste0("spp", s)]] <- rec
+
+
+
+  
+
+
+
+
     }
+
+
+    })
+    View(MoveProb)
+      View(Rec)
+      print("sum rec")
+      print("spp1")
+      print(sum(Rec[["spp1"]]))
+      print("sum rec")
+      print("spp2")
+      print(sum(Rec[["spp2"]]))
+      print("sum rec")
+      print("spp3")
+      print(sum(Rec[["spp3"]]))
     
+  
+  
+  
     ##########################
     #### Spatial closures ####
     ##########################
@@ -405,6 +464,8 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     # Apply the delay_diff()
     # Need B-1 and B to calc B+1
     
+   # print( "here1")
+    
     if(Pop_dyn) { #POP_DYN IS SET ON LINE 143
       
       #  print("Delay-difference model")
@@ -503,7 +564,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       
       
     } # end if statement
-    
+   # print("here2")
     #######################
     ##### Pop movement ####
     #######################
@@ -524,7 +585,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
         ## The temperature covariates for the week
         move_cov_wk <- move_cov[["cov.matrix"]][[week.breaks.all[t]]]  #this should now use all moveCov matrices
         
-        
+       # print( "here3")
         B <- lapply(paste0("spp", seq_len(n_spp)), function(s) {
           
           move_cov_wk_spp <- matrix(nc = sim_init[["idx"]][["ncols"]],
@@ -543,20 +604,20 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
             #                           Nzero_row = as.vector(nonzero_idx[[s]][,1]),
             #                           Nzero_col = as.vector(nonzero_idx[[s]][,2]))
           #  print(class(x1[nz[[1]]]))
-      #      print("here")
-            newPop <- move_population(moveProp = lapply(lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1[nz[[s]]]))),
+      #      print(")
+            newPop <- move_population(moveProp = lapply(lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),
                                       StartPop = Bp1[[s]], Nzero_vals = nz[[s]])
-       #     print("here2")
+       #     print(2")
           }
-          
+       
           if(week.breaks[t] %in% pop_init[["dem_params"]][[s]][["spwn_wk"]]) {
             #	  print("spawning movement")
-            newPop <- move_population(moveProp = lapply(lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1[nz[[s]]]))),
+            newPop <- move_population(moveProp = lapply(lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),
                                       StartPop = Bp1[[s]], Nzero_vals = nz[[s]])
           }
-          
+         #    print( "here41")
           Reduce("+", newPop)
-          
+         # print( "here42")
         }) #end lapply()
         
         
@@ -572,17 +633,19 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
           
           ## If in a non-spawning week or spawning week
           if(!week.breaks[t] %in% pop_init[["dem_params"]][[s]][["spwn_wk"]]) {
-            newPop <- move_population(lapply(lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1[nz[[s]]]))),
+           # print( "here4b1")
+            newPop <- move_population(lapply(lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),
                                       StartPop = Bm1[[s]], Nzero_vals = nz[[s]])
+           # print( "here4b2")
           }
           
           if(week.breaks[t] %in% pop_init[["dem_params"]][[s]][["spwn_wk"]]) {
-            newPop <- move_population(lapply(lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1[nz[[s]]]))),
+            newPop <- move_population(lapply(lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),    #c++ version: norm_mat(as.matrix(x1[nz[[s]]]))   vs: norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))
                                       StartPop = Bm1[[s]], Nzero_vals = nz[[s]])
           }
-          
+        #  print( "here4a1")
           Reduce("+", newPop)
-          
+         # print( "here4a2")
         })
         
       }  #end  if(!is.null(move_cov))
@@ -632,6 +695,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       
       ## If we're saving population biomass, do so here
       if(save_pop_bio == TRUE) {
+      #  print( "here4c")
         if(!"pop_bios" %in% ls()) {
           # Create a list structure for storing pop bios
           pop_bios <- vector("list", sim_init[["idx"]][["ny"]] * sim_init[["idx"]][["nw"]]) 
@@ -654,7 +718,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     } # end if(Pop_Move) statement
     
     
-    
+ #   print( "here4d")
     ######################
     ##### Update #########
     ######################
@@ -665,16 +729,17 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       ##print("Recording metrics")
       
       for(s in paste0("spp", seq_len(n_spp))) {
-        
-        
+    #    print( "here5")
+     #  View(spat_fs)
+     #  View(B[[s]])
         pop_init[["Pop_record"]][[s]][["F.mat"]][year.breaks[t], day.breaks[t]] <- weighted.mean(spat_fs[[s]], B[[s]])
-        
+      #  print( "here6")
         pop_init[["Pop_record"]][[s]][["Catch.mat"]][year.breaks[t], day.breaks[t]] <- sum(spp_catches[[s]])
-        
+      #  print( "here7")
         pop_init[["Pop_record"]][[s]][["Bio.mat"]][year.breaks[t], day.breaks[t]] <- sum(Bp1[[s]])
-        
+      #  print( "here8")
         pop_init[["Pop_record"]][[s]][["Rec.mat"]][1, year.breaks[t]] <- sum(Rec[[s]], pop_init[["Pop_record"]][[s]][["Rec.mat"]][1, year.breaks[t]], na.rm = T)
-        
+       # print( "here9")
         
       }
       

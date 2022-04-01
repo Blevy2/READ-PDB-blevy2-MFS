@@ -96,6 +96,8 @@ We can plot the starting distributions for each population as a check.
 
 ```{r pop_init}
 
+hab <- readRDS("hab_GB_3species.RDS")
+
 #rebuild package
 devtools::build()
 
@@ -119,16 +121,35 @@ names(nonzero_idx) <- paste("spp",seq_len(sim$idx[["n.spp"]]), sep ="")
  source("R/init_pop_Bens.R")
 # profvis({
 
+	
+
+##where should starting point be? check highest values locations
+# which(hab[["hab"]][["spp1"]]==max(hab[["hab"]][["spp1"]],na.rm=T),arr.ind=T)
+# which(hab[["hab"]][["spp2"]]==max(hab[["hab"]][["spp2"]],na.rm=T),arr.ind=T)
+# which(hab[["hab"]][["spp3"]]==max(hab[["hab"]][["spp3"]],na.rm=T),arr.ind=T)
+# 
+# #make sure each have nonzero value on start cell
+# hab[["hab"]][["spp1"]][46,112]
+# hab[["hab"]][["spp2"]][30,134]
+# hab[["hab"]][["spp3"]][24,91]
+
 #YELLOWTAIL, COD, HADDOCK
 
-STILL NEED: START CELL, REC PARAMS, K GROWTH PARAMS
+STILL NEED: REC PARAMS, K GROWTH PARAMS
+
+
+Recr(model = "BH", params = list("a" = 1000, "b" = 450),
+   B = max(Pop[["Start_pop"]][["spp1"]],na.rm=T), cv = 0)
+
 
 #decreasing population settings
 Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
-                     hab = hab[["hab"]], start_cell = c(42,155),
+                     hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
                      lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
                      init_move_steps = 20,
-                     rec_params = list("spp1" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0)), #CHANGE
+                     rec_params = list("spp1" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0),
+                                       "spp3" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0)), #CHANGE
                      rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
                      spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), #CORRECT FOR YTF
                      M = c("spp1" = 0.25+0, "spp2" = 0.35+0, "spp3" = 0.2+.05), #CHANGE
@@ -139,6 +160,8 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
 
 #set lambda at 0 first, change after initial population set
 Pop$dem_params$spp1$lambda <- .1
+Pop$dem_params$spp2$lambda <- .1
+Pop$dem_params$spp3$lambda <- .1
 
 
 #I PUT THIS BACK INSIDE RUN_SIM
@@ -155,7 +178,8 @@ Pop$dem_params$spp1$lambda <- .1
 
 
 fields::image.plot(Pop$Start_pop[[1]], main = "spp1 starting biomass")
-
+fields::image.plot(Pop$Start_pop[[2]], main = "spp1 starting biomass")
+fields::image.plot(Pop$Start_pop[[3]], main = "spp1 starting biomass")
 
 
 
@@ -203,8 +227,8 @@ random walk function.
 library(MixFishSim)
 
 #no fishing
-fleets <- init_fleet(sim_init = sim, VPT = list("spp1" = 0, "spp2" = 0), #VPT = value per ton
-                     Qs = list("fleet 1" = c("spp1" = 0, "spp2" = 0)   #Q = catchability
+fleets <- init_fleet(sim_init = sim, VPT = list("spp1" = 0, "spp2" = 0, "spp3" = 0), #VPT = value per ton
+                     Qs = list("fleet 1" = c("spp1" = 0, "spp2" = 0, "spp3" = 0)   #Q = catchability
                      ),
                      fuelC = list("fleet1" = 3),
                      step_params = list("fleet 1" = c("rate" = 3, "B1" = 1, "B2" = 2, "B3" = 3)
@@ -244,9 +268,15 @@ run_simulation <- function(x){
   #3: replace go_fish with go_fish_Bens in the MixFishSim package
   assignInNamespace("go_fish", go_fish_Bens, ns = "MixFishSim")
   
+#   #rebuild package
+devtools::build()
+
   
-  
-  
+  #load rcpp exports
+Rcpp::sourceCpp(file= "src/Movement.cpp")
+Rcpp::sourceCpp(file= "src/RcppExports.cpp")
+Rcpp::compileAttributes() #this updates RcppExports.R file, which contains function definitions
+
   
   library(MixFishSim) #each core needs to load library
   
@@ -265,7 +295,7 @@ library(profvis)
 
 profvis({
 
-
+  
 start_time <- Sys.time() # record start time
 
 
