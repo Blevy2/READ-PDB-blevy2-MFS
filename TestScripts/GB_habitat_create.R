@@ -9,6 +9,9 @@ setwd("C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-toy/")
 loadedPackages <- c("rgdal", "data.table", "maptools","envi", "raster", "RStoolbox", "spatstat.data", "spatstat.geom", "spatstat.core")
 invisible(lapply(loadedPackages, library, character.only = TRUE))
 
+#to rotate matrix before fields::image.plot
+rotate <- function(x) t(apply(x, 2, rev))
+
 
 
 # 
@@ -314,20 +317,20 @@ YT_spwn_ind <-which(hab$hab$spp1 >= .0006 , arr.ind=T) #832 are above .0006
 #northeast between rows 40-80 and columns 155-196 
 #use .0002 in NE corner 
 YT_spwn_ind <-which(hab$hab$spp1 >= .0006 , arr.ind=T) #832 are above .0006
-YT_spwn_NE <- YT_spwn_ind[(YT_spwn_ind[,1]>=res_factor*40) & (YT_spwn_ind[,1]<=res_factor*80) & (YT_spwn_ind[,2]>=res_factor*155) & (YT_spwn_ind[,2]<=res_factor*196), ]
+YT_spwn_NE <- YT_spwn_ind[(YT_spwn_ind[,1]>=34) & (YT_spwn_ind[,1]<=60) & (YT_spwn_ind[,2]>=95) & (YT_spwn_ind[,2]<=128), ]
 
 
 #will use southwest red area and northeast red area for spawning
 #SW between rows 96 to 127 and columns 50 to 82 
 #use .0001 in SW corner 
-YT_spwn_ind <-which(hab$hab$spp1 >= .0004 , arr.ind=T) #3,833 are above .0001
-YT_spwn_SW <- YT_spwn_ind[(YT_spwn_ind[,1]>=res_factor*96) & (YT_spwn_ind[,1]<=res_factor*127) & (YT_spwn_ind[,2]>=res_factor*50) & (YT_spwn_ind[,2]<=res_factor*82), ]
+YT_spwn_ind <-which(hab$hab$spp1 >= .0002 , arr.ind=T) #3,833 are above .0001
+YT_spwn_SW <- YT_spwn_ind[(YT_spwn_ind[,1]>=62) & (YT_spwn_ind[,1]<=83) & (YT_spwn_ind[,2]>=33) & (YT_spwn_ind[,2]<=53), ]
 
 YT_spwn <- rbind(YT_spwn_NE,YT_spwn_SW)
 
 spwn_mult <- 10
 YT_spwn_hab <- create_spawn_hab_Bens(hab = hab$hab$spp1, spwnareas = YT_spwn, mult = spwn_mult)
-fields::image.plot(YT_spwn_hab)
+fields::image.plot(rotate(YT_spwn_hab))
 
 
 
@@ -342,12 +345,12 @@ Cod_spwn_ind <-which(hab$hab$spp2 >= .0007 , arr.ind=T) #514 are above .0007
 #will use northeast area between rows 0-44 and columns 60-144
 #use .0002 in NE corner 
 Cod_spwn_ind <-which(hab$hab$spp2 >= .0007 , arr.ind=T) #832 are above .0006
-Cod_spwn_NE <- Cod_spwn_ind[(Cod_spwn_ind[,1]>=0) & (Cod_spwn_ind[,1]<=44) & (Cod_spwn_ind[,2]>=60) & (Cod_spwn_ind[,2]<=144), ]
+Cod_spwn_NE <- Cod_spwn_ind[(Cod_spwn_ind[,1]>=0) & (Cod_spwn_ind[,1]<=44) & (Cod_spwn_ind[,2]>=90) & (Cod_spwn_ind[,2]<=144), ]
 
 
 spwn_mult <- 10
 Cod_spwn_hab <- create_spawn_hab_Bens(hab = hab$hab$spp2, spwnareas = Cod_spwn_NE, mult = spwn_mult)
-fields::image.plot(Cod_spwn_hab)
+fields::image.plot(rotate(Cod_spwn_hab))
 
 
 
@@ -362,21 +365,21 @@ Had_spwn_ind <-which(hab$hab$spp3 >= .0003 , arr.ind=T) #1431 are above .0003
 #will use northeast area between rows 0-44 and columns 60-144
 #use .0002 in NE corner 
 Had_spwn_ind <-which(hab$hab$spp3 >= .0003 , arr.ind=T) 
-Had_spwn_NE <- Had_spwn_ind[(Had_spwn_ind[,1]>=0) & (Had_spwn_ind[,1]<=44) & (Had_spwn_ind[,2]>=60) & (Had_spwn_ind[,2]<=144), ]
+Had_spwn_NE <- Had_spwn_ind[(Had_spwn_ind[,1]>=20) & (Had_spwn_ind[,1]<=36) & (Had_spwn_ind[,2]>=90) & (Had_spwn_ind[,2]<=144), ]
 
 
 #will use great south channel
 #SW between rows 20 to 50  and columns 25 to 45 
 
-Had_spwn_ind <-which(hab$hab$spp3 >= .0003 , arr.ind=T) 
-Had_spwn_SW <- Had_spwn_ind[(Had_spwn_ind[,1]>=20) & (Had_spwn_ind[,1]<=50) & (Had_spwn_ind[,2]>=20) & (Had_spwn_ind[,2]<=45), ]
+Had_spwn_ind <-which(hab$hab$spp3 >= .00009 , arr.ind=T) 
+Had_spwn_SW <- Had_spwn_ind[(Had_spwn_ind[,1]>=35) & (Had_spwn_ind[,1]<=50) & (Had_spwn_ind[,2]>=20) & (Had_spwn_ind[,2]<=45), ]
 
 Had_spwn <- rbind(Had_spwn_NE,Had_spwn_SW)
 
 
 spwn_mult <- 10
 Had_spwn_hab <- create_spawn_hab_Bens(hab = hab$hab$spp3, spwnareas = Had_spwn, mult = spwn_mult)
-fields::image.plot(Had_spwn_hab)
+fields::image.plot(rotate(Had_spwn_hab))
 
 
 
