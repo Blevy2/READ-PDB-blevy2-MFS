@@ -3,6 +3,97 @@
 editor_options: 
   chunk_output_type: console
 ---
+
+```{r}
+library(Rcpp)
+
+#just sum matrix for denominator and then do x1 / sum_mat. 1 year took 4.059 minutes
+cppFunction('
+            
+            double sum_mat(NumericVector M){
+            
+            double S = sum(M);
+            
+            return S;
+            }
+            ')
+
+sum(hab$hab$spp1[nonzero_idx[[1]]])
+
+sum_mat(hab$hab$spp1[nonzero_idx[[1]]])
+
+
+#normalize entire matrix in C++. 4.95 minutes for 1 year.
+#I think because I must use as.matrix to entier MM. Will change to vector instead below
+
+cppFunction('
+
+NumericMatrix norm_mat(NumericMatrix M, NumericMatrix MM, NumericMatrix Nzero_vals) {
+  //NumericMatrix MM = M(! is_na(M));
+  double sm = sum(MM);
+  int nNonzero = Nzero_vals.nrow();
+  
+  int nrow = M.nrow();
+  int ncol = M.ncol();
+  
+ 
+  
+  NumericMatrix new_val(nrow, ncol);// for storing new values
+  
+  for(int p = 0; p < nNonzero; p++)  {
+    
+    new_val(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) = M(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) / sm ;
+    
+    
+  }
+  
+  
+  return new_val;
+}
+')
+
+
+
+#normalize entire matrix in C++. Send MM as vector instead of using as.matrix()
+#took 4.71 minutes to run 1 year
+#norm_mat(x1, x1[nz[[s]]],Nzero_vals = nz[[s]])
+cppFunction('
+
+NumericMatrix norm_mat(NumericMatrix M, NumericVector MM, NumericMatrix Nzero_vals) {
+  
+  double sm = sum(MM);
+  int nNonzero = Nzero_vals.nrow();
+  
+  int nrow = M.nrow();
+  int ncol = M.ncol();
+  
+ 
+  
+  NumericMatrix new_val(nrow, ncol);// for storing new values
+  
+  for(int p = 0; p < nNonzero; p++)  {
+    
+    new_val(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) = M(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) / sm ;
+    
+    
+  }
+  
+  
+  return new_val;
+}
+')
+
+
+
+
+#integrated the normalization into the movement command. This runs the fastest: 3.82 minutes for 1 year
+
+
+
+```
+
+
+
   
   ## Habitat setup
 
@@ -141,7 +232,7 @@ STILL NEED: REC PARAMS, K GROWTH PARAMS
 Recr(model = "BH", params = list("a" = 1000, "b" = 450),
    B = max(Pop[["Start_pop"]][["spp1"]],na.rm=T), cv = 0)
 
-
+profvis::profvis({
 #decreasing population settings
 Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
                      hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
@@ -155,6 +246,8 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
                      M = c("spp1" = 0.25+0, "spp2" = 0.35+0, "spp3" = 0.2+.05), #CHANGE
                      K = c("spp1" = 0.3, "spp2" = 0.3, "spp3" = 0.3), #CHANGE
                      nz = nonzero_idx)
+
+})
 
 #})
 

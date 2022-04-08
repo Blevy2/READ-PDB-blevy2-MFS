@@ -19,10 +19,27 @@ using namespace Rcpp;
 //' @export
 //  [[Rcpp::export]]
 
-NumericMatrix norm_mat(NumericMatrix M, NumericVector MM) {
+NumericMatrix norm_mat(NumericMatrix M, NumericMatrix MM, NumericMatrix Nzero_vals) {
   //NumericMatrix MM = M(! is_na(M));
-  NumericMatrix S = M / sum(MM);
-  return S;
+  double sm = sum(MM);
+  int nNonzero = Nzero_vals.nrow();
+  
+  int nrow = M.nrow();
+  int ncol = M.ncol();
+  
+ 
+  
+  NumericMatrix new_val(nrow, ncol);// for storing new values
+  
+  for(int p = 0; p < nNonzero; p++)  {
+    
+    new_val(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) = M(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) / sm ;
+    
+    
+  }
+  
+  
+  return new_val;
 }
 
 
@@ -206,12 +223,14 @@ List move_prob_Lst(double lambda, NumericMatrix hab, NumericMatrix Nzero_vals) {
 //'
 //' @export
 // [[Rcpp::export]]
-List move_population(List moveProp, NumericMatrix StartPop, NumericMatrix Nzero_vals) {
+List move_population(List moveProp, NumericMatrix StartPop, NumericMatrix Nzero_vals, List HabTemp) {
   
   // Define matrix size
   int nrow = StartPop.nrow();
   int ncol = StartPop.ncol();
   int n = Nzero_vals.nrow();
+  
+
   
   // ONLY LOOP THROUGH CELLS WITH NONZERO VALUES
   int nNonzero = Nzero_vals.nrow(); //number of nonzero indices for given species
@@ -239,6 +258,11 @@ List move_population(List moveProp, NumericMatrix StartPop, NumericMatrix Nzero_
 
         //ONLY ALLOCATE THESE MATRICES IF WILL USE THEM
         NumericMatrix Props = moveProp[counter];  // update probs
+      
+      
+      NumericVector MM = HabTemp[counter];
+      //sum of hab*temp matrix for normalizing
+      double sm = sum(MM);
 
         // Calculate the distribution of the population from the cell 
         
@@ -247,7 +271,7 @@ List move_population(List moveProp, NumericMatrix StartPop, NumericMatrix Nzero_
           
           
           // Allocate cell pop to the new pop matrix
-          outPop(Nzero_vals(i,0)-1,Nzero_vals(i,1)-1) = Props(Nzero_vals(i,0)-1,Nzero_vals(i,1)-1) * CellPop;
+          outPop(Nzero_vals(i,0)-1,Nzero_vals(i,1)-1) = (Props(Nzero_vals(i,0)-1,Nzero_vals(i,1)-1) * CellPop) / sm;
           // std::cout << Props(i,j) << std::endl;
           
         }

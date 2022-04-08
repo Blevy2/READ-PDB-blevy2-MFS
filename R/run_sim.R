@@ -54,9 +54,42 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
   ##### Temporary containers ########
   ###################################
   
+  
+#   require(Rcpp)
+#   require(inline)
+#   
+#   fx <- cxxfunction( signature( x_ = "matrix" ), '
+#     NumericMatrix x(x_) ;
+#     int nr = x.nrow(), nc = x.ncol() ;
+#     std::vector< std::vector<double> > vec( nc ) ;
+#     for( int i=0; i<nc; i++){
+#         NumericMatrix::Column col = x(_,i) ;
+#         vec[i].assign( col.begin() , col.end() ) ;
+#     }
+#     // now do whatever with it
+#     // for show here is how Rcpp::wrap can wrap vector<vector<> >
+#     // back to R as a list of numeric vectors
+#     return wrap( vec ) ;
+# ', plugin = "Rcpp" )
+#   
+  
+  
+  
   Rec  <- vector("list", n_spp) # For storing spatial recruitment, is overwritten
-  names(Rec) <- paste0("spp", seq_len(n_spp))
+ 
+  Rec<- lapply(seq_len(n_spp), function(s) {
+ 
+      
+      rec <- matrix(0, ncol = ncols, nrow = nrows)
+      
+     })
+  
+  
   for(s in paste0("spp",seq_len(n_spp))) { Rec[[s]] <- 0 }
+  
+  
+  
+  
   B    <- pop_init[["Start_pop"]]  # For storing current biomass, is overwritten
   Bm1  <- pop_init[["Start_pop"]]  # For storing last time-step biomass, is overwritten
   
@@ -189,11 +222,11 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     })
     
   
-    print(Recruit[[1]])
+   # print(Recruit[[1]])
     
-    print(Recruit[[2]])
+    #print(Recruit[[2]])
     
-    print(Recruit[[3]])
+  #  print(Recruit[[3]])
     
     
     if(t != ntow) {
@@ -243,13 +276,28 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     #   if(week.breaks[t] == pop_init[["dem_params"]][[s]][["rec_wk"]][1]) {
  
 
-    lapply(seq_len(n_spp), function(s) {
-      print(s)
+    Rec<- lapply(seq_len(n_spp), function(s) {
+   #   print(s)
 
-      #set as matrix of zeros and override if needed
-    Rec[[paste0("spp", s)]] <- matrix(0, ncol = ncols, nrow = nrows)
-View(Rec)
-  
+      #if outside recruitment weeks or in first year, set as matrix of zeros
+     
+       if( !week.breaks[t] %in% pop_init[["dem_params"]][[s]][["rec_wk"]]  | year.breaks[t]==1 ) {
+      
+      
+    rec <- matrix(0, ncol = ncols, nrow = nrows)
+
+       }
+      
+      
+      #if weeks 2 through end of recruitment, use value from first week
+      if( week.breaks[t] %in% tail(pop_init[["dem_params"]][[s]][["rec_wk"]],n=length(pop_init[["dem_params"]][[s]][["rec_wk"]])-1) ) {
+        
+        
+        rec <- Rec[[s]]
+        
+      }
+      
+      
     if(Recruit[[s]]) { # Check for new week
 
     #  print("Recruiting")
@@ -307,32 +355,28 @@ View(Rec)
 
         }
 
-      Rec[[paste0("spp", s)]] <- rec
-
-
-
-  
-
-
+    
 
 
     }
-
+ rec
 
     })
-    View(MoveProb)
-      View(Rec)
-      print("sum rec")
-      print("spp1")
-      print(sum(Rec[["spp1"]]))
-      print("sum rec")
-      print("spp2")
-      print(sum(Rec[["spp2"]]))
-      print("sum rec")
-      print("spp3")
-      print(sum(Rec[["spp3"]]))
     
-  
+    names(Rec) <- paste0("spp", seq_len(n_spp))
+   
+    #  View(Rec)
+      # print("sum rec")
+      # print("spp1")
+      # print(sum(Rec[["spp1"]]))
+      # print("sum rec")
+      # print("spp2")
+      # print(sum(Rec[["spp2"]]))
+      # print("sum rec")
+      # print("spp3")
+      # print(sum(Rec[["spp3"]]))
+      # 
+      # 
   
   
     ##########################
@@ -605,15 +649,36 @@ View(Rec)
             #                           Nzero_col = as.vector(nonzero_idx[[s]][,2]))
           #  print(class(x1[nz[[1]]]))
       #      print(")
-            newPop <- move_population(moveProp = lapply(lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),
-                                      StartPop = Bp1[[s]], Nzero_vals = nz[[s]])
+            
+            
+            # newPop <- move_population(moveProp = lapply(lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(x1, x1[nz[[s]]],Nzero_vals = nz[[s]]) ),   #norm_mat(fx(as.matrix(x1)), fx(as.matrix(x1[nz[[s]]])),Nzero_vals = nz[[s]])
+            #                           StartPop = Bp1[[s]], Nzero_vals = nz[[s]])
+
+            MP = lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp)
+            #HabTemp = lapply(MP[[s]], function(x) x[nz[[s]]])
+            # View(MP)
+            # View(Bp1)
+            # View(nz)
+            # View(HabTemp)
+            # print(class(Bp1[[1]]))
+            # print(class(MP[[1]]))
+            # View(MP[[1]][nz[[1]]])
+            # print(class(MP[[1]][nz[[1]]]))
+            # View(MP[[1]][nz[[1]]])
+            
+            newPop <- move_population(moveProp = MP ,   #norm_mat(fx(as.matrix(x1)), fx(as.matrix(x1[nz[[s]]])),Nzero_vals = nz[[s]])
+                                      StartPop = Bp1[[s]], Nzero_vals = nz[[s]], HabTemp = lapply(MP, function(x) x[nz[[s]]]))
+            
        #     print(2")
           }
        
           if(week.breaks[t] %in% pop_init[["dem_params"]][[s]][["spwn_wk"]]) {
+            
+            MP = lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp)
+            
             #	  print("spawning movement")
-            newPop <- move_population(moveProp = lapply(lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),
-                                      StartPop = Bp1[[s]], Nzero_vals = nz[[s]])
+            newPop <- move_population(moveProp = MP, #  norm_mat(fx(as.matrix(x1)), fx(as.matrix(x1[nz[[s]]])),Nzero_vals = nz[[s]])
+                                      StartPop = Bp1[[s]], Nzero_vals = nz[[s]], HabTemp = lapply(MP, function(x) x[nz[[s]]]))
           }
          #    print( "here41")
           Reduce("+", newPop)
@@ -633,15 +698,18 @@ View(Rec)
           
           ## If in a non-spawning week or spawning week
           if(!week.breaks[t] %in% pop_init[["dem_params"]][[s]][["spwn_wk"]]) {
+            MP = lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp)
            # print( "here4b1")
-            newPop <- move_population(lapply(lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),
-                                      StartPop = Bm1[[s]], Nzero_vals = nz[[s]])
+            MP = lapply(MoveProb[[s]], function(x) x * move_cov_wk_spp)
+            newPop <- move_population(moveProp = MP , #  norm_mat(fx(as.matrix(x1)), fx(as.matrix(x1[nz[[s]]])),Nzero_vals = nz[[s]])
+                                      StartPop = Bm1[[s]], Nzero_vals = nz[[s]], HabTemp = lapply(MP, function(x) x[nz[[s]]]))
            # print( "here4b2")
           }
           
           if(week.breaks[t] %in% pop_init[["dem_params"]][[s]][["spwn_wk"]]) {
-            newPop <- move_population(lapply(lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp), function(x1) norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))),    #c++ version: norm_mat(as.matrix(x1[nz[[s]]]))   vs: norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))
-                                      StartPop = Bm1[[s]], Nzero_vals = nz[[s]])
+            MP = lapply(MoveProb_spwn[[s]], function(x) x * move_cov_wk_spp)
+            newPop <- move_population(moveProp = MP , # norm_mat(fx(as.matrix(x1)), fx(as.matrix(x1[nz[[s]]])),Nzero_vals = nz[[s]])    #c++ version: norm_mat(as.matrix(x1[nz[[s]]]))   vs: norm_mat(as.matrix(x1), as.vector(x1[nz[[s]]]))
+                                      StartPop = Bm1[[s]], Nzero_vals = nz[[s]], HabTemp = lapply(MP, function(x) x[nz[[s]]]))
           }
         #  print( "here4a1")
           Reduce("+", newPop)

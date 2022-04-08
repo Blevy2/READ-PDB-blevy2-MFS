@@ -12,8 +12,8 @@
 #' @examples sum_mat(M)
 #'
 #' @export
-norm_mat <- function(M, MM) {
-    .Call('_MixFishSim_norm_mat', PACKAGE = 'MixFishSim', M, MM)
+norm_mat <- function(M, MM, Nzero_vals) {
+    .Call('_MixFishSim_norm_mat', PACKAGE = 'MixFishSim', M, MM, Nzero_vals)
 }
 
 #' @title distance calculation
@@ -95,7 +95,7 @@ move_prob_Lst <- function(lambda, hab, Nzero_vals) {
 #' @examples None at the moment
 #'
 #' @export
-move_population <- function(moveProp, StartPop, Nzero_vals) {
-    .Call('_MixFishSim_move_population', PACKAGE = 'MixFishSim', moveProp, StartPop, Nzero_vals)
+move_population <- function(moveProp, StartPop, Nzero_vals, HabTemp) {
+    .Call('_MixFishSim_move_population', PACKAGE = 'MixFishSim', moveProp, StartPop, Nzero_vals, HabTemp)
 }
 

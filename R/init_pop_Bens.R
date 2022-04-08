@@ -106,7 +106,14 @@ Pop <- lapply(names(Bio), function(x) {
 		     # PopIn <- move_population(moveProp = MoveProp, StartPop = PopIn,       
 		      #                         Nzero_vals = NZi)
 		       # print(i)
-		        PopIn <- move_population(moveProp = MoveProp, StartPop = PopIn, Nzero_vals = NZi )  
+		        #PopIn <- move_population(moveProp = MoveProp, StartPop = PopIn, Nzero_vals = NZi )  
+		        
+		        # MP = lapply(lapply(MoveProp, function(x1) x1), function(x) x * move_cov_wk_spp)
+		        # View(MP)
+		        #	  print("spawning movement")
+		        PopIn <- move_population(moveProp = MoveProp, #  norm_mat(fx(as.matrix(x1)), fx(as.matrix(x1[nz[[s]]])),Nzero_vals = nz[[s]])
+		                                  StartPop = PopIn, Nzero_vals = nz[[x]], HabTemp = lapply(MoveProp, function(x1) x1[nz[[x]]]))
+		        
 		        
 		      PopIn <- Reduce("+", PopIn)
 		     # print(class(PopIn))
