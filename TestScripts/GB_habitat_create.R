@@ -426,11 +426,10 @@ saveRDS(hab, file="hab_GB_3species.RDS")
 moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
 
 
-#add temp tolerances order: had, cod, yellow
-moveCov[["spp_tol"]] <- list() #just in case
-moveCov[["spp_tol"]] <- list("spp1" = list("mu" = 9, "va" = 4), 
-                             "spp2" = list("mu" = 8.75, "va" = 4.25), 
-                             "spp3" = list("mu" = 9, "va" = 4) )
+#order: , Yellowtail, Cod, Haddock
+tol_list <- list("spp1" = list("mu" = 9, "va" = 4),  #Yellowtail
+                 "spp2" = list("mu" = 8.75, "va" = 4.25),  #Cod
+                 "spp3" = list("mu" = 9, "va" = 4) )    #Haddock
 
 
 
@@ -457,6 +456,8 @@ zmax <- max(unlist(lapply(moveCov$cov.matrix,FUN=max, na.rm=T)))
 zmin <- min(unlist(lapply(moveCov$cov.matrix,FUN=min, na.rm=T)))
 
 
+
+#plot same week on each page. GOOD FOR INCREASING TEMP SITUATION
 for(k in seq(12)){
   
   par(mfrow = c(5,4),mar = c(1, 1, 1, 1))
@@ -482,6 +483,37 @@ for(k in seq(12)){
 }
 
 
+
+
+
+#PLOT SINGLE YEAR EACH ON OWN PAGE. GOOD FOR CONSTANT TEMP SITUATION
+  for(i in seq(52)){
+ 
+    
+     par(mfrow = c(1,1),mar = c(1, 1, 1, 1))
+  
+  
+
+    
+    temp_rotate <- rotate(moveCov$cov.matrix[[i]])
+    
+    fields::image.plot(temp_rotate, zlim = c(zmin,zmax))
+    
+    #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
+    #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
+    text(0.5, 0.98, labels = paste( 'Week', (i)), cex = 1)
+    
+    
+  }
+  
+  
+
+
+
+
+
+
+
 dev.off()
 
 
@@ -490,22 +522,23 @@ dev.off()
 
 
 
-spp_names <- c("Haddock","Cod","Yellowtail Flounder")
+spp_names <- c("Yellowtail Flounder","Cod","Haddock")
 
-spp_names_short <- c("HAD","COD","YTF")
+spp_names_short <- c("YTF","COD","HAD")
 
 month_nm <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
 
 #deifne spawning weeks (made up for now)
-spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ),
+spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  )
 
 
 
-#order: Haddock, Cod, Yellowtail
-tol_list <- list("spp1" = list("mu" = 9, "va" = 4),  #Haddock
+#order: , Yellowtail, Cod, Haddock
+tol_list <- list("spp1" = list("mu" = 9, "va" = 4),  #Yellowtail
                  "spp2" = list("mu" = 8.75, "va" = 4.25),  #Cod
-                 "spp3" = list("mu" = 9, "va" = 4) )    #Yellowtail
+                 "spp3" = list("mu" = 9, "va" = 4) )    #Haddock
+
 
 
 
@@ -620,8 +653,8 @@ for(s in seq_len(length(hab[["hab"]]))) {
       fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F, zlim = c(zmin[s],zmax[s]) )
     }
     #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
-    #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
-    text(0.5, 0.98, labels = paste(spp_names[s], month_nm[floor(i/(13/3))+1] , 'Week', (i)%%52), cex = 1)
+    #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))  month_nm[floor(i/(13/3))+1] ,
+    text(0.5, 0.98, labels = paste(spp_names[s],  'Week', (i)%%52), cex = 1)
     
     maxtemp1[i]<- max(temp_rotate,na.rm=T)
     mintemp1[i]<- min(temp_rotate,na.rm=T)
@@ -846,12 +879,12 @@ for(s in seq_len(length(hab[["hab"]]))) {
     }
     # col = grey(seq(1,0,l = 51)),
     if(i %in% spwn_wk[[s]]) {
-      temp_rotate <- rotate(hab[["hab"]][[paste0('spp',s)]]^2 * move_cov_wk_spp)
+      temp_rotate <- rotate(hab[["spwn_hab"]][[paste0('spp',s)]]^2 * move_cov_wk_spp)
       fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 1, axes = F )
     }
     #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
     #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
-    text(0.5, 0.98, labels = paste(spp_names[s],  month_nm[floor(i/(13/3))+1] , 'Week', (i)%%52), cex = 1)
+    text(0.5, 0.98, labels = paste(spp_names[s], 'Week', (i)%%52), cex = 1)
     
     maxtemp1[i]<- max(temp_rotate,na.rm=T)
     mintemp1[i]<- min(temp_rotate,na.rm=T)
