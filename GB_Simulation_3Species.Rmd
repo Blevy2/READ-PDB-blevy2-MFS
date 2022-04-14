@@ -113,7 +113,9 @@ If plot.dist = TRUE, it returns the plots to a file.
 
 #LOAD HABITAT PREVIOUSLY CREATED
 #hab <- readRDS(file="hab_justYT.RDS") #finer resolution
-hab <- readRDS(file="hab_justYT2.RDS") #courser resolution
+#hab <- readRDS(file="hab_justYT2.RDS") #courser resolution
+
+hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
 
 
 #plot strata
@@ -124,10 +126,21 @@ fields::image.plot(hab$stratas)
 par(mar=c(1,1,1,1))
 fields::image.plot(hab[["hab"]][["spp1"]])
 
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["hab"]][["spp2"]])
+
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["hab"]][["spp3"]])
+
 #plot spawn habitat
 par(mar=c(1,1,1,1))
 fields::image.plot(hab[["spwn_hab"]][["spp1"]])
 
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["spwn_hab"]][["spp2"]])
+
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["spwn_hab"]][["spp3"]])
 
 
 ```
@@ -187,7 +200,7 @@ We can plot the starting distributions for each population as a check.
 
 ```{r pop_init}
 
-hab <- readRDS("hab_GB_3species.RDS")
+#hab <- readRDS("hab_GB_3species.RDS")
 
 #rebuild package
 devtools::build()
@@ -226,28 +239,24 @@ names(nonzero_idx) <- paste("spp",seq_len(sim$idx[["n.spp"]]), sep ="")
 
 #YELLOWTAIL, COD, HADDOCK
 
-STILL NEED: REC PARAMS, K GROWTH PARAMS
 
 
-Recr(model = "BH", params = list("a" = 1000, "b" = 450),
-   B = max(Pop[["Start_pop"]][["spp1"]],na.rm=T), cv = 0)
-
-profvis::profvis({
+#profvis::profvis({
 #decreasing population settings
 Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
                      hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
                      lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
                      init_move_steps = 20,
-                     rec_params = list("spp1" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0),
-                                       "spp2" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0),
-                                       "spp3" = c("model" = "BH", "a" = 2, "b" = 4, "cv" = 0)), #CHANGE
+                     rec_params = list("spp1" = c("model" = "BH", "a" = 108582, "b" = 4301, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 25922 , "b" = 3491, "cv" = 0),
+                                       "spp3" = c("model" = "BH", "a" = 157783, "b" = 40530, "cv" = 0)), #CHANGE
                      rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
-                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), #CORRECT FOR YTF
-                     M = c("spp1" = 0.25+0, "spp2" = 0.35+0, "spp3" = 0.2+.05), #CHANGE
-                     K = c("spp1" = 0.3, "spp2" = 0.3, "spp3" = 0.3), #CHANGE
+                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
+                     M = c("spp1" = 1.478+.358, "spp2" = 1.299+.511, "spp3" = 1.097+.7985), #NEED F
+                     K = c("spp1" = 1.417, "spp2" = 1.801, "spp3" = 1.422), 
                      nz = nonzero_idx)
 
-})
+#})
 
 #})
 
