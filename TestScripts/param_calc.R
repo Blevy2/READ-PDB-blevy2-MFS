@@ -1,6 +1,10 @@
-#This script reads in weight info (avg weight by age and avg number by age) for each species to calculate weighted mean of adults
-#This value is used to calculate phi0 and in delay_diff for MFS
+#This script calculates various parameters for mixfishsim input
 
+##################################################################
+#first calculate weighted average of prerecruits and adults
+#reads in weight info (avg weight by age and avg number by age) for each species to calculate weighted mean of adults
+#This value is used to calculate phi0 and in delay_diff for MFS
+##################################################################
 
 
 #1- YELLOWTAIL FLOUNDER
@@ -179,6 +183,130 @@ Had_adult_weightmean <- sum(Had_FRW_mean*Had_FRN_mean)/sum(Had_FRN_mean)
 Had_prerec_weightmean <- sum(Had_PRN_mean*Had_PRW_mean)/sum(Had_PRN_mean)
 
 
+
+
+
+
+
+################################################################################
+# calculate weighted fishing mortality F for adults and prerecruits
+################################################################################
+
+
+
+#1- YELLOWTAIL FLOUNDER
+
+YT_all_F <- read.csv("C:\\Users\\benjamin.levy\\Desktop\\NOAA\\Stock Assessment Review Committee (SARC) Docs\\YT Fishing Mort Info.csv",header=TRUE,stringsAsFactors=FALSE)
+
+YT_row_F <- nrow(YT_all_F) #total number of observations (top half for weight bottom half for corresponding numbers)
+
+YT_PreRecAge <- 1 #age before they are recruited (1)
+YT_AdultAge <-  2 #age when they become adults (2)
+
+YT_F <- YT_all_F[1:(YT_row/2),] #weight by age
+YT_N <- YT_all_F[(YT_row/2+1):YT_row,] #number by age
+
+#Pre recruit weight. Add +1 bc col 1 has year
+YT_PRF <- as.numeric(YT_F[,(YT_PreRecAge+1)])
+
+#Pre recruit numbers. Add +1 bc col 1 has year
+YT_PRN <- YT_N[,(YT_PreRecAge+1)]
+#remove commas
+YT_PRN <- as.numeric(gsub(",", "", YT_PRN))
+
+#calculate mean 
+YT_PRN_mean <- mean(YT_PRN)
+YT_PRF_mean <- mean(YT_PRF)
+
+#Fully recruited (ie adult) F. Add +1 bc col 1 has year
+YT_FRF <- YT_F[,(YT_AdultAge+1):ncol(YT_F)]
+#Pre recruit numbers. Add +1 bc col 1 has year
+YT_FRN <- YT_N[,(YT_AdultAge+1):ncol(YT_F)]
+#change each of above from characters to numeric
+temp1 <- matrix(0,ncol=ncol(YT_FRF),nrow=nrow(YT_FRF))
+temp2 <- matrix(0,ncol=ncol(YT_FRF),nrow=nrow(YT_FRF))
+for(i in seq(ncol(YT_FRF))){
+  
+  temp1[,i] <- as.numeric(YT_FRF[,i])
+  
+  temp3 <- YT_FRN[,i]
+  temp2[,i] <- as.numeric(gsub(",","",temp3))
+  
+}
+YT_FRF <- temp1
+YT_FRN <- temp2
+
+#calculate mean for each year
+YT_FRF_mean <- colMeans(YT_FRF)
+YT_FRN_mean <- colMeans(YT_FRN)
+
+
+#final adult weighted mean is sum(weight_i*x_i)/(sum(weights))
+YT_adult_Fmean <- sum(YT_FRF_mean*YT_FRN_mean)/sum(YT_FRN_mean)
+
+YT_prerec_Fmean <- sum(YT_PRN_mean*YT_PRF_mean)/sum(YT_PRN_mean)
+
+
+
+#2- Cod
+
+Cod_all_F <- read.csv("C:\\Users\\benjamin.levy\\Desktop\\NOAA\\Stock Assessment Review Committee (SARC) Docs\\Cod Fishing Mort Info.csv",header=TRUE,stringsAsFactors=FALSE)
+
+Cod_row_F <- nrow(Cod_all_F) #total number of observations (top half for weight bottom half for corresponding numbers)
+
+Cod_PreRecAge <- 1 #age before they are recruited (1)
+Cod_AdultAge <-  2 #age when they become adults (2)
+
+Cod_F <- Cod_all_F[1:(Cod_row/2),] #weight by age
+Cod_N <- Cod_all_F[(Cod_row/2+1):Cod_row,] #number by age
+
+#Pre recruit weight. Add +1 bc col 1 has year
+Cod_PRF <- as.numeric(Cod_F[,(Cod_PreRecAge+1)])
+
+#Pre recruit numbers. Add +1 bc col 1 has year
+Cod_PRN <- Cod_N[,(Cod_PreRecAge+1)]
+#remove commas
+Cod_PRN <- as.numeric(gsub(",", "", Cod_PRN))
+
+#calculate mean 
+Cod_PRN_mean <- mean(Cod_PRN)
+Cod_PRF_mean <- mean(Cod_PRF)
+
+#Fully recruited (ie adult) F. Add +1 bc col 1 has year
+Cod_FRF <- Cod_F[,(Cod_AdultAge+1):ncol(Cod_F)]
+#Pre recruit numbers. Add +1 bc col 1 has year
+Cod_FRN <- Cod_N[,(Cod_AdultAge+1):ncol(Cod_F)]
+#change each of above from characters to numeric
+temp1 <- matrix(0,ncol=ncol(Cod_FRF),nrow=nrow(Cod_FRF))
+temp2 <- matrix(0,ncol=ncol(Cod_FRF),nrow=nrow(Cod_FRF))
+for(i in seq(ncol(Cod_FRF))){
+  
+  temp1[,i] <- as.numeric(Cod_FRF[,i])
+  
+  temp3 <- Cod_FRN[,i]
+  temp2[,i] <- as.numeric(gsub(",","",temp3))
+  
+}
+Cod_FRF <- temp1
+Cod_FRN <- temp2
+
+#calculate mean for each year
+Cod_FRF_mean <- colMeans(Cod_FRF)
+Cod_FRN_mean <- colMeans(Cod_FRN)
+
+
+#final adult weighted mean is sum(weight_i*x_i)/(sum(weights))
+Cod_adult_Fmean <- sum(Cod_FRF_mean*Cod_FRN_mean)/sum(Cod_FRN_mean)
+
+Cod_prerec_Fmean <- sum(Cod_PRN_mean*Cod_PRF_mean)/sum(Cod_PRN_mean)
+
+
+
+
+
+#3- Haddock was estimated from a plot
+#Figure B116 shows FullF ranging from ~0.15-.75 since 2000. 
+#I think this is after exponentiation so lets say e^F = .45 so that F = ln(.45) = -.7985
 
 
 
