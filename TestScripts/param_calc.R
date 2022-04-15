@@ -320,15 +320,15 @@ Cod_prerec_Fmean <- sum(Cod_PRN_mean*Cod_PRF_mean)/sum(Cod_PRN_mean)
 
 phi0 <- function(M = NULL, Adult_weight = NULL, PreRecruit_weight = NULL){
   
-  p0 <- exp(M)*(Adult_weight/PreRecruit_weight)
+  p0 <- exp(-M)*(Adult_weight/PreRecruit_weight)
   return(p0)
 }
 
-YT_phi0 <- phi0(M = -1.478, Adult_weight = .39, PreRecruit_weight = .13)
+YT_phi0 <- phi0(M = .2064, Adult_weight = .39, PreRecruit_weight = .13)
 
-Cod_phi0 <- phi0(M = -1.299, Adult_weight = 2.95, PreRecruit_weight = .39)
+Cod_phi0 <- phi0(M = .2728, Adult_weight = 2.95, PreRecruit_weight = .39)
 
-Had_phi0 <- phi0(M = -1.097, Adult_weight = 1.12, PreRecruit_weight = .19)
+Had_phi0 <- phi0(M = .334, Adult_weight = 1.12, PreRecruit_weight = .19)
 
 
 #define R0 for each species (see notes document for details on values)
