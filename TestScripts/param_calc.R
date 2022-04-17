@@ -373,13 +373,13 @@ beta(h= YT_h, R0= YT_R0, phi0= YT_phi0)
 
 #Cod
 Cod_h<- .793
-  
+
 alpha(h= Cod_h, R0 = Cod_R0)
 beta(h= Cod_h, R0= Cod_R0, phi0= Cod_phi0)
 
 #Haddock
 Had_h <- .657
-  
+
 alpha(h= Had_h, R0 = Had_R0)
 beta(h= Had_h, R0= Had_R0 , phi0= Had_phi0)
 
@@ -390,19 +390,19 @@ beta(h= Had_h, R0= Had_R0 , phi0= Had_phi0)
 
 #yellowtail biomass range
 YT_range <- seq(0,90000)
-YT_params <- list("a"=108582,"b"=4301)  #alph,beta
+YT_params <- list("a"=30445,"b"=4301)  #alph,beta
 
-Cod_range <- seq(0,200000)
-Cod_params <- list("a"=77766,"b"=10472)  #alph,beta
+Cod_range <- seq(0,170000)
+Cod_params <- list("a"=27868,"b"=10472)  #alph,beta
 
 
 Had_range <- seq(0,300000)
-Had_params <- list("a"=157783,"b"=40530)  #alph,beta
+Had_params <- list("a"=73568,"b"=40530)  #alph,beta
 
 
 #change range, params and abline input
-range <- YT_range
-params_ <- YT_params
+range <- Cod_range
+params_ <- Cod_params
 rec <- vector()
 for(i in range){
   rec[i] <- Recr(model = "BH", params = params_, B = i, cv = 0)
@@ -411,7 +411,7 @@ for(i in range){
 plot(rec)
 
 #add intersection line
-abline(0,1/YT_phi0)
+abline(0,1/Cod_phi0)
 
 
 
