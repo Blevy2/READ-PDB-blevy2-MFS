@@ -254,8 +254,8 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
                      spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
                      M = c("spp1" = .2064+.358, "spp2" = .2728+.511, "spp3" = .334+.45), #NEED F
                      K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
-                     Weight_PreRecruit = (c("spp1" = .13, "spp2" = 2.95, "spp3" = .19)),
-                     Weight_Adult = (c("spp1" = .39, "spp2" = .39, "spp3" = 1.12)),
+                     Weight_PreRecruit = (c("spp1" = .13, "spp2" = .39, "spp3" = .19)),
+                     Weight_Adult = (c("spp1" = .39, "spp2" = 2.95, "spp3" = 1.12)),
                      nz = nonzero_idx)
 
 #})
