@@ -42,7 +42,7 @@
 
 #' @export
 
-init_pop_Bens <- function(nz = NULL,sim_init = sim_init, Bio = NULL, hab = NULL, start_cell = NULL, lambda = NULL, init_move_steps = 10, rec_params = NULL, rec_wk = NULL, spwn_wk = NULL, M = NULL, K = NULL, cores = 3) {
+init_pop_Bens <- function(nz = NULL,sim_init = sim_init, Bio = NULL, hab = NULL, start_cell = NULL, lambda = NULL, init_move_steps = 10, rec_params = NULL, rec_wk = NULL, spwn_wk = NULL, M = NULL, K = NULL, cores = 3, Weight_PreRecruit = NULL, Weight_Adult = NULL) {
 
 # extract the indices
 idx <- sim_init[["idx"]]
@@ -158,7 +158,7 @@ names(Pop_vec) <- paste("spp",seq(idx[["n.spp"]]), sep ="")
 
 dem_params <- lapply(names(Bio), function(x) {
 
-dem_params = list(rec_params = rec_params[[x]], rec_wk = rec_wk[[x]], spwn_wk = spwn_wk[[x]], M = M[[x]], K = K[[x]], lambda = lambda[[x]])
+dem_params = list(rec_params = rec_params[[x]], rec_wk = rec_wk[[x]], spwn_wk = spwn_wk[[x]], M = M[[x]], K = K[[x]], lambda = lambda[[x]], Weight_PreRecruit =  Weight_PreRecruit[[x]], Weight_Adult = Weight_Adult[[x]] )
 
 return(dem_params)
 		  
