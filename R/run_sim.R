@@ -222,11 +222,11 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     })
     
   
-   # print(Recruit[[1]])
-    
-    #print(Recruit[[2]])
-    
-  #  print(Recruit[[3]])
+    print(Recruit[[1]])
+
+  print(Recruit[[2]])
+
+   print(Recruit[[3]])
     
     
     if(t != ntow) {
@@ -317,11 +317,22 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
 
                     #NEED TO ACCOUNT FOR ALPHA IN POP DYNMAICS BY SCALING UP RECRUITMENT FOR 1 WEEK
 
-                    rec <- length(pop_init[["dem_params"]][[s]][["rec_wk"]])*Recr_mat(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
+                    # rec <- length(pop_init[["dem_params"]][[s]][["rec_wk"]])*Recr_mat(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
+                    #                                                                   params = c("a" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["a"]]),
+                    #                                                                              "b" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["b"]])),
+                    #                                                                   B = B[[s]], #THIS IS NEW. USE CURRENT POP IN FIRST YEAR
+                    #                                                                   cv = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["cv"]])),
+                    
+                    
+                    #TRYING RECR.R INSTEAD OF RECR_MAT.R
+                    {SB <- sum(B[[s]],na.rm=T)
+                    rec1 <- length(pop_init[["dem_params"]][[s]][["rec_wk"]])*Recr(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
                                                                                       params = c("a" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["a"]]),
                                                                                                  "b" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["b"]])),
-                                                                                      B = B[[s]], #THIS IS NEW. USE CURRENT POP IN FIRST YEAR
-                                                                                      cv = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["cv"]])),
+                                                                                      B = SB, #THIS IS NEW. USE CURRENT POP IN FIRST YEAR
+                                                                                      cv = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["cv"]]))
+                    rec <- rec1*B[[s]]/SB},
+                    
                     rec <- matrix(0, ncol = ncols, nrow = nrows)
             )
 
@@ -331,12 +342,22 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
 
             last_spwn <- tail(pop_init[["dem_params"]][[s]][["rec_wk"]],n=1)
 
-            rec <- Recr_mat(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
+            # rec <- Recr_mat(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
+            #                 params = c("a" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["a"]]),
+            #                            "b" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["b"]])),
+            #                 B = pop_bios[[year.breaks[t]-1, week.breaks[last_spwn]]][[s]], #THIS IS NEW. USING PREVIOUS YEARS POPULATION VALUE AT END OF RECRUITMENT TO MAKE PULSE IN SPAWNING GROUND
+            #                 cv = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["cv"]]))
+            
+            #TRYING RECR.R INSTEAD OF RECR_MAT.
+            SB1 <- sum(pop_bios[[year.breaks[t]-1, week.breaks[last_spwn]]][[s]],na.rm=T)
+            
+            rec1 <- Recr(model = pop_init[["dem_params"]][[s]][["rec_params"]][["model"]],
                             params = c("a" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["a"]]),
                                        "b" = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["b"]])),
-                            B = pop_bios[[year.breaks[t]-1, week.breaks[last_spwn]]][[s]], #THIS IS NEW. USING PREVIOUS YEARS POPULATION VALUE AT END OF RECRUITMENT TO MAKE PULSE IN SPAWNING GROUND
+                            B = SB1, #THIS IS NEW. USING PREVIOUS YEARS POPULATION VALUE AT END OF RECRUITMENT TO MAKE PULSE IN SPAWNING GROUND
                             cv = as.numeric(pop_init[["dem_params"]][[s]][["rec_params"]][["cv"]]))
-
+            
+            rec <- rec1*pop_bios[[year.breaks[t]-1, week.breaks[last_spwn]]][[s]]/SB1
           }
         }
 
@@ -366,17 +387,17 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     names(Rec) <- paste0("spp", seq_len(n_spp))
    
     #  View(Rec)
-      # print("sum rec")
-      # print("spp1")
-      # print(sum(Rec[["spp1"]]))
-      # print("sum rec")
-      # print("spp2")
-      # print(sum(Rec[["spp2"]]))
-      # print("sum rec")
-      # print("spp3")
-      # print(sum(Rec[["spp3"]]))
-      # 
-      # 
+      print("sum rec")
+      print("spp1")
+      print(sum(Rec[["spp1"]]))
+      print("sum rec")
+      print("spp2")
+      print(sum(Rec[["spp2"]]))
+      print("sum rec")
+      print("spp3")
+      print(sum(Rec[["spp3"]]))
+
+
   
   
     ##########################
@@ -509,6 +530,13 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     # Need B-1 and B to calc B+1
     
    # print( "here1")
+      print("pre pop dynamics")
+      print("sum of Spp1")
+      print(sum(B[[1]]))
+      print("sum of Spp2")
+      print(sum(B[[2]]))
+      print("sum of Spp3")
+      print(sum(B[[3]]))
     
     if(Pop_dyn) { #POP_DYN IS SET ON LINE 143
       
@@ -552,16 +580,24 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
        # print(sum(Rec[[x]]))
         #View(B[[x]])
         
+        #portion out 1/(# recruit weeks) of recruitment each recruitment week 
+        #except for year 1 in which case all of it will be put out in final week of recruitment
+        
         al   <- ifelse(week.breaks[t] %in% pop_init[["dem_params"]][[x]][["rec_wk"]],
-                       1/length(pop_init[["dem_params"]][[x]][["rec_wk"]]), 0)
-        alm1 <- ifelse(c(week.breaks[t]-1) %in% pop_init[["dem_params"]][[x]][["rec_wk"]],
-                       1/length(pop_init[["dem_params"]][[x]][["rec_wk"]]), 0)
+                       1/length(pop_init[["dem_params"]][[x]][["rec_wk"]]) 
+                       , 0)
+        alm1 <- ifelse((week.breaks[t]-1) %in% pop_init[["dem_params"]][[x]][["rec_wk"]],
+                       ifelse(year.breaks[t]==1,0,
+                              1/length(pop_init[["dem_params"]][[x]][["rec_wk"]]))
+                       , 0)
        # print("al and alm1 are")
        # print(al)
        # print(alm1)
         
+        print(sum(Rec[[x]]))
+        
         res <- delay_diff(K = pop_init[["dem_params"]][[x]][["K"]], F = spat_fs[[x]], 
-                          M = pop_init[["dem_params"]][[x]][["M"]]/365, 
+                          M = pop_init[["dem_params"]][[x]][["M"]]/52, 
                           wt = pop_init[["dem_params"]][[x]][["Weight_Adult"]], 
                           wtm1 = pop_init[["dem_params"]][[x]][["Weight_PreRecruit"]], 
                           R = Rec[[x]], B = B[[x]], Bm1 = Bm1[[x]], al = al,  alm1 = alm1)
@@ -572,6 +608,14 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       
       Bm1 <- B  #record at location
       B <- Bp1
+      
+      print("post pop dynamics")
+      print("sum of Spp1")
+      print(sum(B[[1]]))
+      print("sum of Spp2")
+      print(sum(B[[2]]))
+      print("sum of Spp3")
+      print(sum(B[[3]]))
       
       ####################
       ## scientific survey

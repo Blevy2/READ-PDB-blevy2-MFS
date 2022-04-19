@@ -401,8 +401,8 @@ Had_params <- list("a"=73568,"b"=40530)  #alph,beta
 
 
 #change range, params and abline input
-range <- Cod_range
-params_ <- Cod_params
+range <- YT_range
+params_ <- YT_params
 rec <- vector()
 for(i in range){
   rec[i] <- Recr(model = "BH", params = params_, B = i, cv = 0)

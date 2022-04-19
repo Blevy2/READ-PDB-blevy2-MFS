@@ -176,7 +176,7 @@ The object returned is used internally by MixFishSim a list with two levels:
 
 #NEW VERSION that has week breaks for entire simulation and allows fishing on just 1 day per week
 source("R/init_sim_Bens_nofish.R")
-sim <- init_sim_Bens_nofish(nrows = nrow(hab$hab$spp1), ncols = ncol(hab$hab$spp1), n_years = 22, n_tows_day = 1,n_days_wk_fished = 1, n_fleets = 1, n_vessels = 1, n_species = 3,
+sim <- init_sim_Bens_nofish(nrows = nrow(hab$hab$spp1), ncols = ncol(hab$hab$spp1), n_years = 5, n_tows_day = 1,n_days_wk_fished = 1, n_fleets = 1, n_vessels = 1, n_species = 3,
                             move_freq = 1)
 
 class(sim)
@@ -253,7 +253,8 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
                      rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
                      spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
                      M = c("spp1" = .2064+.358, "spp2" = .2728+.511, "spp3" = .334+.45), #NEED F
-                     K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
+                   K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
+                     #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
                      Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
                      Weight_Adult = (c("spp1" = 1, "spp2" = 1, "spp3" = 1)),
                      nz = nonzero_idx)
