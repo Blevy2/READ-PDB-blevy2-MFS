@@ -276,7 +276,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     #   if(week.breaks[t] == pop_init[["dem_params"]][[s]][["rec_wk"]][1]) {
  
 
-    Rec<- lapply(seq_len(n_spp), function(s) {
+    Rec <- lapply(seq_len(n_spp), function(s) {
    #   print(s)
 
       #if outside recruitment weeks or in first year, set as matrix of zeros
@@ -396,7 +396,6 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       print("sum rec")
       print("spp3")
       print(sum(Rec[["spp3"]]))
-
 
   
   
@@ -852,9 +851,21 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       #  print( "here7")
         pop_init[["Pop_record"]][[s]][["Bio.mat"]][year.breaks[t], day.breaks[t]] <- sum(Bp1[[s]])
       #  print( "here8")
-        pop_init[["Pop_record"]][[s]][["Rec.mat"]][1, year.breaks[t]] <- sum(Rec[[s]], pop_init[["Pop_record"]][[s]][["Rec.mat"]][1, year.breaks[t]], na.rm = T)
-       # print( "here9")
         
+        #only update in first week of recruitment or last week of first year, which will have total for the year
+        if(( week.breaks[t] == pop_init$dem_params[[s]]$rec_wk[1] )
+          | ( t == tail(pop_init$dem_params[[s]]$rec_wk,n=1))){
+          
+       
+        pop_init[["Pop_record"]][[s]][["Rec.mat"]][1, year.breaks[t]] <- sum(Rec[[s]])
+        
+        #if first year divide by length of rec weeks because it all is sent out in 1 week
+        if(t == tail(pop_init$dem_params[[s]]$rec_wk,n=1)){
+        pop_init[["Pop_record"]][[s]][["Rec.mat"]][1, year.breaks[t]] <- sum(Rec[[s]])/ length(pop_init[["dem_params"]][[s]][["rec_wk"]])
+       }
+        
+       # print( "here9")
+        }
       }
       
       
