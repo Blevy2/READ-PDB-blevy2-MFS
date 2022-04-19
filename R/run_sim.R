@@ -222,12 +222,12 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     })
     
   
-    print(Recruit[[1]])
-
-  print(Recruit[[2]])
-
-   print(Recruit[[3]])
-    
+  #   print(Recruit[[1]])
+  # 
+  # print(Recruit[[2]])
+  # 
+  #  print(Recruit[[3]])
+  #   
     
     if(t != ntow) {
       Pop_dyn  <- ifelse(day.breaks[t] != day.breaks[t+1], TRUE, FALSE) ## weekly delay diff
@@ -387,15 +387,15 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     names(Rec) <- paste0("spp", seq_len(n_spp))
    
     #  View(Rec)
-      print("sum rec")
-      print("spp1")
-      print(sum(Rec[["spp1"]]))
-      print("sum rec")
-      print("spp2")
-      print(sum(Rec[["spp2"]]))
-      print("sum rec")
-      print("spp3")
-      print(sum(Rec[["spp3"]]))
+      # print("sum rec")
+      # print("spp1")
+      # print(sum(Rec[["spp1"]]))
+      # print("sum rec")
+      # print("spp2")
+      # print(sum(Rec[["spp2"]]))
+      # print("sum rec")
+      # print("spp3")
+      # print(sum(Rec[["spp3"]]))
 
   
   
@@ -529,13 +529,13 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     # Need B-1 and B to calc B+1
     
    # print( "here1")
-      print("pre pop dynamics")
-      print("sum of Spp1")
-      print(sum(B[[1]]))
-      print("sum of Spp2")
-      print(sum(B[[2]]))
-      print("sum of Spp3")
-      print(sum(B[[3]]))
+      # print("pre pop dynamics")
+      # print("sum of Spp1")
+      # print(sum(B[[1]]))
+      # print("sum of Spp2")
+      # print(sum(B[[2]]))
+      # print("sum of Spp3")
+      # print(sum(B[[3]]))
     
     if(Pop_dyn) { #POP_DYN IS SET ON LINE 143
       
@@ -593,7 +593,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
        # print(al)
        # print(alm1)
         
-        print(sum(Rec[[x]]))
+       # print(sum(Rec[[x]]))
         
         res <- delay_diff(K = pop_init[["dem_params"]][[x]][["K"]], F = spat_fs[[x]], 
                           M = pop_init[["dem_params"]][[x]][["M"]]/52, 
@@ -607,15 +607,15 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       
       Bm1 <- B  #record at location
       B <- Bp1
-      
-      print("post pop dynamics")
-      print("sum of Spp1")
-      print(sum(B[[1]]))
-      print("sum of Spp2")
-      print(sum(B[[2]]))
-      print("sum of Spp3")
-      print(sum(B[[3]]))
-      
+      # 
+      # print("post pop dynamics")
+      # print("sum of Spp1")
+      # print(sum(B[[1]]))
+      # print("sum of Spp2")
+      # print(sum(B[[2]]))
+      # print("sum of Spp3")
+      # print(sum(B[[3]]))
+      # 
       ####################
       ## scientific survey
       ####################
