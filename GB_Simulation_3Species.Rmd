@@ -380,12 +380,12 @@ run_simulation <- function(x){
 devtools::build()
 
   
-  #load rcpp exports
+  #load rcpp exports ON SERVER ONLY. WONT WORK ON PC
 Rcpp::sourceCpp(file= "src/Movement.cpp")
 Rcpp::sourceCpp(file= "src/RcppExports.cpp")
 Rcpp::compileAttributes() #this updates RcppExports.R file, which contains function definitions
 
-  
+  #ON PC JUST 1) REBUILD PACKAGE (ABOVE) THEN 2) RELOAD PACKAGE 
   library(MixFishSim) #each core needs to load library
   
   #load data from CPU
