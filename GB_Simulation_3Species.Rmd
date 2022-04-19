@@ -248,7 +248,7 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
                      lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
                      init_move_steps = 20,
                      rec_params = list("spp1" = c("model" = "BH", "a" = 30445, "b" = 4301, "cv" = 0),
-                                       "spp2" = c("model" = "BH", "a" = 27868 , "b" = 3491, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 27868 , "b" = 10472, "cv" = 0),
                                        "spp3" = c("model" = "BH", "a" = 73568, "b" = 40530, "cv" = 0)), #CHANGE
                      rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
                      spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
