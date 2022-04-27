@@ -51,13 +51,13 @@ plot_pop_summary <- function(results = res, timestep = 'daily', save = FALSE, sa
   })
   results_df <- do.call(rbind, res_df)
   
-  View(results_df)
+  #View(results_df)
   
   if(timestep == "daily") {
     require(ggplot2)
     
     results_df <- na.omit(results_df) #removing rows that contain NA
-    View(results_df)
+  #  View(results_df)
     
     print(ggplot(results_df, aes(x = julien_day, y = data, group = 2)) + geom_point() + facet_grid(pop ~ metric, scale = "free"))
     

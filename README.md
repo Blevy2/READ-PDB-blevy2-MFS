@@ -168,3 +168,10 @@ Instead, it is automatically updated when C++ changes are implimented using the 
 BENS_create_hab.R is an edit of create_hab.R, which is used to generate a generic habitat with the RandomFields package. This is only used to defined a generic habitat. 
 My edit reads in the corners of retangular stratas defined by [x1,x2,y1,y2] and creates a matrix that will have the strata number in each strata cell.
 As a result we create hab$strata and hab$stratas, which is used in Run_survey and BENS_init_survey.R to generate random survey locations
+
+param_estimate.R is used to fit recruitment parameters for desired scenario (increasing, decreasing, constant populations). This is the main script that sets up the simulations and 
+impliments the optimizations scheme by calling the below codes.
+
+run_sim_param_estimate.R is run_sim with everything removed except for recruitment and population dynamics. This code is called by param_estimate.R to fit recruitment parameters for desired scenario (increasing, decreasing, constant populations)
+
+init_pop_Bens_param_estimate.R is an edit of init_pop_Bens used to initialize the population during parameter estimation. The main difference here is instead of creating an initial spatial population, the initial pop is a scalar value
