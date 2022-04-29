@@ -93,25 +93,32 @@ BENS_init_survey <- function (sim_init = NULL, design = 'fixed_station', n_stati
 	  	  for(i in seq(1:length(strata_num[,1]))){
 	    new_strat <- c(new_strat,unique(strata_num[i,]))
 	     }
-	  unique_numbers <- unique(new_strat)
+	  unique_numbers <- unique(new_strat[(new_strat>0)&(!is.na(new_strat))]) #avoid NA and 0 values
+print(unique_numbers)
 	  
 #setup list that 1 entry for each strata
-	  strata_index_list <- vector(mode = "list", length = max(unique_numbers))
+	  strata_index_list <- vector(mode = "list", length = max(unique_numbers,na.rm = T))
 
-
+#replace NAs in strata_num with -999
+	  strata_num[is.na(strata_num)] <- -999
 	  
 	  #prepare indices for each strata 
 	  index <- vector()  #empty vector
+	  
+	  un_idx <- 0  #unique_numbers index
+	  
 	  for(j in unique_numbers){
-	    index[j]<-0
+	   	   
+	     un_idx <- un_idx+1
+	   	 index[j]<-0
+	    
 
-	
 	  #go through entire strata and number each strata 1 to n where n is the total elements in the strata
 	  strata_index <- matrix(0,nrow=idx[["nrows"]],idx[["ncols"]])
 	  
 	  for(i in seq(1:length(strata_num))){
-	    
-	    if(strata_num[i] == unique_numbers[j]){
+
+	    if(strata_num[i] == unique_numbers[un_idx]){
 	      strata_index[i]<-index[strata_num[i]] +1
 	      index[strata_num[i]]<-index[strata_num[i]]+1
 	      
@@ -123,11 +130,11 @@ BENS_init_survey <- function (sim_init = NULL, design = 'fixed_station', n_stati
 	  }	  
 	  #have created matirx with 1 to n in correct strata and 0 elsewhere
 	  #store each in list
-	  strata_index_list[[j]]<-strata_index
+	  strata_index_list[[un_idx]]<-strata_index
 	  }
 	  
 	  
-	  
+	  print(index)
 	  
 	  #go through each strata_index_list, choose correct number of random stations
 	  #translate back to index for given strata
@@ -136,15 +143,20 @@ BENS_init_survey <- function (sim_init = NULL, design = 'fixed_station', n_stati
 	  #while you do keep track of strata number
 	  str_num <-vector()
 	  	   yrs <- vector()
+	  nstat_idx <- 0 #n_stations index	   
+	  	   
 	  for(j in unique_numbers){
 	    print(j)
 	    #index[j] is how many total stations there are in each strata
 	    #currently dividing total number of samples evening among each strata
-	    
-	   ifelse(index[j]>=(n_stations[[j]]*(sim_init[["idx"]][["ny"]]-years_cut)),
-	                     {my_sample <- sample(index[j],n_stations[[j]]*(sim_init[["idx"]][["ny"]]-years_cut),replace = FALSE)},
-	                     {print("not enough sampling locations. sampling this strata with replacement")
-	                     my_sample <- sample(index[j],n_stations[[j]]*(sim_init[["idx"]][["ny"]]-years_cut),replace = TRUE)})
+	    nstat_idx <- nstat_idx +1
+	   if(index[j]>=(n_stations[[nstat_idx]]*(sim_init[["idx"]][["ny"]]-years_cut))){
+	     {my_sample <- sample(index[j],n_stations[[nstat_idx]]*(sim_init[["idx"]][["ny"]]-years_cut),replace = FALSE)}
+	     }else{print("not enough sampling locations. sampling this strata with replacement")
+	                     my_sample <- sample(index[j],n_stations[[nstat_idx]]*(sim_init[["idx"]][["ny"]]-years_cut),replace = TRUE)
+	                     temp <- strata_num
+	                     temp[strata_num!=j]=-999
+	                     fields::image.plot(rotate(temp))}
 #	print("max/min is")
 #	print(max(my_sample))
 #	print(min(my_sample))
@@ -159,10 +171,10 @@ BENS_init_survey <- function (sim_init = NULL, design = 'fixed_station', n_stati
 	   nsamps <- length(my_sample)
 	 #  print(nsamps)
 	    for(i in seq(1:nsamps)){
-	    coords <- c(coords,which(strata_index_list[[j]]==my_sample[i]))
+	    coords <- c(coords,which(strata_index_list[[nstat_idx]]==my_sample[i]))
 
 	    #record strata number
-	    str_num <-c(str_num,unique_numbers[j])
+	    str_num <-c(str_num,unique_numbers[nstat_idx])
 	    
 	    #record year
 	   
@@ -199,7 +211,7 @@ BENS_init_survey <- function (sim_init = NULL, design = 'fixed_station', n_stati
 
 	      
 	      coord[1,1] <- ((pos-1) %% dim.mat[1]) +1  #xcoordinate
-	      coord[1,2] <- ((pos-1) %/% dim.mat[1]) +1 #y coordinate
+	      coord[1,2] <- ((pos-1) %/% dim.mat[2]) +1 #y coordinate
 	   #  show(pos)
 	   	      
 #	    coords <- pos2coord(pos=i,dim.mat = dim.mat)   #I extracted the above code from this function file 

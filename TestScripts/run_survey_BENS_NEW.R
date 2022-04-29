@@ -1,6 +1,72 @@
 # after simulation takes place, go through and do a random survey
 
 
+
+
+#Load tow record to figure out how many tows in each stratum. This is Haddock because it has all the stratas
+tows <- read.csv("C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\From_Liz\\survey_tow_latlon-20220107T192759Z-001\\survey_tow_latlon\\ADIOS_SV_164744_GBK_NONE_survey_dist_map_fixed.csv")
+
+#GB strata
+GB_strata <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300")
+
+#remove the first 0 from above list to match the data in the tow csv
+GB_strata <- sub('.', '', GB_strata)
+
+#count number of samples in each strata in each year
+num <- matrix(0,nrow=length(seq(2000,2019)),ncol=length(GB_strata))
+idxr <-1
+for(k in seq(2000,2019)){
+idxc<-1
+for(i in GB_strata){
+  
+  num[idxr,idxc] <- sum((tows$YEAR==k)&(tows$STRATUM==GB_strata[idxc]))
+  idxc<-idxc+1
+}
+idxr <- idxr+1
+}
+
+#after looking at above output I have decided to sample the following amounts from each stratum PER SEASON
+#"01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300"
+#THESE ARE PER SEASON. WILL BE TWICE AS MANY PER YEAR TOTAL
+strata_samples <- c(10,4,3,14,4,4,8,6,4,4,6,7,3,10,3)
+
+
+
+source("R/BENS_init_survey.R")
+
+
+#CURRENTLY NEED TO MAKE SURE THAT N_STATIONS*#YEARS / #STRATA IS A WHOLE NUMBER OTHERWISE DAY, TOW, YEAR WONT LINEUP WITH NUMBER OF STATIONS
+#ALSO NEED N_STATION TO BE DIVISIBLE BY STATIONS_PER_DAY
+#ALSO NEED N_STATIONS / STATIONS_PER_DAY <= 52 otherwise wont get to all of them in a year results in NA in the matrix
+
+nstat <- 2*strata_samples #this is total samples per year per strata 
+surv_random <- BENS_init_survey(sim_init = sim,design = 'random_station', n_stations = nstat, 
+                                start_day = 1, stations_per_day = 1, Qs = c("spp1" = 0.1, "spp2"= 0.2),
+                                strata_coords = hab$strata, strata_num = hab$stratas, 
+                                years_cut = 2 #if running 22 years, remove first 2 years 
+)
+
+
+
+
+#make sure samples are in correct strata
+
+fields::image.plot(rotate(hab$stratas))
+
+test <- matrix(0, nrow = length(hab$hab$spp1[1,]),ncol = length(hab$hab$spp1[,1]))
+
+for(i in seq(length(surv_random$log.mat[,1]))){
+  # print(surv_random$log.mat[i,2])
+  # print(surv_random$log.mat[i,4])
+  # print( surv_random$log.mat[i,4])
+  test[surv_random$log.mat[i,2],surv_random$log.mat[i,3]] <- surv_random$log.mat[i,4]
+  
+}
+
+fields::image.plot(rotate(test)) #colors in this plot should match the previous plot above
+
+
+
 #RUN BELOW IF JUST RAN SINGLE ITERATION
 #result <- list()
 #result[[1]] <- res
