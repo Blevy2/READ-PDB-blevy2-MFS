@@ -174,7 +174,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
   ### loop control #
   for (t in seq_len(ntow)) { #for(t in seq(50,ntow,1)){ #THIS DEFINES THE LOOP. NTOW = n_tows_day * n_days_wk_fished * 52 * n_years
     ##################
-    print(t)
+   # print(t)
     ## Loop messages
     
     ## Print when new year

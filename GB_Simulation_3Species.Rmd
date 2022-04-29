@@ -242,7 +242,7 @@ names(nonzero_idx) <- paste("spp",seq_len(sim$idx[["n.spp"]]), sep ="")
 
 
 #profvis::profvis({
-#decreasing population settings
+#original settings
 Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
                      hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
                      lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
@@ -253,6 +253,24 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
                      rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
                      spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
                      M = c("spp1" = .2064+.358, "spp2" = .2728+.511, "spp3" = .334+.45), #NEED F
+                   K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
+                     #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
+                     Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
+                     Weight_Adult = (c("spp1" = 1, "spp2" = 1, "spp3" = 1)),
+                     nz = nonzero_idx)
+
+
+#increasing population
+Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
+                     hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
+                     lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
+                     init_move_steps = 20,
+                     rec_params = list("spp1" = c("model" = "BH", "a" = 40000, "b" = 4301*10, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 45000 , "b" = 10472*6, "cv" = 0),
+                                       "spp3" = c("model" = "BH", "a" = 100000, "b" = 40530*10, "cv" = 0)), #CHANGE
+                     rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
+                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
+                     M = c("spp1" = .2064+.358, "spp2" = .2728+.1, "spp3" = .334+.45), #NEED F
                    K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
                      #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
                      Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
@@ -305,8 +323,12 @@ interact.
 #load temp gradient
 
 #moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+
+#Constant temp
 moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
 
+#increasing temp
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
 
 #set temperature preferences manually. 
 #The following assumes moveCov has been created and already has an empty spp_tol sublist
@@ -365,6 +387,10 @@ distributions. These can be examined with some inbuilt plotting functions.
 ```{r sim}
 run_simulation <- function(x){
   
+  #this might track progress. If not check here: https://cran.r-project.org/web/packages/pbapply/pbapply.pdf
+ system(paste("echo 'now processing:",x,"'"))
+  
+  
   source("R/run_sim.R")
   
   
@@ -377,7 +403,7 @@ run_simulation <- function(x){
   assignInNamespace("go_fish", go_fish_Bens, ns = "MixFishSim")
   
 #   #rebuild package
-devtools::build()
+#devtools::build()
 
   
   #load rcpp exports ON SERVER ONLY. WONT WORK ON PC
@@ -395,13 +421,13 @@ Rcpp::compileAttributes() #this updates RcppExports.R file, which contains funct
   #load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Final_constanttemp_20yr.RData")
   
   #load increase temp data from Mars
-  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Increase_temp_20yr_LargerTempVA7.RData")
+  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_ConstTemp_environment.RData")
   
   
   #this starts the profiling
-library(profvis)
-
-profvis({
+# library(profvis)
+# 
+# profvis({
 
   
 start_time <- Sys.time() # record start time
@@ -421,8 +447,10 @@ start_time <- Sys.time() # record start time
 end_time <- Sys.time() # record end time
 tot_time <- end_time - start_time # calculate duration of lrren() example
 
-})
 
+#})
+
+ return(res)
   
 }
 
@@ -443,7 +471,7 @@ cl <- parallel::makeCluster(nCoresToUse,revtunnel = TRUE, outfile = "", verbose 
 result <- list()
 
 
-result <- parallel::parLapply(cl,1:6,run_simulation)
+result <- parallel::parLapply(cl,1:100,run_simulation)
 parallel::stopCluster(cl)
 
 
