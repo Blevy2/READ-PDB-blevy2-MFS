@@ -1,7 +1,8 @@
 # after simulation takes place, go through and do a random survey
 
 
-
+#to rotate matrix before fields::image.plot
+rotate <- function(x) t(apply(x, 2, rev))
 
 #Load tow record to figure out how many tows in each stratum. This is Haddock because it has all the stratas
 tows <- read.csv("C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\From_Liz\\survey_tow_latlon-20220107T192759Z-001\\survey_tow_latlon\\ADIOS_SV_164744_GBK_NONE_survey_dist_map_fixed.csv")
@@ -133,13 +134,15 @@ surv_random <- BENS_init_survey(sim_init = sim,design = 'random_station', n_stat
 sample_per_sn <- 10   #samples per season per strata
 #10 per season for 2 seasons is 20 samples in each strata over a year, or 80 total per year This would be 1600 over 20 years 
 
-n_spp <- 2     #number of species
+n_spp <- 3     #number of species
 
-nstrata <- 16   #number of strata
+nstrata <- 15   #number of strata
 
 nyears <- 20 #number of simulation years
 
 years_cut <- 2 #number of extra years cut off the front
+
+n_cols <- 7 + n_spp  #number of columns in survey matrix. 7 + number of species
 
 strat_samp_tot <- nstat*nyears #total number of samples to collect in each strata over entire simulation
 #(number of stations in each strata per year) * (number of years)
@@ -149,11 +152,11 @@ strat_samp_tot <- nstat*nyears #total number of samples to collect in each strat
 strata_surv <- list()
 #pull out each strata survey info and store separately  
 
-temp <- matrix(unlist(surv_random$log.mat),ncol=9, nrow=sum(strat_samp_tot))
+temp <- matrix(unlist(surv_random$log.mat),ncol=n_cols, nrow=sum(strat_samp_tot))
 idx <- 1
 for(i in seq(nstrata)){
   
-  strata_surv[[i]] <- temp[idx:(idx+strat_samp_tot[i]-1),1:9]
+  strata_surv[[i]] <- temp[idx:(idx+strat_samp_tot[i]-1),1:n_cols]
   
   idx <- idx + strat_samp_tot[i]
   # print(idx)
@@ -239,7 +242,7 @@ for(i in seq(nstrata)){
     strata_surv[[i]]<-cbind(strata_surv[[i]],S3_seq,Season)
     
   }
-  colnames(strata_surv[[i]]) <- c("station_no","x","y","stratum","day","tow","year","spp1","spp2","week","Season")
+  colnames(strata_surv[[i]]) <- c("station_no","x","y","stratum","day","tow","year",paste0("spp", seq_len(n_spp)),"week","Season")
   
   
 }
@@ -302,7 +305,7 @@ s <- nstat[i]
  # print(swks)
 
     strata_surv[[i]] <- cbind(strata_surv[[i]],swks,Season)
-    colnames(strata_surv[[i]]) <- c("station_no","x","y","stratum","day","tow","year","spp1","spp2","week","Season")
+    colnames(strata_surv[[i]]) <- c("station_no","x","y","stratum","day","tow","year",paste0("spp", seq_len(n_spp)),"week","Season")
     
 }
 
@@ -337,10 +340,16 @@ for(res in seq(length(result))){ #for each simulation result
       year <- as.numeric(strata_surv[[s]][i,"year"]) #year in 7th column
       week <- as.numeric(strata_surv[[s]][i,"week"])  #appended sample week into 10th column above
       
+      #OLD WAY WITH JUST 2 SPECIES
+      # strata_surv[[s]][i,8] <- result[[res]][["pop_bios"]][[(week+(52*(year-1)))]][["spp1"]][x,y]   #POPULATIONMATRIX$spp1(week+(52*(year-1))[x,y]   #spp1 in col 8
+      # strata_surv[[s]][i,9] <- result[[res]][["pop_bios"]][[(week+(52*(year-1)))]][["spp2"]][x,y]   #POPULATIONMATRIX$spp2(week+(52*(year-1))[x,y]   #spp2 in col 9
       
-      strata_surv[[s]][i,8] <- result[[res]][["pop_bios"]][[(week+(52*(year-1)))]][["spp1"]][x,y]   #POPULATIONMATRIX$spp1(week+(52*(year-1))[x,y]   #spp1 in col 8
-      strata_surv[[s]][i,9] <- result[[res]][["pop_bios"]][[(week+(52*(year-1)))]][["spp2"]][x,y]   #POPULATIONMATRIX$spp2(week+(52*(year-1))[x,y]   #spp2 in col 9
+      #NEW WAY THAT ALLOWS FOR ANY NUMBER OF SPECIES
       
+      
+      for(k in seq(n_spp)){
+       strata_surv[[s]][i,paste0("spp", k)] <- result[[res]][["pop_bios"]][[(week+(52*(year-1)))]][[paste0("spp", k)]][x,y]
+      }
     }
     
     
@@ -448,17 +457,17 @@ STRATUM_AREA <- surv_random$cells_per_strata # old way: rep(10000/nstrata,nstrat
 sv.area <- as_tibble(data.frame(stratum,STRATUM_AREA))
 
 
+#setup dimensions for each species- 1 for each strata
+strat_mean_all <- vector("list",length(seq(n_spp)))
 
-#setup dimensions for species 1. 1 for each strata
-strat_mean_all_spp1 <- vector("list",length(surv_noise)) 
-
-#setup dimensions for species 2. 1 for each strata
-strat_mean_all_spp2 <- vector("list",length(surv_noise)) #4 strata
+for(s in seq(n_spp)){
+  
+strat_mean_all[[s]] <- vector("list",length(surv_noise)) 
+}
 
 
 
 #go through each strata survey, iteration, sample
-
 
 
 for(iter in seq(length(surv_noise))){
@@ -479,29 +488,45 @@ for(iter in seq(length(surv_noise))){
     
     # calculate SRS estimates ====
     
-    #species 1
-    spp.srs.1 <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = "spp1"  )  # if strata=NULL, the function will use the unique strata set found in df
-    
-    strat_mean_all_spp1[[iter]][[sample]] <- spp.srs.1 %>%
-      mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
-             CV.absolute=sd.mean.yr.absolute/mean.yr.absolute)
-    
-    #need to convert to matrix so can average later
-    strat_mean_all_spp1[[iter]][[sample]] <- data.matrix(strat_mean_all_spp1[[iter]][[sample]])
-    
-    # strat_mean_all_spp1[[iter]][[sample]] <- as.double(as.matrix(strat_mean_all_spp1[[iter]][[sample]]))
-    
-    #species 2
-    spp.srs.2  <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = "spp2"  )  # if strata=NULL, the function will use the unique strata set found in df
-    
-    strat_mean_all_spp2[[iter]][[sample]] <- spp.srs.2 %>%
-      mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
-             CV.absolute=sd.mean.yr.absolute/mean.yr.absolute)
-    
-    #need to convert to matrix so can average later
-    strat_mean_all_spp2[[iter]][[sample]] <- data.matrix(strat_mean_all_spp2[[iter]][[sample]])
-    
-    # strat_mean_all_spp2[[iter]][[sample]] <- as.double(as.matrix(strat_mean_all_spp2[[iter]][[sample]]))
+    for(s in seq(n_spp)){
+      
+      temp <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = paste0("spp", s, sep="")  )   # if strata=NULL, the function will use the unique strata set found in df
+   
+      strat_mean_all[[s]][[iter]][[sample]] <- temp %>%
+               mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
+                      CV.absolute=sd.mean.yr.absolute/mean.yr.absolute) # if strata=NULL, the function will use the unique strata set found in df
+      
+      strat_mean_all[[s]][[iter]][[sample]] <- data.matrix(strat_mean_all[[s]][[iter]][[sample]])
+      
+       }
+    # 
+    # 
+    # #old way doing it manually for 2 species
+    # # 
+    # #species 1
+    # spp.srs.1 <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = "spp1"  )  # if strata=NULL, the function will use the unique strata set found in df
+    # 
+    # 
+    # strat_mean_all_spp1[[iter]][[sample]] <- spp.srs.1 %>%
+    #   mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
+    #          CV.absolute=sd.mean.yr.absolute/mean.yr.absolute)
+    # 
+    # #need to convert to matrix so can average later
+    # strat_mean_all_spp1[[iter]][[sample]] <- data.matrix(strat_mean_all_spp1[[iter]][[sample]])
+    # 
+    # # strat_mean_all_spp1[[iter]][[sample]] <- as.double(as.matrix(strat_mean_all_spp1[[iter]][[sample]]))
+    # 
+    # #species 2
+    # spp.srs.2  <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = "spp2"  )  # if strata=NULL, the function will use the unique strata set found in df
+    # 
+    # strat_mean_all_spp2[[iter]][[sample]] <- spp.srs.2 %>%
+    #   mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
+    #          CV.absolute=sd.mean.yr.absolute/mean.yr.absolute)
+    # 
+    # #need to convert to matrix so can average later
+    # strat_mean_all_spp2[[iter]][[sample]] <- data.matrix(strat_mean_all_spp2[[iter]][[sample]])
+    # 
+    # # strat_mean_all_spp2[[iter]][[sample]] <- as.double(as.matrix(strat_mean_all_spp2[[iter]][[sample]]))
     
   }
   
@@ -511,8 +536,8 @@ for(iter in seq(length(surv_noise))){
 
 
 
-#put them all into single object
-strat_mean_all <- list(strat_mean_all_spp1,strat_mean_all_spp2)
+#put them all into single object (old method when doing them manually for 2 species)
+#strat_mean_all <- list(strat_mean_all_spp1,strat_mean_all_spp2)
 
 
 

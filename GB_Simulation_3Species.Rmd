@@ -385,7 +385,8 @@ the information on fisheries catches, the population dynamics and population
 distributions. These can be examined with some inbuilt plotting functions. 
 
 ```{r sim}
-run_simulation <- function(x){
+run_simulation <- 
+  function(x){
   
   #this might track progress. If not check here: https://cran.r-project.org/web/packages/pbapply/pbapply.pdf
  system(paste("echo 'now processing:",x,"'"))
@@ -421,7 +422,7 @@ Rcpp::compileAttributes() #this updates RcppExports.R file, which contains funct
   #load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Final_constanttemp_20yr.RData")
   
   #load increase temp data from Mars
-  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_ConstTemp_environment.RData")
+  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncrTemp_environment.RData")
   
   
   #this starts the profiling
@@ -462,7 +463,7 @@ library(parallel)
 
 nCoresToUse <- detectCores() - 1   #this show 16 cores but I think I have 6??
 
-nCoresToUse <- 6
+nCoresToUse <- 5
 
 
 cl <- parallel::makeCluster(nCoresToUse,revtunnel = TRUE, outfile = "", verbose = TRUE, master=nsl(Sys.info()['nodename'])) #options from https://stackoverflow.com/questions/41639929/r-cannot-makecluster-multinode-due-to-cannot-open-the-connection-error
@@ -474,6 +475,10 @@ result <- list()
 result <- parallel::parLapply(cl,1:100,run_simulation)
 parallel::stopCluster(cl)
 
+
+
+#save results
+save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncrTemp_RESULTS.RData")
 
 # 
 # #below throws an error
