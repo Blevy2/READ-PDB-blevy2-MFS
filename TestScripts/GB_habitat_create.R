@@ -965,8 +965,11 @@ for(s in seq_len(length(hab[["hab"]]))) {
   
   for(k in seq(12)){
     
+   #uncomment below to have weeks 13 and 37 on own page (used this to create video)
+     ifelse(((k==4)|(k==10)), par(mfrow = c(1,1), mar = c(1, 1, 1, 1)), par(mfrow = c(5,4), mar = c(1, 1, 1, 1)))
     
-    par(mfrow = c(5,4), mar = c(1, 1, 1, 1))
+    #uncomment below to have all weeks in 5x4 grid on each page
+    # par(mfrow = c(5,4), mar = c(1, 1, 1, 1))
     
     
     for(i in seq(52*yearscut+1,length(moveCov$cov.matrix),52)){
@@ -983,16 +986,16 @@ for(s in seq_len(length(hab[["hab"]]))) {
       #col = grey(seq(1,0,l = 51)), 
       if(!i %in% spwn_wk[[s]]) {
         temp_rotate <- rotate(hab[["hab"]][[paste0('spp',s)]]^2 * move_cov_wk_spp)
-        fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 2, axes = F )
+        fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 2, axes = F, col = c("#4e83ed",rev(heat.colors(50))[5:50]) )
       }
       # col = grey(seq(1,0,l = 51)),
       if(i %in% spwn_wk[[s]]) {
         temp_rotate <- rotate(hab[["spwn_hab"]][[paste0('spp',s)]]^2 * move_cov_wk_spp)
-        fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 1, axes = F )
+        fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 1, axes = F, col =c("#4e83ed",rev(heat.colors(50))[5:50]) )
       }
       #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
       #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
-      text(0.5, 0.98, labels = paste(spp_names_short[s], month_nm[floor(i/(13/3))+1] , 'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52)), cex = 1)
+      text(0.5, 0.98, labels = paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52)), cex = 1)
       
       
       
