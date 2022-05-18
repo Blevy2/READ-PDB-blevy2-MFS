@@ -285,9 +285,9 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
  #                    Weight_Adult = (c("spp1" = .39, "spp2" = 2.95, "spp3" = 1.12)),
 
 #set lambda at 0 first, change after initial population set
-Pop$dem_params$spp1$lambda <- .1
-Pop$dem_params$spp2$lambda <- .1
-Pop$dem_params$spp3$lambda <- .1
+Pop$dem_params$spp1$lambda <- .7
+Pop$dem_params$spp2$lambda <- .7
+Pop$dem_params$spp3$lambda <- .7
 
 
 #I PUT THIS BACK INSIDE RUN_SIM

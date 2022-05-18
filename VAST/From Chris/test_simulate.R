@@ -1,7 +1,7 @@
 # test_simulate.R
 # from the Wiki
 
-RootDir = "C:\\Users\\chris.legault\\Documents\\Working\\VAST training 2019\\VASTwd\\simulate example"
+RootDir = "C:\\Users\\benjamin.levy\\Desktop\\Github\\READ-PDB-blevy2-MFS2\\VAST"
 
 library(TMB)
 library(VAST)
@@ -31,7 +31,7 @@ dir.create(DateFile)
 
 # Load data
 data( EBS_pollock_data )
-Data_Geostat = data.frame( "Catch_KG"=EBS_pollock_data[,'catch'], "Year"=EBS_pollock_data[,'year'], "Vessel"="missing", "AreaSwept_km2"=0.01, "Lat"=EBS_pollock_data[,'lat'], "Lon"=EBS_pollock_data[,'long'], "Pass"=0)
+Data_Geostat = data.frame( "Catch_KG"=EBS_pollock_data$sampling_data[,'catch'], "Year"=EBS_pollock_data$covariate_data[,'Year'], "Vessel"="missing", "AreaSwept_km2"=0.01, "Lat"=EBS_pollock_data$sampling_data[,'lat'], "Lon"=EBS_pollock_data$sampling_data[,'long'], "Pass"=0)
 Extrapolation_List = make_extrapolation_info( Region=Region, strata.limits=strata.limits )
 Spatial_List = make_spatial_info( grid_size_km=grid_size_km, n_x=n_x, Method=Method, Lon=Data_Geostat[,'Lon'], Lat=Data_Geostat[,'Lat'], Extrapolation_List=Extrapolation_List, randomseed=Kmeans_Config[["randomseed"]], nstart=Kmeans_Config[["nstart"]], iter.max=Kmeans_Config[["iter.max"]], DirPath=DateFile, Save_Results=TRUE )
 Data_Geostat = cbind( Data_Geostat, "knot_i"=Spatial_List$knot_i )

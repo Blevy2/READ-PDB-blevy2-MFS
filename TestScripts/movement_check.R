@@ -189,6 +189,8 @@ YT_spring_mnth <-  list() #7 months with survey observations
 cod_spring_mnth <- list() #7 months
 had_spring_mnth <- list() #7 months
 
+Hab_pref <- list(list(),list(),list())
+
 m_idx <- 1
 
 for (m in spring_sample_mnts) {
@@ -211,7 +213,7 @@ for (m in spring_sample_mnts) {
   )
   
   
-  m_idx <- m_idx+1
+
   # 
   # YT_mnth[[idx]] <-
   #   (YT_wk[[w]] + YT_wk[[w + 1]] + YT_wk[[w + 2]] + YT_wk[[w + 3]]) / 4
@@ -220,6 +222,37 @@ for (m in spring_sample_mnts) {
   # had_mnth[[idx]] <-
   #   (had_wk[[w]] + had_wk[[w + 1]] + had_wk[[w + 2]] + had_wk[[w + 3]]) / 4
   # idx <- idx + 1
+  
+  
+  
+  #CREATE MONTHLY AVERAGE OF HABITAT + TEMPERATURE PREFERENCES WITH LAMBDA = 0 
+  #FOR COMPARISON TO TRUE MODEL REALIZATION WITH LAMBDA NONZERO
+  
+  for(s in seq_len(length(hab[["hab"]]))) {
+    
+    move_cov_wk1 <- moveCov[["cov.matrix"]][[wk1]]
+    move_cov_wk2 <- moveCov[["cov.matrix"]][[wk1+1]]   #FALL USES 5 WEEKS AS DEFINED ABOVE
+    move_cov_wk3 <- moveCov[["cov.matrix"]][[wk1+2]]
+    move_cov_wk4 <- moveCov[["cov.matrix"]][[wk1+3]]
+    move_cov_wk5 <- moveCov[["cov.matrix"]][[wk1+4]]
+    
+    move_cov_wk1_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk1, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+    move_cov_wk2_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk2, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+    move_cov_wk3_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk3, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+    move_cov_wk4_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk4, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+    move_cov_wk5_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk5, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+   
+    
+    
+    Hab_pref[[s]][[m]] <-(  spring_week_weights[m_idx, 1] * (hab[["hab"]][[s]]^2 * move_cov_wk1_spp) + spring_week_weights[m_idx, 2] *
+                                                    hab[["hab"]][[s]]^2 * move_cov_wk2_spp + spring_week_weights[m_idx, 3] * hab[["hab"]][[s]]^2 * move_cov_wk3_spp + spring_week_weights[m_idx, 4] *
+                                                    hab[["hab"]][[s]]^2 * move_cov_wk4_spp + spring_week_weights[m_idx, 5] * hab[["hab"]][[s]]^2 * move_cov_wk5_spp )
+    
+    
+    
+  }
+  
+    m_idx <- m_idx+1
 }
 
 
@@ -268,6 +301,8 @@ YT_fall_mnth <-  list() #7 months with survey observations
 cod_fall_mnth <- list() #7 months
 had_fall_mnth <- list() #7 months
 
+
+  
 m_idx <- 1
 
 for (m in fall_sample_mnts) {
@@ -294,7 +329,7 @@ for (m in fall_sample_mnts) {
   )
   
   
-  m_idx <- m_idx+1
+
   # 
   # YT_mnth[[idx]] <-
   #   (YT_wk[[w]] + YT_wk[[w + 1]] + YT_wk[[w + 2]] + YT_wk[[w + 3]]) / 4
@@ -303,7 +338,51 @@ for (m in fall_sample_mnts) {
   # had_mnth[[idx]] <-
   #   (had_wk[[w]] + had_wk[[w + 1]] + had_wk[[w + 2]] + had_wk[[w + 3]]) / 4
   # idx <- idx + 1
-}
+  
+  
+  
+  
+  
+  #CREATE MONTHLY AVERAGE OF HABITAT + TEMPERATURE PREFERENCES WITH LAMBDA = 0 
+  #FOR COMPARISON TO TRUE MODEL REALIZATION WITH LAMBDA NONZERO
+  
+  for(s in seq_len(length(hab[["hab"]]))) {
+    
+  move_cov_wk1 <- moveCov[["cov.matrix"]][[wk1]]
+  move_cov_wk2 <- moveCov[["cov.matrix"]][[wk1+1]]   #FALL USES 6 WEEKS AS DEFINED ABOVE
+  move_cov_wk3 <- moveCov[["cov.matrix"]][[wk1+2]]
+  move_cov_wk4 <- moveCov[["cov.matrix"]][[wk1+3]]
+  move_cov_wk5 <- moveCov[["cov.matrix"]][[wk1+4]]
+  move_cov_wk6 <- moveCov[["cov.matrix"]][[wk1+5]]
+  
+  move_cov_wk1_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk1, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+  move_cov_wk2_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk2, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+  move_cov_wk3_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk3, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+  move_cov_wk4_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk4, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+  move_cov_wk5_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk5, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+  move_cov_wk6_spp <- matrix(nc = ncol(move_cov_wk1), nr = nrow(move_cov_wk1), sapply(move_cov_wk6, norm_fun, mu = moveCov[["spp_tol"]][[s]][["mu"]],va = moveCov[["spp_tol"]][[s]][["va"]]))
+  
+  
+  
+  Hab_pref[[s]][[m]] <- (1/fall_weeks_n[m_idx]) * (  fall_week_weights[m_idx, 1] * (hab[["hab"]][[s]]^2 * move_cov_wk1_spp) + fall_week_weights[m_idx, 2] *
+                                            hab[["hab"]][[s]]^2 * move_cov_wk2_spp + fall_week_weights[m_idx, 3] * hab[["hab"]][[s]]^2 * move_cov_wk3_spp + fall_week_weights[m_idx, 4] *
+                                            hab[["hab"]][[s]]^2 * move_cov_wk4_spp + fall_week_weights[m_idx, 5] * hab[["hab"]][[s]]^2 * move_cov_wk5_spp + fall_week_weights[m_idx, 6] *hab[["hab"]][[s]]^2 * move_cov_wk6_spp)
+                               
+
+  
+  }
+  
+  m_idx <- m_idx+1
+  
+  }
+
+Had_hab_pref <- list()
+Cod_hab_pref <- list()
+YT_hab_pref <- list()
+
+Had_hab_pref <- Hab_pref[[3]]
+Cod_hab_pref <- Hab_pref[[2]]
+YT_hab_pref <- Hab_pref[[1]]
 
 
 
@@ -317,8 +396,13 @@ had_model_month <- do.call(c,list(had_spring_mnth,had_fall_mnth))
 
 
 
+
+
 #READY TO COMPARE VALUES
 
+
+
+#FIRST TRY COMPARING BY MONTH
 
 library(gstat)
 library(rgdal)
@@ -338,12 +422,27 @@ YT_months <-c("Mar","Apr","May","Sep", "Oct", "Nov")
 
 for(m in YT_months){
   
-  par(mfrow = c(2,1), mar = c(1.5, 1.5, 1.5, 1.5))
+  par(mfrow = c(2,2), mar = c(1.5, 1.5, 1.5, 1.5))
 
   #plotting model values
+  
+  #first plot overall preference for week (temp + habitat with lambda 0)
+  temp_rotate <- rotate(YT_hab_pref[[m]]/sum(YT_hab_pref[[m]],na.rm=T))
+
+  fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F )
+  text(0.5, 0.98, labels = paste("YT Hab Pref", m , cex = 1))
+
+
+  
+  #second plot model realization with labmda nonzero
   temp <- raster(YT_model_month[[m]])
   extent(temp) <- extent(Had_ras)
   plot(temp, main =paste("YTF Model, Month:",m))
+  
+  
+  
+  
+  
   
   
   
@@ -364,9 +463,11 @@ for(m in YT_months){
   idw = gstat::idw(formula=temp3$`temp2$CATCH_WT_CAL`~1, locations = temp3, newdata= grid)
   
   temp4 <- raster(idw)
-  plot(temp4, main =paste("YTF Survey, Month:",m, "N_samp:",nsamps)) 
+  plot(temp4, main =paste("YTF Survey IDW, Month:",m, "N_samp:",nsamps)) 
   
   
+  temp5 <- ppp(temp2$LONGITUDE, temp2$LATITUDE, marks = temp2$CATCH_WT_CAL , owin(c(-69.98877, -65.56877) ,c(40.07482,42.79482) ))
+  plot.ppp(temp5, use.marks = T, main=paste("YT Survey PPP, Month:",m, "N_samp:",nsamps))
   
 }
 
@@ -378,9 +479,19 @@ cod_months <-  c("Mar","Apr","May","Jun","Sep", "Oct", "Nov")
 
 for(m in cod_months){
   
-  par(mfrow = c(2,1), mar = c(1.5, 1.5, 1.5, 1.5))
+  par(mfrow = c(2,2), mar = c(1.5, 1.5, 1.5, 1.5))
   
   #plotting model values
+  
+  #first plot overall preference for week (temp + habitat with lambda 0)
+  temp_rotate <- rotate(Cod_hab_pref[[m]]/sum(Cod_hab_pref[[m]],na.rm=T))
+  
+  fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F )
+  text(0.5, 0.98, labels = paste("Cod Hab Pref", m , cex = 1))
+  
+  
+  
+  #second plot model realization with labmda nonzero
   temp <- raster(cod_model_month[[m]])
   extent(temp) <- extent(Had_ras)
   plot(temp, main =paste("Cod Model, Month:",m))
@@ -404,8 +515,10 @@ for(m in cod_months){
   idw = gstat::idw(formula=temp3$`temp2$CATCH_WT_CAL`~1, locations = temp3, newdata= grid)
   
   temp4 <- raster(idw)
-  plot(temp4, main =paste("Cod Survey, Month:",m, "N_samp:",nsamps))  
+  plot(temp4, main =paste("Cod Survey IDW, Month:",m, "N_samp:",nsamps))  
   
+  temp5 <- ppp(temp2$LONGITUDE, temp2$LATITUDE, marks = temp2$CATCH_WT_CAL , owin(c(-69.98877, -65.56877) ,c(40.07482,42.79482) ))
+  plot.ppp(temp5, use.marks = T, main=paste("Cod Survey PPP, Month:",m, "N_samp:",nsamps))
   
   
 }
@@ -418,9 +531,20 @@ had_months <- surv_mnths <- c("Mar","Apr","May","Jun","Sep", "Oct", "Nov")
 
 for(m in had_months){
   
-  par(mfrow = c(2,1), mar = c(1.5, 1.5, 1.5, 1.5))
+  par(mfrow = c(2,2), mar = c(1.5, 1.5, 1.5, 1.5))
+  
   
   #plotting model values
+  
+  #first plot overall preference for week (temp + habitat with lambda 0)
+  temp_rotate <- rotate(Had_hab_pref[[m]]/sum(Had_hab_pref[[m]],na.rm=T))
+  
+  fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F )
+  text(0.5, 0.98, labels = paste("Had Hab Pref", m , cex = 1))
+  
+  
+  
+  #second plot model realization with labmda nonzero
   temp <- raster(had_model_month[[m]])
   extent(temp) <- extent(Had_ras)
   plot(temp, main =paste("Had Model, Month:",m))
@@ -433,9 +557,22 @@ for(m in had_months){
   
   temp3 <- SpatialPointsDataFrame(cbind(temp2$LONGITUDE,temp2$LATITUDE), data = as.data.frame(temp2$CATCH_WT_CAL))
   
+  # temp3$Catch_wt <- as.numeric(temp3$`temp2$CATCH_WT_CAL`)
+  # 
+  # 
+  # # Define the color ramp
+  # # http://www.0to255.com/ is a helpful website for selecting colors manually
+  # manual.col = colorRampPalette(c("#f7f6fd","#4635d0"))
+  # color.match = manual.col(length(unique(temp3$Catch_wt)))
+  # lookupTable = sort(unique(temp3$Catch_wt))
+  # temp3$color = color.match[match(temp3$Catch_wt, lookupTable)]
+  # 
+  # x<-spplot(temp3,"Catch_wt")
+  # plot(x,add=T)
+  
   #setup raster to use
   grid <- as(Had_ras,"SpatialPixels")
-  #proj4string(grid) = proj4string(YT_oct_pts)
+  proj4string(grid) = proj4string(YT_oct_pts)
   
   crs(grid)<-crs(Had_ras) #need to have same CRS
   crs(temp3)<-crs(grid)
@@ -443,8 +580,12 @@ for(m in had_months){
   idw = gstat::idw(formula=temp3$`temp2$CATCH_WT_CAL`~1, locations = temp3, newdata= grid)
   
   temp4 <- raster(idw)
-  plot(temp4, main =paste("Had Survey, Month:",m, "N_samp:",nsamps)) 
+  plot(temp4, main =paste("Had Survey IDW, Month:",m, "N_samp:",nsamps)) 
 
+  
+  
+  temp5 <- ppp(temp2$LONGITUDE, temp2$LATITUDE, marks = temp2$CATCH_WT_CAL , owin(c(-69.98877, -65.56877) ,c(40.07482,42.79482) ))
+ plot.ppp(temp5, use.marks = T, main=paste("Had Survey PPP, Month:",m, "N_samp:",nsamps))
   
   
 }
@@ -453,4 +594,12 @@ for(m in had_months){
 
 dev.off()
 
+
+
+
+#SECOND TRY COMPARING BY SEASON - NOT WORTH DOING SINCE MOST SAMPLES COME IN ONE MONTH. JUST COMPARE THAT ONE MONTH
+# 
+# 
+# YT_fall_tows <- YT_tows[(YT_tows$month=="SEP"|YT_tows$month=="OCT"|YT_tows$month=="NOV"),]
+# had_fall_tows
 
