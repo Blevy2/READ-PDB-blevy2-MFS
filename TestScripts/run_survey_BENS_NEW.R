@@ -400,16 +400,26 @@ surv_noise <- vector("list",length(list_all))
 for(iter in seq(length(list_all))){ #go down each iteration
   temp <- list_all[[iter]]
   
-  spp1_sam <- as.numeric(temp[,8])   #spp1 sample in column 8 
-  spp2_sam <- as.numeric(temp[,9])   #spp1 sample in column 9
+  #pull out individual species samples
+  sam_list <- vector("list",n_spp) 
+  for(s in seq(n_spp)){
+    
+   sam_list[[s]] <- assign(paste0("spp", s, "_sam", sep="") , as.numeric(temp[,7+s]) )
+    
+  }
+  # old method of above with 2 species  
+  # spp1_sam <- as.numeric(temp[,8])   #spp1 sample in column 8 
+  # spp2_sam <- as.numeric(temp[,9])   #spp1 sample in column 9
+  
   for(noise_samp in seq(samp_per_iter)){   #add noise to each survey from each iteration samp_per_iter times
     
-    
-    
     #adding noise to survey
-    temp[,8] <- sapply(spp1_sam,function(x){rlnorm(1,mean=log(x),sdlog=.35)}) #what should sdlog be?
-    temp[,9] <- sapply(spp2_sam,function(x){rlnorm(1,mean=log(x),sdlog=.35)})
+    temp[,8:(7+n_spp)] <-  sapply(seq(n_spp) , function(s) {  sapply(sam_list[[s]] , function(x){rlnorm(1,mean=log(x),sdlog=.35)} ) } )
     
+    # old method of above with 2 species  
+    # temp[,8] <- sapply(spp1_sam,function(x){rlnorm(1,mean=log(x),sdlog=.35)}) #what should sdlog be?
+    # temp[,9] <- sapply(spp2_sam,function(x){rlnorm(1,mean=log(x),sdlog=.35)})
+    # 
     
     surv_noise[[iter]][[noise_samp]]  <- temp
     
@@ -450,9 +460,9 @@ source("TestScripts/Calc_strat_mean/fn_srs_survey_BENS.R")
 
 
 #DEFINE INDIVIDUAL STRATUM AREAS 
-stratum <- seq(nstrata)
+stratum <- sort(unique(surv_random$log.mat[,4]))
 
-STRATUM_AREA <- surv_random$cells_per_strata # old way: rep(10000/nstrata,nstrata) #100x100 grid so each corner has area 2500
+STRATUM_AREA <- na.omit(surv_random$cells_per_strata) # old way: rep(10000/nstrata,nstrata) #100x100 grid so each corner has area 2500
 
 sv.area <- as_tibble(data.frame(stratum,STRATUM_AREA))
 
@@ -480,18 +490,22 @@ for(iter in seq(length(surv_noise))){
     spp <- as_tibble(surv_noise[[iter]][[sample]],header=T) #pull out entire survey matrix
     
     spp$year <- as.numeric(spp$year)
+
     
     # get total area of stock ====
     spp.strata <- unique(spp$stratum)
+    spp.strata <- as.numeric(spp.strata)
+    
     spp.area <- sum(sv.area$STRATUM_AREA[sv.area$stratum %in% spp.strata]) #TOTAL AREA OF ALL STRATA
     
+
     
     # calculate SRS estimates ====
     
     for(s in seq(n_spp)){
       
       temp <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = paste0("spp", s, sep="")  )   # if strata=NULL, the function will use the unique strata set found in df
-   
+  # View(temp)
       strat_mean_all[[s]][[iter]][[sample]] <- temp %>%
                mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
                       CV.absolute=sd.mean.yr.absolute/mean.yr.absolute) # if strata=NULL, the function will use the unique strata set found in df
@@ -551,10 +565,10 @@ for(iter in seq(length(surv_noise))){
 ###########################################################
 
 
-sum_survey_iter <- list(list(),list())
+sum_survey_iter <- vector("list",n_spp) 
 
 
-for(s in seq(length(strat_mean_all))){ #2 species
+for(s in seq(length(strat_mean_all))){ #n species
   
   for(iter in seq(length(strat_mean_all[[s]]))){
     
@@ -593,7 +607,7 @@ for(s in seq(length(strat_mean_all))){ #2 species
 ################################################
 
 
-sum_survey_iter_final <- list(list(),list())
+sum_survey_iter_final <- vector("list",n_spp) 
 
 
 for(s in seq(length(sum_survey_iter))){ #2 species
@@ -625,6 +639,8 @@ for(s in seq(length(sum_survey_iter))){ #2 species
 #write csvs
 write.csv(sum_survey_iter_final[[1]], file="spp1_SRS_16Randomstrata_option1_IncTemp.csv", row.names=F)
 write.csv(sum_survey_iter_final[[2]], file="spp2_SRS_16Randomstrata_option1_IncTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[1]], file="spp3_SRS_16Randomstrata_option1_IncTemp.csv", row.names=F)
+
 
 
 
