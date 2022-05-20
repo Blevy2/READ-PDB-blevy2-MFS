@@ -277,6 +277,25 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+3000
                      Weight_Adult = (c("spp1" = 1, "spp2" = 1, "spp3" = 1)),
                      nz = nonzero_idx)
 
+
+#constant population
+Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
+                     hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
+                     lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
+                     init_move_steps = 20,
+                     rec_params = list("spp1" = c("model" = "BH", "a" = 30445, "b" = 4301, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 27868 , "b" = 10472, "cv" = 0),
+                                       "spp3" = c("model" = "BH", "a" = 73568, "b" = 40530, "cv" = 0)), #CHANGE
+                     rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
+                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
+                     M = c("spp1" = .2064+.358+2, "spp2" = .2728+.511+.05, "spp3" = .334-.025), #NEED F
+                   K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
+                     #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
+                     Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
+                     Weight_Adult = (c("spp1" = 1, "spp2" = 1, "spp3" = 1)),
+                     nz = nonzero_idx)
+
+
 #})
 
 #})
@@ -422,7 +441,7 @@ Rcpp::compileAttributes() #this updates RcppExports.R file, which contains funct
   #load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Final_constanttemp_20yr.RData")
   
   #load increase temp data from Mars
-  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncrTemp_environment.RData")
+  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_ConsPop_ConsTemp_environment.RData")
   
   
   #this starts the profiling
@@ -478,7 +497,7 @@ parallel::stopCluster(cl)
 
 
 #save results
-save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncrTemp_RESULTS.RData")
+save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_ConsPop_ConsTemp_RESULTS.RData")
 
 # 
 # #below throws an error

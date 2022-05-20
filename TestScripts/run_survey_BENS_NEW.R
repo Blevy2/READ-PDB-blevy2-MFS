@@ -650,9 +650,9 @@ for(s in seq(length(sum_survey_iter))){ #2 species
 
 # NEED TO UPDATE BELOW
 # #write csvs
-# write.csv(sum_survey_iter_final[[1]], file="spp1_SRS_16Randomstrata_option1_IncTemp.csv", row.names=F)
-# write.csv(sum_survey_iter_final[[2]], file="spp2_SRS_16Randomstrata_option1_IncTemp.csv", row.names=F)
-# write.csv(sum_survey_iter_final[[1]], file="spp3_SRS_16Randomstrata_option1_IncTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[1]], file="YT_SRS_GB_allstrata_IncPop_ConTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[2]], file="Cod_SRS_GB_allstrata_IncPop_ConTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[3]], file="Had_SRS_GB_allstrata_IncPop_ConTemp.csv", row.names=F)
 
 
 
@@ -859,74 +859,67 @@ log.mat <- rbind(sum_survey_results[[1]],sum_survey_results[[2]],sum_survey_resu
 #1) go through each iteration and put individual results in their own list 
 #2) use Reduce to add all items in each list together, then by total number in list to obtain mean
 #3) use info from https://stackoverflow.com/questions/39351013/standard-deviation-over-a-list-of-matrices-in-r to calculate standard deviation
+                  
+                 #spp1 spp2 spp3
+short_names <- c("YT","Cod","Had") 
 
-pop_sum_s1_biomat <- list()
-pop_sum_s1_recmat <- list()
-pop_sum_s2_biomat <- list()
-pop_sum_s2_recmat <- list()
+
+pop_sum_biomats <- list()
+pop_sum_recmats <- list()
+
+
 
 
 for(i in seq(length(result))){
   
-  #make a list of each category from each iteration
-  pop_sum_s1_biomat[[i]] <- result[[i]][["pop_summary"]][["spp1"]][["Bio.mat"]] 
-  pop_sum_s1_recmat[[i]] <- result[[i]][["pop_summary"]][["spp1"]][["Rec.mat"]] 
-  pop_sum_s2_biomat[[i]] <- result[[i]][["pop_summary"]][["spp2"]][["Bio.mat"]]
-  pop_sum_s2_recmat[[i]] <- result[[i]][["pop_summary"]][["spp2"]][["Rec.mat"]]
   
+    #make a list of each category from each iteration
+  for(s in seq(length(short_names))){
+    
+    pop_sum_biomats[[short_names[s]]][[i]] <- result[[i]][["pop_summary"]][[s]][["Bio.mat"]]
+    pop_sum_recmats[[short_names[s]]][[i]] <- result[[i]][["pop_summary"]][[s]][["Rec.mat"]]
 }
 
+}
+
+
 #FINDING MEANS
-sum_pop_sum_s1_biomat <- list()
-sum_pop_sum_s1_recmat <- list()
-sum_pop_sum_s2_biomat <- list()
-sum_pop_sum_s2_recmat <- list()
+sum_pop_sum_biomat <- list()
+sum_pop_sum_recmat <- list()
 
 #biomat matrices of form [year,day]
 #recmat are vector of form [recruitment in year]
-sum_pop_sum_s1_biomat <- Reduce("+", pop_sum_s1_biomat)/length(pop_sum_s1_biomat)
-sum_pop_sum_s1_recmat <- Reduce("+", pop_sum_s1_recmat)/length(pop_sum_s1_recmat)  #FINDING THE MEAN
-sum_pop_sum_s2_biomat <- Reduce("+", pop_sum_s2_biomat)/length(pop_sum_s2_biomat) 
-sum_pop_sum_s2_recmat <- Reduce("+", pop_sum_s2_recmat)/length(pop_sum_s2_recmat)
+for(s in seq(length(short_names))){
+   
+  sum_pop_sum_biomat[[short_names[s]]] <- Reduce("+", pop_sum_biomats[[s]])/length(pop_sum_biomats[[s]])#FINDING THE MEAN
+  sum_pop_sum_recmat[[short_names[s]]] <- Reduce("+", pop_sum_recmats[[s]])/length(pop_sum_recmats[[s]])
+   
+  }
+
 
 
 
 
 #FINDING STANDARD DEV
-sd_pop_sum_s1_biomat <- list()
-sd_pop_sum_s1_recmat <- list()
-sd_pop_sum_s2_biomat <- list()
-sd_pop_sum_s2_recmat <- list()
+sd_pop_sum_biomat <- list()
+sd_pop_sum_recmat <- list()
 
-
-m<-pop_sum_s1_biomat #pull out list to summarize
-sd_pop_sum_s1_biomat <- matrix(apply(sapply(1:length(pop_sum_s1_biomat[[1]]), 
-                                            function(x) unlist(m)[seq(x, length(unlist(m)),
-                                                                      length(pop_sum_s1_biomat[[1]]) )]), 2, sd), 
-                               ncol = length(pop_sum_s1_biomat[[1]][1,]))
-
-
-
-m<-pop_sum_s1_recmat #pull out list to summarize
-sd_pop_sum_s1_recmat <- matrix(apply(sapply(1:length(pop_sum_s1_recmat[[1]]), 
-                                            function(x) unlist(m)[seq(x, length(unlist(m)),
-                                                                      length(pop_sum_s1_recmat[[1]]) )]), 2, sd), 
-                               ncol = length(pop_sum_s1_recmat[[1]][1,]))
-
-
-m<-pop_sum_s2_biomat #pull out list to summarize
-sd_pop_sum_s2_biomat <- matrix(apply(sapply(1:length(pop_sum_s2_biomat[[1]]), 
-                                            function(x) unlist(m)[seq(x, length(unlist(m)),
-                                                                      length(pop_sum_s2_biomat[[1]]) )]), 2, sd), 
-                               ncol = length(pop_sum_s2_biomat[[1]][1,]))
-
-
-m<-pop_sum_s2_recmat #pull out list to summarize
-sd_pop_sum_s2_recmat <- matrix(apply(sapply(1:length(pop_sum_s2_recmat[[1]]), 
-                                            function(x) unlist(m)[seq(x, length(unlist(m)),
-                                                                      length(pop_sum_s2_recmat[[1]]) )]), 2, sd), 
-                               ncol = length(pop_sum_s2_recmat[[1]][1,]))
-
+for(s in seq(length(short_names))){
+  
+  m<-pop_sum_biomats[[s]] #pull out list to summarize
+  
+  sd_pop_sum_biomat[[short_names[s]]] <-matrix(apply(sapply(1:length(pop_sum_biomats[[s]][[1]]), 
+                                                            function(x) unlist(m)[seq(x, length(unlist(m)),
+                                                                                      length(pop_sum_biomats[[s]][[1]]) )]), 2, sd), 
+                                               ncol = length(pop_sum_biomats[[s]][[1]][1,]))
+  
+  n <- pop_sum_recmats[[s]]
+  sd_pop_sum_recmat[[short_names[s]]] <- matrix(apply(sapply(1:length(pop_sum_recmats[[s]][[1]]), 
+                                                             function(x) unlist(n)[seq(x, length(unlist(n)),
+                                                                                       length(pop_sum_recmats[[s]][[1]]) )]), 2, sd), 
+                                                ncol = length(pop_sum_recmats[[s]][[1]][1,]))
+  
+}
 
 
 
@@ -949,74 +942,57 @@ sd_pop_sum_s2_recmat <- matrix(apply(sapply(1:length(pop_sum_s2_recmat[[1]]),
 #was tough calculating SD same as before because list was so long and sapply took a long time
 #found info here to update the process for speed: https://stackoverflow.com/questions/38493741/calculating-standard-deviation-of-variables-in-a-large-list-in-r
 
-spat_pop_spp1 <- list()
-spat_pop_spp2 <- list()
-
-
-spat_pop_spp1_sd <- list()
-spat_pop_spp2_sd <- list()
+spat_pop <- vector("list",n_spp) 
+spat_pop_sd <- vector("list",n_spp)
 
 
 for(wk in seq(52*(nyears+years_cut))){ #fix week
   
-  temp_wk_spp1 <- list()
-  temp_wk_spp2 <- list()
-  
+  temp_wk <- list()
+
   for(res in seq(length(result))){ #go through results
     
     #make list of given week for each species
-    temp_wk_spp1[[res]] <-  result[[res]][["pop_bios"]][[wk]][["spp1"]] 
-    temp_wk_spp2[[res]] <-  result[[res]][["pop_bios"]][[wk]][["spp2"]] 
+    for(s in seq(length(short_names))){
+      
+      temp_wk[[short_names[s]]][[res]]<- result[[res]][["pop_bios"]][[wk]][[s]] 
+      
+    }
     
   }
   
   #average weekly list into single list entry
-  spat_pop_spp1[[wk]] <-  Reduce("+", temp_wk_spp1)/length(temp_wk_spp1)
-  spat_pop_spp2[[wk]] <-  Reduce("+", temp_wk_spp2)/length(temp_wk_spp2)
-  
-  
-  
+  for(s in seq(length(short_names))){
+    
+    spat_pop[[s]][[wk]] <-  Reduce("+", temp_wk[[s]])/length(temp_wk[[s]])
+    
+    
   #calculate SD for given week
   
-  #spp1
-  m<-temp_wk_spp1 #pull out list to summarize
+
+  m<-temp_wk[[s]] #pull out list to summarize
   
+  list.squared.mean <-  Reduce("+", lapply(temp_wk[[s]], "^", 2)) / length(temp_wk[[s]])
   
-  list.squared.mean <-  Reduce("+", lapply(temp_wk_spp1, "^", 2)) / length(temp_wk_spp1)
-  
-  list.mean <- Reduce("+",temp_wk_spp1) / length(temp_wk_spp1)
-  
-  #list.variance <- list.squared.mean - list.mean^2
-  
-  list.sd <- sqrt((round(list.squared.mean - list.mean^2,1)))   #sd(x) = sqrt(E(x^2) - (E(x))^2)
-  
-  spat_pop_spp1_sd[[wk]] <- list.sd
-  
-  
-  
-  
-  #spp2
-  m<-temp_wk_spp2 #pull out list to summarize
-  
-  list.squared.mean <-  Reduce("+", lapply(temp_wk_spp2, "^", 2)) / length(temp_wk_spp2)
-  
-  list.mean <- Reduce("+",temp_wk_spp2) / length(temp_wk_spp2)
+  list.mean <- Reduce("+",temp_wk[[s]]) / length(temp_wk[[s]])
   
   #list.variance <- list.squared.mean - list.mean^2
   
   list.sd <- sqrt((round(list.squared.mean - list.mean^2,1)))   #sd(x) = sqrt(E(x^2) - (E(x))^2)
   
-  spat_pop_spp2_sd[[wk]] <- list.sd
+  spat_pop_sd[[short_names[s]]][[wk]] <- list.sd
+  }
+
   
   
+
 }
 
 #remove years_cut years from beginning
-spat_pop_spp1 <- spat_pop_spp1[(52*years_cut+1):(52*(nyears+years_cut))]
-spat_pop_spp2<-spat_pop_spp2[(52*years_cut+1):(52*(nyears+years_cut))]
-spat_pop_spp1_sd <- spat_pop_spp1_sd[(52*years_cut+1):(52*(nyears+years_cut))]
-spat_pop_spp2_sd <- spat_pop_spp2_sd[(52*years_cut+1):(52*(nyears+years_cut))]
-
+for(s in seq(length(short_names))){
+ spat_pop[[short_names[s]]] <- spat_pop[[s]][(52*years_cut+1):(52*(nyears+years_cut))]
+ spat_pop_sd[[short_names[s]]] <- spat_pop_sd[[s]][(52*years_cut+1):(52*(nyears+years_cut))]
+}
 
 
 
@@ -1029,48 +1005,34 @@ spat_pop_spp2_sd <- spat_pop_spp2_sd[(52*years_cut+1):(52*(nyears+years_cut))]
 ##################################################################
 
 
-#build spp1 and spp2 in plot summary
-spp1 <- list()
-spp2 <- list()
-spp1[["Bio.mat"]] <-sum_pop_sum_s1_biomat
-spp1[["Rec.mat"]] <- sum_pop_sum_s1_recmat
-spp2[["Bio.mat"]] <-sum_pop_sum_s2_biomat
-spp2[["Rec.mat"]] <- sum_pop_sum_s2_recmat
-
-spp1[["Bio.mat.sd"]] <-sd_pop_sum_s1_biomat
-spp1[["Rec.mat.sd"]] <- sd_pop_sum_s1_recmat
-spp2[["Bio.mat.sd"]] <-sd_pop_sum_s2_biomat
-spp2[["Rec.mat.sd"]] <- sd_pop_sum_s2_recmat
-
-
 
 #put spp1 and spp2 into pop_summary
-pop_summary <- list()
-pop_summary[["spp1"]] <- spp1
-pop_summary[["spp2"]] <- spp2
+pop_summary <- vector("list",n_spp)
 
-
-
-
-pop_bios <- list()
-for(i in seq(52*nyears)){
-  temp <-list()
-  temp[["spp1"]] <- spat_pop_spp1[[i]]
-  temp[["spp2"]] <- spat_pop_spp2[[i]]
-  
-  pop_bios[[i]] <- temp
-  
+for(s in seq(length(short_names))){
+  pop_summary[[short_names[s]]][["Bio.mat"]] <- sum_pop_sum_biomat[[s]]
+  pop_summary[[short_names[s]]][["Rec.mat"]] <- sum_pop_sum_recmat[[s]]
+    
 }
 
 
-pop_bios_sd <- list()
+
+
+pop_bios <- vector("list",52*nyears)
 for(i in seq(52*nyears)){
-  # temp <-list()
-  # temp[["spp1.sd"]] <- 
-  # temp[["spp2.sd"]] <-
+
+  for(s in seq(length(short_names))){
+  pop_bios[[i]][[short_names[s]]] <- spat_pop[[s]][[i]]
+  } 
+}
+
+
+pop_bios_sd <- vector("list",52*nyears)
+for(i in seq(52*nyears)){
+  for(s in seq(length(short_names))){
   
-  pop_bios_sd[["spp1"]][[i]] <- spat_pop_spp1_sd[[i]]
-  pop_bios_sd[["spp2"]][[i]] <- spat_pop_spp2_sd[[i]]
+  pop_bios_sd[[i]][[short_names[s]]] <- spat_pop_sd[[s]][[i]]
+}
 }
 
 
