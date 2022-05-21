@@ -146,6 +146,11 @@ n_cols <- 7 + n_spp  #number of columns in survey matrix. 7 + number of species
 
 strat_samp_tot <- nstat*nyears #total number of samples to collect in each strata over entire simulation
 #(number of stations in each strata per year) * (number of years)
+
+#short names to define variables for summary and plotting at the end of script
+#also used in those scripts to determine number of species
+                  #spp1 spp2 spp3
+short_names <- c("YT","Cod","Had") 
               
 
 
@@ -860,8 +865,8 @@ log.mat <- rbind(sum_survey_results[[1]],sum_survey_results[[2]],sum_survey_resu
 #2) use Reduce to add all items in each list together, then by total number in list to obtain mean
 #3) use info from https://stackoverflow.com/questions/39351013/standard-deviation-over-a-list-of-matrices-in-r to calculate standard deviation
                   
-                 #spp1 spp2 spp3
-short_names <- c("YT","Cod","Had") 
+
+#short_names defined at top of script
 
 
 pop_sum_biomats <- list()
@@ -1221,9 +1226,13 @@ print(ggplot(results_df_an2, aes(x = year, y = data, group = 2)) + geom_point() 
 
 
 
+annual_species <- list()
 
-
-
+for(s in seq(length(short_names))){
+  annual_species[[short_names[s]]] <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == short_names[s]) %>% 
+    group_by(pop,year) %>% summarise(data = sum(data))
+  
+}
 
 #ANNUAL POP BY SPECIES
 spp1_annual <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == "spp_1") %>% 
@@ -1233,6 +1242,8 @@ spp2_annual <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == "spp_
   group_by(pop,year) %>% summarise(data = sum(data))
 
 
+
+#NEED TO GENERALIZE BELOW FOR N SPECIES
 
 #stratified mean calculation by species and season
 srs_spp1_fall <- as.data.frame(sum_survey_iter_final[[1]])[as.data.frame(sum_survey_iter_final[[1]])$season==2,]
@@ -1281,6 +1292,12 @@ lines(srs_spp1_fall$mean.yr.absolute)
 #plot stratified calculation and population estimate on same plot
 
 #first make model output have 2 seasons to match the stratified mean calcs
+for(i in seq(length(annual_species))){
+  annual_species[[short_names[s]]] <- rbind(annual_species[[short_names[s]]][3:22,],annual_species[[short_names[s]]][3:22,])
+  annual_species[[short_names[s]]]$season <- c(rep(1,nyears),rep(2,nyears)) #spring = season 1, fall = season 2
+  annual_species[[short_names[s]]]$year <- rep(seq(1,nyears),2)
+}
+
 #spp1
 spp1_annual <- rbind(spp1_annual[3:22,],spp1_annual[3:22,])
 spp1_annual$season <- c(rep(1,20),rep(2,20))
@@ -1292,11 +1309,41 @@ spp2_annual$year <- rep(seq(1,20),2)
 
 
 #MAKE SURE TO CHANGE THESE TO CORRECT CSVS
-#read in stratified mean csvs
+#read in stratified mean csvs mannually
 data_spp1 <- read_csv(file="Results/DecrPop_IncrTemp/spp1_SRS_16strata.csv")
 data_spp2 <- read_csv(file="Results/DecrPop_IncrTemp/spp2_SRS_16strata.csv")
 
+SRS_data <- list(data_spp1, data_spp2)
+names(SRS_data) <- c("spp1","spp2")
 
+#put in same folder and read in csvs automatircally
+SRS_data <- vector("list",n_spp)
+
+for(s in short_names){ 
+  path <- ""
+  SRS_data[[s]] <- read_csv(file = paste(path,short_names[s],"name.csv"),sep="")
+  
+  }
+
+
+long_names <- c("Yellowtail Flounder","Cod","Haddock")
+
+for(s in short_names){
+  
+  #initiate ggplot
+  ggplot() +
+    #plot stratified calculation data
+    geom_errorbar(data=SRS_data[s],aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+    geom_point(data=SRS_data[s],aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+    geom_line(data=SRS_data[s],aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+    #plot model data
+    geom_point(data = annual_species[[s]], aes(x=year,y=data, group =season, color = "Model")) +
+    geom_line(data = annual_species[[s]], aes(x=year,y=data, group =season, color = "Model")) +
+    
+    facet_wrap(~ season) +
+    labs(x="year",y="Biomass", title = long_names[s], color ="" ) 
+  
+}
 
 #spp1 plot
 
