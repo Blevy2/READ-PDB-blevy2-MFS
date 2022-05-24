@@ -441,7 +441,7 @@ Rcpp::compileAttributes() #this updates RcppExports.R file, which contains funct
   #load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Final_constanttemp_20yr.RData")
   
   #load increase temp data from Mars
-  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_ConsPop_ConsTemp_environment.RData")
+  load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncTemp_environment.RData")
   
   
   #this starts the profiling
@@ -482,7 +482,7 @@ library(parallel)
 
 nCoresToUse <- detectCores() - 1   #this show 16 cores but I think I have 6??
 
-nCoresToUse <- 5
+nCoresToUse <- 4
 
 
 cl <- parallel::makeCluster(nCoresToUse,revtunnel = TRUE, outfile = "", verbose = TRUE, master=nsl(Sys.info()['nodename'])) #options from https://stackoverflow.com/questions/41639929/r-cannot-makecluster-multinode-due-to-cannot-open-the-connection-error
@@ -497,7 +497,7 @@ parallel::stopCluster(cl)
 
 
 #save results
-save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_ConsPop_ConsTemp_RESULTS.RData")
+save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_ConPop_IncTemp_RESULTS.RData")
 
 # 
 # #below throws an error

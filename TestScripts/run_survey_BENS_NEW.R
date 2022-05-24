@@ -50,6 +50,22 @@ surv_random <- BENS_init_survey(sim_init = sim,design = 'random_station', n_stat
 
 
 
+#plot individual strata for identification purposes
+for(strata in unique(surv_random$log.mat[,4])){
+  
+  temp <- hab$stratas
+  temp[temp!= strata]= -999
+  fields::image.plot(rotate(temp))
+  text(0.5, 0.98, labels = paste(strata))
+  
+  
+  
+}
+
+
+
+
+
 #make sure samples are in correct strata
 
 fields::image.plot(rotate(hab$stratas))
@@ -445,10 +461,17 @@ for(iter in seq(length(list_all))){ #go down each iteration
 
 #choose some strata to exclude, if desired
 
-#1- exclude northeast 4 corner strata (#3, 4, 6, 7)
-exclude <- c(3,4,7,8)
+#Generic setup- out of 16 strata, exclude northeast 4 corner strata (#3, 4, 6, 7)
+exclude <- list(c(3,4,7,8),c(3,4,7,8)) #2 species
 
-exclude <- c(0)
+
+#George's Bank Setup by species
+                        #YT            Cod          Haddock
+exclude <- list(c(13,14,15,17,18), c(23,24,25), c(23,24,25,29,30))
+
+#exclude none
+exclude <- list(c(0),c(0),c(0)) #3 species
+
 
 #NOW WE NEED TO CREATE A STRATIFIED MEAN FROM EACH OF THESE SAMPLES
 #there are #strata * #iterations * #samp_per_iter total samples
@@ -470,16 +493,6 @@ source("TestScripts/Calc_strat_mean/fn_srs_survey_BENS.R")
 
 
 
-#DEFINE INDIVIDUAL STRATUM AREAS 
-stratum <- sort(unique(surv_random$log.mat[,4]))
-
-STRATUM_AREA <- na.omit(surv_random$cells_per_strata) # old way: rep(10000/nstrata,nstrata) #100x100 grid so each corner has area 2500
-
-sv.area <- as_tibble(data.frame(stratum,STRATUM_AREA))
-
-#remove strata to exclude from stratified mean calculation
-sv.area <- sv.area[!(sv.area$stratum %in% exclude),]#sv.area %>% slice(-exclude)
-
 #setup dimensions for each species- 1 for each strata
 strat_mean_all <- vector("list",length(seq(n_spp)))
 
@@ -500,10 +513,27 @@ for(iter in seq(length(surv_noise))){
     #if any NA columns make them zero
     surv_noise[[iter]][[sample]][is.na(surv_noise[[iter]][[sample]])]=0
     
-    spp <- as_tibble(surv_noise[[iter]][[sample]],header=T) #pull out entire survey matrix
+   
+    
+    # calculate SRS estimates ====
+    
+    for(s in seq(n_spp)){
+      
+      
+      #DEFINE INDIVIDUAL STRATUM AREAS 
+      stratum <- sort(unique(surv_random$log.mat[,4]))
+      
+      STRATUM_AREA <- na.omit(surv_random$cells_per_strata) # old way: rep(10000/nstrata,nstrata) #100x100 grid so each corner has area 2500
+      
+      sv.area <- as_tibble(data.frame(stratum,STRATUM_AREA))
+      
+      #remove strata to exclude from stratified mean calculation
+      sv.area <- sv.area[!(sv.area$stratum %in% exclude[[s]]),]#sv.area %>% slice(-exclude)
+      
+       spp <- as_tibble(surv_noise[[iter]][[sample]],header=T) #pull out entire survey matrix
     
     ##remove strata to exclude from stratified mean calculation
-    spp <- spp[!(spp$stratum %in% exclude),]
+    spp <- spp[!(spp$stratum %in% exclude[[s]]),]
     
     spp$year <- as.numeric(spp$year)
 
@@ -515,10 +545,6 @@ for(iter in seq(length(surv_noise))){
     spp.area <- sum(sv.area$STRATUM_AREA[sv.area$stratum %in% spp.strata]) #TOTAL AREA OF ALL STRATA
     
 
-    
-    # calculate SRS estimates ====
-    
-    for(s in seq(n_spp)){
       
       temp <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = paste0("spp", s, sep="")  )   # if strata=NULL, the function will use the unique strata set found in df
   # View(temp)
@@ -655,9 +681,9 @@ for(s in seq(length(sum_survey_iter))){ #2 species
 
 # NEED TO UPDATE BELOW
 # #write csvs
-write.csv(sum_survey_iter_final[[1]], file="YT_SRS_GB_allstrata_IncPop_ConTemp.csv", row.names=F)
-write.csv(sum_survey_iter_final[[2]], file="Cod_SRS_GB_allstrata_IncPop_ConTemp.csv", row.names=F)
-write.csv(sum_survey_iter_final[[3]], file="Had_SRS_GB_allstrata_IncPop_ConTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[1]], file="YT_SRS_GB_allstrata_IncPop_IncTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[2]], file="Cod_SRS_GB_allstrata_IncPop_IncTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[3]], file="Had_SRS_GB_allstrata_IncPop_IncTemp.csv", row.names=F)
 
 
 
@@ -1013,6 +1039,7 @@ for(s in seq(length(short_names))){
 
 #put spp1 and spp2 into pop_summary
 pop_summary <- vector("list",n_spp)
+names(pop_summary) <- short_names
 
 for(s in seq(length(short_names))){
   pop_summary[[short_names[s]]][["Bio.mat"]] <- sum_pop_sum_biomat[[s]]
@@ -1047,7 +1074,7 @@ res <- list()
 
 res[["pop_summary"]] <- pop_summary
 res[["pop_bios"]] <- pop_bios
-res[["survey"]][["log.mat"]] <- log.mat
+res[["survey"]][["log.mat"]] <- surv_random$log.mat
 
 
 res[["pop_bios_sd"]] <- pop_bios_sd
@@ -1157,7 +1184,7 @@ n_spp <- length(res[["pop_summary"]])
 res_df <- lapply(seq_len(n_spp), function(x) {
   res_spp <- lapply(names(res[["pop_summary"]][[x]]), function(x1) {
     x1_res <- tidyr::gather(as.data.frame(t(res[["pop_summary"]][[x]][[x1]])), key = "year", factor_key = T)
-    if(x1 == "Bio.mat" | x1 == "Bio.mat.sd") {	res_out <- data.frame("pop" = rep(paste("spp",x, sep = "_"), length.out = nrow(x1_res)), 
+    if(x1 == "Bio.mat" | x1 == "Bio.mat.sd") {	res_out <- data.frame("pop" = rep(short_names[[x]], length.out = nrow(x1_res)), 
                                                                      "metric" = x1, 
                                                                      "year" = x1_res$year, 
                                                                      "day" = rep(1:358, length.out = nrow(x1_res)),#changed 362 to 358
@@ -1167,7 +1194,7 @@ res_df <- lapply(seq_len(n_spp), function(x) {
     return(res_out)
     
     }
-    if(x1 == "Rec.mat" | x1 == "Rec.mat.sd") { res_out <- data.frame("pop" = rep(paste("spp",x, sep = "_"), length.out = nrow(x1_res)), 
+    if(x1 == "Rec.mat" | x1 == "Rec.mat.sd") { res_out <- data.frame("pop" = rep(short_names[[x]], length.out = nrow(x1_res)), 
                                                                      "metric" = x1 , 
                                                                      "year" = seq_len(nrow(x1_res)), 
                                                                      "day" = rep(1, length.out = nrow(x1_res)),
@@ -1233,13 +1260,13 @@ for(s in seq(length(short_names))){
     group_by(pop,year) %>% summarise(data = sum(data))
   
 }
-
-#ANNUAL POP BY SPECIES
-spp1_annual <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == "spp_1") %>% 
-  group_by(pop,year) %>% summarise(data = sum(data))
-
-spp2_annual <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == "spp_2") %>% 
-  group_by(pop,year) %>% summarise(data = sum(data))
+# 
+# #ANNUAL POP BY SPECIES
+# spp1_annual <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == "spp_1") %>% 
+#   group_by(pop,year) %>% summarise(data = sum(data))
+# 
+# spp2_annual <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == "spp_2") %>% 
+#   group_by(pop,year) %>% summarise(data = sum(data))
 
 
 
@@ -1292,20 +1319,20 @@ lines(srs_spp1_fall$mean.yr.absolute)
 #plot stratified calculation and population estimate on same plot
 
 #first make model output have 2 seasons to match the stratified mean calcs
-for(i in seq(length(annual_species))){
+for(s in seq(length(annual_species))){
   annual_species[[short_names[s]]] <- rbind(annual_species[[short_names[s]]][3:22,],annual_species[[short_names[s]]][3:22,])
   annual_species[[short_names[s]]]$season <- c(rep(1,nyears),rep(2,nyears)) #spring = season 1, fall = season 2
   annual_species[[short_names[s]]]$year <- rep(seq(1,nyears),2)
 }
-
-#spp1
-spp1_annual <- rbind(spp1_annual[3:22,],spp1_annual[3:22,])
-spp1_annual$season <- c(rep(1,20),rep(2,20))
-spp1_annual$year <- rep(seq(1,20),2)
-#spp2
-spp2_annual <- rbind(spp2_annual[3:22,],spp2_annual[3:22,])
-spp2_annual$season <- c(rep(1,20),rep(2,20))
-spp2_annual$year <- rep(seq(1,20),2)
+# 
+# #spp1
+# spp1_annual <- rbind(spp1_annual[3:22,],spp1_annual[3:22,])
+# spp1_annual$season <- c(rep(1,20),rep(2,20))
+# spp1_annual$year <- rep(seq(1,20),2)
+# #spp2
+# spp2_annual <- rbind(spp2_annual[3:22,],spp2_annual[3:22,])
+# spp2_annual$season <- c(rep(1,20),rep(2,20))
+# spp2_annual$year <- rep(seq(1,20),2)
 
 
 #MAKE SURE TO CHANGE THESE TO CORRECT CSVS
@@ -1319,6 +1346,7 @@ names(SRS_data) <- c("spp1","spp2")
 #put in same folder and read in csvs automatircally
 SRS_data <- vector("list",n_spp)
 
+
 for(s in short_names){ 
   path <- ""
   SRS_data[[s]] <- read_csv(file = paste(path,short_names[s],"name.csv"),sep="")
@@ -1328,56 +1356,59 @@ for(s in short_names){
 
 long_names <- c("Yellowtail Flounder","Cod","Haddock")
 
+  idx <-1
 for(s in short_names){
-  
+
   #initiate ggplot
-  ggplot() +
+ p<- ggplot() +
     #plot stratified calculation data
-    geom_errorbar(data=SRS_data[s],aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
-    geom_point(data=SRS_data[s],aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-    geom_line(data=SRS_data[s],aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+    geom_errorbar(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+    geom_point(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+    geom_line(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
     #plot model data
-    geom_point(data = annual_species[[s]], aes(x=year,y=data, group =season, color = "Model")) +
-    geom_line(data = annual_species[[s]], aes(x=year,y=data, group =season, color = "Model")) +
+    geom_point(data = as.data.frame(annual_species[[s]]), aes(x=year,y=data, group =season, color = "Model")) +
+    geom_line(data = as.data.frame(annual_species[[s]]), aes(x=year,y=data, group =season, color = "Model")) +
     
     facet_wrap(~ season) +
-    labs(x="year",y="Biomass", title = long_names[s], color ="" ) 
+    labs(x="year",y="Biomass", title = long_names[idx], color ="" ) 
+  idx<-idx+1
   
+  print(p)
 }
-
-#spp1 plot
-
-#initiate ggplot
-ggplot() +
-  #plot stratified calculation data
-  geom_errorbar(data=data_spp1,aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
-  geom_point(data=data_spp1,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-  geom_line(data=data_spp1,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-  #plot model data
-  geom_point(data = spp1_annual, aes(x=year,y=data, group =season, color = "Model")) +
-  geom_line(data = spp1_annual, aes(x=year,y=data, group =season, color = "Model")) +
-  
-  facet_wrap(~ season) +
-  labs(x="year",y="Biomass", title = "Spp1", color ="" ) 
-
-
-#spp2 plot
-
-#initiate ggplot
-ggplot() +
-  #plot stratified calculation data
-  geom_errorbar(data=data_spp2,aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
-  geom_point(data=data_spp2,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-  geom_line(data=data_spp2,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-  #plot model data
-  geom_point(data = spp2_annual, aes(x=year,y=data, group =season, color = "Model")) +
-  geom_line(data = spp2_annual, aes(x=year,y=data, group =season, color = "Model")) +
-  
-  facet_wrap(~ season) +
-  labs(x="year",y="Biomass", title = "Spp2", color ="" ) 
-
-
-
+# 
+# #spp1 plot
+# 
+# #initiate ggplot
+# ggplot() +
+#   #plot stratified calculation data
+#   geom_errorbar(data=data_spp1,aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+#   geom_point(data=data_spp1,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+#   geom_line(data=data_spp1,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+#   #plot model data
+#   geom_point(data = spp1_annual, aes(x=year,y=data, group =season, color = "Model")) +
+#   geom_line(data = spp1_annual, aes(x=year,y=data, group =season, color = "Model")) +
+#   
+#   facet_wrap(~ season) +
+#   labs(x="year",y="Biomass", title = "Spp1", color ="" ) 
+# 
+# 
+# #spp2 plot
+# 
+# #initiate ggplot
+# ggplot() +
+#   #plot stratified calculation data
+#   geom_errorbar(data=data_spp2,aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+#   geom_point(data=data_spp2,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+#   geom_line(data=data_spp2,aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+#   #plot model data
+#   geom_point(data = spp2_annual, aes(x=year,y=data, group =season, color = "Model")) +
+#   geom_line(data = spp2_annual, aes(x=year,y=data, group =season, color = "Model")) +
+#   
+#   facet_wrap(~ season) +
+#   labs(x="year",y="Biomass", title = "Spp2", color ="" ) 
+# 
+# 
+# 
 
 
 
