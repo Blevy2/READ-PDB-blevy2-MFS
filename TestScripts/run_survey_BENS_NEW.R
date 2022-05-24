@@ -1251,7 +1251,8 @@ print(ggplot(results_df_an2, aes(x = year, y = data, group = 2)) + geom_point() 
 #read.csv( file="spp2_SRS.csv", row.names=F)
 
 
-
+# 
+# #ANNUAL POP BY SPECIES
 
 annual_species <- list()
 
@@ -1260,7 +1261,7 @@ for(s in seq(length(short_names))){
     group_by(pop,year) %>% summarise(data = sum(data))
   
 }
-# 
+# old way:
 # #ANNUAL POP BY SPECIES
 # spp1_annual <- results_df %>% filter(metric == "Bio.mat", day == 1, pop == "spp_1") %>% 
 #   group_by(pop,year) %>% summarise(data = sum(data))
