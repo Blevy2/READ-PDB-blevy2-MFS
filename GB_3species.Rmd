@@ -1,0 +1,582 @@
+---
+  title: "Modeling 3 species on George's Bank (Yellowtail Flounder, Cod, Haddock)"
+editor_options: 
+  chunk_output_type: console
+---
+  
+  ```{r}
+library(Rcpp)
+
+#just sum matrix for denominator and then do x1 / sum_mat. 1 year took 4.059 minutes
+cppFunction('
+            
+            double sum_mat(NumericVector M){
+            
+            double S = sum(M);
+            
+            return S;
+            }
+            ')
+
+sum(hab$hab$spp1[nonzero_idx[[1]]])
+
+sum_mat(hab$hab$spp1[nonzero_idx[[1]]])
+
+
+#normalize entire matrix in C++. 4.95 minutes for 1 year.
+#I think because I must use as.matrix to entier MM. Will change to vector instead below
+
+cppFunction('
+
+NumericMatrix norm_mat(NumericMatrix M, NumericMatrix MM, NumericMatrix Nzero_vals) {
+  //NumericMatrix MM = M(! is_na(M));
+  double sm = sum(MM);
+  int nNonzero = Nzero_vals.nrow();
+  
+  int nrow = M.nrow();
+  int ncol = M.ncol();
+  
+ 
+  
+  NumericMatrix new_val(nrow, ncol);// for storing new values
+  
+  for(int p = 0; p < nNonzero; p++)  {
+    
+    new_val(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) = M(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) / sm ;
+    
+    
+  }
+  
+  
+  return new_val;
+}
+')
+
+
+
+#normalize entire matrix in C++. Send MM as vector instead of using as.matrix()
+#took 4.71 minutes to run 1 year
+#norm_mat(x1, x1[nz[[s]]],Nzero_vals = nz[[s]])
+cppFunction('
+
+NumericMatrix norm_mat(NumericMatrix M, NumericVector MM, NumericMatrix Nzero_vals) {
+  
+  double sm = sum(MM);
+  int nNonzero = Nzero_vals.nrow();
+  
+  int nrow = M.nrow();
+  int ncol = M.ncol();
+  
+ 
+  
+  NumericMatrix new_val(nrow, ncol);// for storing new values
+  
+  for(int p = 0; p < nNonzero; p++)  {
+    
+    new_val(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) = M(Nzero_vals(p,0)-1,Nzero_vals(p,1)-1) / sm ;
+    
+    
+  }
+  
+  
+  return new_val;
+}
+')
+
+
+
+
+#integrated the normalization into the movement command. This runs the fastest: 3.82 minutes for 1 year
+
+
+
+```
+
+
+
+
+## Habitat setup
+
+First read in habitat created using point data and covariates (sediment and depth)
+and create other required info
+
+It returns a list of suitable habitat for each species (hab), the habitat as
+adjusted during the spawning period (spwn_hab) and the binary location of
+spawning areas (spwn_loc). It also returns the locations as x1,x2,y1,y2 and the
+multiplier of attractiveness to the spawning area during spawning periods
+(spwn_mult).
+
+If plot.dist = TRUE, it returns the plots to a file.
+
+```{r habitat}
+
+
+#LOAD HABITAT PREVIOUSLY CREATED
+#hab <- readRDS(file="hab_justYT.RDS") #finer resolution
+#hab <- readRDS(file="hab_justYT2.RDS") #courser resolution
+
+hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
+
+
+#plot strata
+par(mar=c(1,1,1,1))
+fields::image.plot(hab$stratas)
+
+#plot habitat
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["hab"]][["spp1"]])
+
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["hab"]][["spp2"]])
+
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["hab"]][["spp3"]])
+
+#plot spawn habitat
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["spwn_hab"]][["spp1"]])
+
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["spwn_hab"]][["spp2"]])
+
+par(mar=c(1,1,1,1))
+fields::image.plot(hab[["spwn_hab"]][["spp3"]])
+
+
+```
+
+# Initialise the simulation
+
+This vignette is a paired down example of how to construct a simulation using
+MixFishSim. We include only a basic example and encourage users to explore the
+other features of the package. \\
+
+
+## Base parameters
+
+First we specify the basic parameters of the simulation. This includes the
+dimensions of the spatial domain, the number of years to simulate, the number
+of fleets and vessels per fleet and the number of species and how often (in
+                                                                         weeks) the fish move.
+
+The object returned is used internally by MixFishSim a list with two levels: 
+  
+  * sim$idx : The different units of different processes 
+* sim$brk.idx: breaks for each of the key processes in units of a timestep
+
+```{r basic}
+
+
+#NEW VERSION that has week breaks for entire simulation
+# source("R/init_sim_Bens.R")
+# sim <- init_sim_Bens(nrows = 100, ncols = 100, n_years = 20, n_tows_day = 1,
+#                 n_days_wk_fished = 1, n_fleets = 1, n_vessels = 0, n_species = 2,
+#                 move_freq = 1)
+
+
+#NEW VERSION that has week breaks for entire simulation and allows fishing on just 1 day per week
+source("R/init_sim_Bens_nofish.R")
+sim <- init_sim_Bens_nofish(nrows = nrow(hab$hab$spp1), ncols = ncol(hab$hab$spp1), n_years = 22, n_tows_day = 1,n_days_wk_fished = 1, n_fleets = 1, n_vessels = 1, n_species = 3,
+                            move_freq = 1)
+
+class(sim)
+sim$idx
+names(sim$brk.idx)
+
+```
+
+
+
+## Population models
+
+Now we need to set up the population models for the simulations. We do this
+with the init_pop function. We set the initial population biomasses, movement
+rates, recruitment parameter and growth and natural mortality rates.
+
+The object created stores all the starting conditions and containers for
+recording the changes in the populations during the simulations.
+
+We can plot the starting distributions for each population as a check.
+
+```{r pop_init}
+
+#hab <- readRDS("hab_GB_3species.RDS")
+
+#rebuild package
+devtools::build()
+
+#load rcpp exports
+Rcpp::sourceCpp(file= "src/Movement.cpp")
+Rcpp::sourceCpp(file= "src/RcppExports.cpp")
+Rcpp::compileAttributes() #this updates RcppExports.R file, which contains function definitions
+
+
+
+#CALULATE INDICES OF NONZERO VALUES IN HAB TO PASS TO MOVE_POPULAITON DURING MOVEMENT
+nonzero_idx <- lapply(paste0("spp", seq_len(sim$idx[["n.spp"]])), function(s) {
+  
+  which(hab[["hab"]][[s]] >0 , arr.ind=T)
+  
+})
+
+names(nonzero_idx) <- paste("spp",seq_len(sim$idx[["n.spp"]]), sep ="")
+
+
+source("R/init_pop_Bens.R")
+# profvis({
+
+
+
+##where should starting point be? check highest values locations
+# which(hab[["hab"]][["spp1"]]==max(hab[["hab"]][["spp1"]],na.rm=T),arr.ind=T)
+# which(hab[["hab"]][["spp2"]]==max(hab[["hab"]][["spp2"]],na.rm=T),arr.ind=T)
+# which(hab[["hab"]][["spp3"]]==max(hab[["hab"]][["spp3"]],na.rm=T),arr.ind=T)
+# 
+# #make sure each have nonzero value on start cell
+# hab[["hab"]][["spp1"]][46,112]
+# hab[["hab"]][["spp2"]][30,134]
+# hab[["hab"]][["spp3"]][24,91]
+
+#YELLOWTAIL, COD, HADDOCK
+
+
+
+#profvis::profvis({
+#original settings
+Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
+                     hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
+                     lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
+                     init_move_steps = 20,
+                     rec_params = list("spp1" = c("model" = "BH", "a" = 30445, "b" = 4301, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 27868 , "b" = 10472, "cv" = 0),
+                                       "spp3" = c("model" = "BH", "a" = 73568, "b" = 40530, "cv" = 0)), #CHANGE
+                     rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
+                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
+                     M = c("spp1" = .2064+.358, "spp2" = .2728+.511, "spp3" = .334+.45), #NEED F
+                     K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
+                     #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
+                     Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
+                     Weight_Adult = (c("spp1" = 1, "spp2" = 1, "spp3" = 1)),
+                     nz = nonzero_idx)
+
+
+#increasing population
+Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
+                     hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
+                     lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
+                     init_move_steps = 20,
+                     rec_params = list("spp1" = c("model" = "BH", "a" = 40000, "b" = 4301*10, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 45000 , "b" = 10472*6, "cv" = 0),
+                                       "spp3" = c("model" = "BH", "a" = 100000, "b" = 40530*10, "cv" = 0)), #CHANGE
+                     rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
+                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
+                     M = c("spp1" = .2064+.358, "spp2" = .2728+.1, "spp3" = .334+.45), #NEED F
+                     K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
+                     #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
+                     Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
+                     Weight_Adult = (c("spp1" = 1, "spp2" = 1, "spp3" = 1)),
+                     nz = nonzero_idx)
+
+
+#constant population
+Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 3194, "spp2" = (13000+30000)/2, "spp3" = 150000*1.2), #CHANGE
+                     hab = hab[["hab"]], start_cell = list("spp1" = c(46,112),"spp2" = c(30,134),"spp3" = c(24,91)),
+                     lambda = c("spp1" = 0, "spp2" = 0, "spp3" = 0), #set at 0 first, change after initial population set
+                     init_move_steps = 20,
+                     rec_params = list("spp1" = c("model" = "BH", "a" = 30445, "b" = 4301, "cv" = 0),
+                                       "spp2" = c("model" = "BH", "a" = 27868 , "b" = 10472, "cv" = 0),
+                                       "spp3" = c("model" = "BH", "a" = 73568, "b" = 40530, "cv" = 0)), #CHANGE
+                     rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
+                     spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
+                     M = c("spp1" = .2064+.358+2, "spp2" = .2728+.511+.05, "spp3" = .334-.025), #NEED F
+                     K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
+                     #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
+                     Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
+                     Weight_Adult = (c("spp1" = 1, "spp2" = 1, "spp3" = 1)),
+                     nz = nonzero_idx)
+
+
+#})
+
+#})
+# actual weights
+#          Weight_PreRecruit = (c("spp1" = .13, "spp2" = .39, "spp3" = .19)),
+#                    Weight_Adult = (c("spp1" = .39, "spp2" = 2.95, "spp3" = 1.12)),
+
+#set lambda at 0 first, change after initial population set
+Pop$dem_params$spp1$lambda <- .7
+Pop$dem_params$spp2$lambda <- .7
+Pop$dem_params$spp3$lambda <- .7
+
+
+#I PUT THIS BACK INSIDE RUN_SIM
+# #Calculate movement probabilities (used to be in run_sim)
+# Move_Prob  <- lapply(paste0("spp", seq_len(sim[["idx"]][["n.spp"]])), function(s) { move_prob_Lst(lambda = Pop[["dem_params"]][[s]][["lambda"]], hab = hab[["hab"]][[s]])})
+# 
+# 
+# Move_Prob_spwn <- lapply(paste0("spp", seq_len(sim[["idx"]][["n.spp"]])), function(s) { move_prob_Lst(lambda = Pop[["dem_params"]][[s]][["lambda"]], hab = hab[["spwn_hab"]][[s]])})
+# 
+# 
+# names(Move_Prob)      <- paste0("spp", seq_len(sim[["idx"]][["n.spp"]]))
+# names(Move_Prob_spwn) <- paste0("spp", seq_len(sim[["idx"]][["n.spp"]]))
+
+
+
+fields::image.plot(Pop$Start_pop[[1]], main = "spp1 starting biomass")
+fields::image.plot(Pop$Start_pop[[2]], main = "spp1 starting biomass")
+fields::image.plot(Pop$Start_pop[[3]], main = "spp1 starting biomass")
+
+
+
+
+```
+
+## Population movement
+
+Now we set up the population tolerance to different temperatures which
+determines how the populations move during the course of a year. We can then
+plot the combined spatiotemporal suitable habitat to examine how these
+interact.
+
+```{r temp}
+#load temp gradient
+
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+
+#Constant temp
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
+
+#increasing temp
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
+
+#set temperature preferences manually. 
+#The following assumes moveCov has been created and already has an empty spp_tol sublist
+moveCov[["spp_tol"]] <- list() #just in case
+moveCov[["spp_tol"]] <- list("spp1" = list("mu" = 9, "va" = 4),  #Haddock
+                             "spp2" = list("mu" = 8.75, "va" = 4.25),  #Cod
+                             "spp3" = list("mu" = 9, "va" = 4) )    #Yellowtail
+
+
+
+```
+
+## Fleet models
+
+Here we initialise the fleet with fish landings price per tonne, catchability
+coefficients per population, fuel cost, the coefficients for the step function
+and fleet behaviour.
+
+We can plot the behaviour of the step function to check its suitable for our
+simulations. This determines the relationship between the monetary value gained
+from a fishing tow and the next move by the vessel when using the correlated
+random walk function.
+
+```{r fleets}
+
+library(MixFishSim)
+
+#no fishing
+fleets <- init_fleet(sim_init = sim, VPT = list("spp1" = 0, "spp2" = 0, "spp3" = 0), #VPT = value per ton
+                     Qs = list("fleet 1" = c("spp1" = 0, "spp2" = 0, "spp3" = 0)   #Q = catchability
+                     ),
+                     fuelC = list("fleet1" = 3),
+                     step_params = list("fleet 1" = c("rate" = 3, "B1" = 1, "B2" = 2, "B3" = 3)
+                     ),				
+                     past_knowledge = FALSE,  #dont use past knowledge
+                     past_year_month = TRUE,
+                     past_trip = TRUE,
+                     threshold = 0.7
+)
+
+
+
+
+```
+
+
+
+
+
+## Run simulation
+
+Finally we run the simulation. The output is a list of objects containing all
+the information on fisheries catches, the population dynamics and population
+distributions. These can be examined with some inbuilt plotting functions. 
+
+```{r sim}
+run_simulation <- 
+  function(x){
+    
+    #this might track progress. If not check here: https://cran.r-project.org/web/packages/pbapply/pbapply.pdf
+    system(paste("echo 'now processing:",x,"'"))
+    
+    
+    source("R/run_sim.R")
+    
+    
+    #to source a new go_fish where I edited to skips most things:
+    #1: load file
+    source("R/go_fish_Bens.R") #my edited version that skips most things
+    #2: allow the function to call other hidden functions from mixfishsim 
+    environment(go_fish_Bens) <- asNamespace('MixFishSim')
+    #3: replace go_fish with go_fish_Bens in the MixFishSim package
+    assignInNamespace("go_fish", go_fish_Bens, ns = "MixFishSim")
+    
+    #   #rebuild package
+    #devtools::build()
+    
+    
+    #load rcpp exports ON SERVER ONLY. WONT WORK ON PC
+    Rcpp::sourceCpp(file= "src/Movement.cpp")
+    Rcpp::sourceCpp(file= "src/RcppExports.cpp")
+    Rcpp::compileAttributes() #this updates RcppExports.R file, which contains function definitions
+    
+    #ON PC JUST 1) REBUILD PACKAGE (ABOVE) THEN 2) RELOAD PACKAGE 
+    library(MixFishSim) #each core needs to load library
+    
+    #load data from CPU
+    #  load("C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Final_moveCov_12_9_Bensmethod.RData")
+    
+    #load constant temp data from Mars
+    #load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Final_constanttemp_20yr.RData")
+    
+    #load increase temp data from Mars
+    load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncTemp_environment.RData")
+    
+    
+    #this starts the profiling
+    # library(profvis)
+    # 
+    # profvis({
+    
+    
+    start_time <- Sys.time() # record start time
+    
+    
+    res<- run_sim(sim_init = sim,
+                  pop_init = Pop,
+                  move_cov = moveCov,
+                  fleets_init = fleets,
+                  hab_init = hab,
+                  save_pop_bio = TRUE,
+                  survey = NULL, #surv_random, will try to survey after simulation
+                  closure = NULL,
+                  InParallel = TRUE,
+                  nz = nonzero_idx)  #does it runin parallel? Doesnt seem like it
+    
+    end_time <- Sys.time() # record end time
+    tot_time <- end_time - start_time # calculate duration of lrren() example
+    
+    
+    #})
+    
+    return(res)
+    
+  }
+
+
+
+#run in parallel
+
+library(parallel)
+
+nCoresToUse <- detectCores() - 1   #this show 16 cores but I think I have 6??
+
+nCoresToUse <- 4
+
+
+cl <- parallel::makeCluster(nCoresToUse,revtunnel = TRUE, outfile = "", verbose = TRUE, master=nsl(Sys.info()['nodename'])) #options from https://stackoverflow.com/questions/41639929/r-cannot-makecluster-multinode-due-to-cannot-open-the-connection-error
+
+
+result <- list()
+
+
+result <- parallel::parLapply(cl,1:100,run_simulation)
+parallel::stopCluster(cl)
+
+
+
+#save results
+save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_ConPop_IncTemp_RESULTS.RData")
+
+# 
+# #below throws an error
+# #result <- foreach(i=1:3) %dopar% run_simulation(i)
+# 
+# #below throws a similar error: 3 nodes produced errors; first error: missing value where TRUE/FALSE needed
+#  parLapply(cl,1:3,run_simulation)
+# stopCluster(cl)
+
+
+```
+
+## Summary plots
+
+
+
+There are a series of input plotting functions to visualise the results of the
+simulation. For example, we can explore:
+  
+  * the population dynamics for each species
+* Seasonal patterns in exploitation
+* the location choice of a vessel
+* the realised step function for a vessel
+
+Users will wish to define their own plots, depending on the issues of interest
+and all the results are saved in the output from the run_sim function.
+
+```{r plots}
+
+## Biological
+source("R/plot_pop_summary.R")
+p1 <- plot_pop_summary(results = res,
+                       timestep = "annual",
+                       save = FALSE, 
+                       save.location = NULL
+)
+
+plot_pop_summary(results = res, timestep = "daily", save = FALSE, save.location = "C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-toy/testfolder")
+p1
+
+p2 <- plot_daily_fdyn(res)
+p2
+
+## Fishery
+
+logs <- combine_logs(res[["fleets_catches"]])
+
+p3 <- plot_vessel_move(sim_init = sim, logs = logs, fleet_no = 1, vessel_no = 5,
+                       year_trip = 5, trip_no = 10)
+p3
+
+p4 <- plot_realised_stepF(logs = logs, fleet_no = 1, vessel_no = 1)
+p4      
+
+
+
+#try some new ones
+
+#plot survey 2 ways
+p5 <- plot_survey(survey = res$survey, type = "spatial")
+p5
+
+p6 <- plot_survey(survey = res$survey, type = "index")
+p6
+
+
+#spatio temporal population plots
+source("R/Bens_plot_pop_spatiotemp.R")
+p7 <- Bens_plot_pop_spatiotemp(results = res,
+                               save = TRUE, 
+                               save.location = "testfolder/spatialplots"
+)
+p7
+
+
+```
+
+Note in our example how the fishing mortality rate for species 2 changes
+following the spatial closure, which was set to cover some of the core
+distribution of the population.
+
+
