@@ -681,9 +681,9 @@ for(s in seq(length(sum_survey_iter))){ #2 species
 
 # NEED TO UPDATE BELOW
 # #write csvs
-write.csv(sum_survey_iter_final[[1]], file="YT_SRS_GB_allstrata_IncPop_IncTemp.csv", row.names=F)
-write.csv(sum_survey_iter_final[[2]], file="Cod_SRS_GB_allstrata_IncPop_IncTemp.csv", row.names=F)
-write.csv(sum_survey_iter_final[[3]], file="Had_SRS_GB_allstrata_IncPop_IncTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[1]], file="YT_SRS_GB_excludestrata_IncPop_ConTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[2]], file="Cod_SRS_GB_excludestrata_IncPop_ConTemp.csv", row.names=F)
+write.csv(sum_survey_iter_final[[3]], file="Had_SRS_GB_excludestrata_IncPop_ConTemp.csv", row.names=F)
 
 
 
