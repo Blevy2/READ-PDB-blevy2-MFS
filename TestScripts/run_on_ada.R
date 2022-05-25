@@ -64,9 +64,9 @@ run_simulation <-
     
     #})
     
-    save.image(file = paste("/home/blevy/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncrTemp_RESULTS_iter",x,".RData", sep = ""))
+    saveRDS(res,file = paste("/home/blevy/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncrTemp_RESULTS_iter",x,".RData", sep = ""))
     
-    return(res)
+    remove(res)
     
   }
 
@@ -84,10 +84,7 @@ nCoresToUse <- 15
 cl <- parallel::makeCluster(nCoresToUse,revtunnel = TRUE, outfile = "", verbose = TRUE, master=nsl(Sys.info()['nodename'])) #options from https://stackoverflow.com/questions/41639929/r-cannot-makecluster-multinode-due-to-cannot-open-the-connection-error
 
 
-result <- list()
-
-
-result <- parallel::parLapply(cl,1:100,run_simulation)
+parallel::parLapply(cl,1:100,run_simulation)
 parallel::stopCluster(cl)
 
 
