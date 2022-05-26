@@ -307,7 +307,7 @@ Pop <- init_pop_Bens(sim_init = sim, Bio = c("spp1" = 50000, "spp2" = (13000+300
                                        "spp3" = c("model" = "BH", "a" = 497371062, "b" = 2078612769, "cv" = 0.55)), #CHANGE
                      rec_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14),
                      spwn_wk = list("spp1" = 9:12, "spp2" = 8:13, "spp3" = 11:14  ), 
-                     M = c("spp1" = .2064+.358, "spp2" = .2728+.511, "spp3" = .334+.45), #NEED F
+                     M = c("spp1" = .2064+.358+.2, "spp2" = .2728+.35, "spp3" = .334), #NEED F
                      K = c("spp1" = -log((1+exp(-.2295))^(1/52)-1), "spp2" = -log((1+exp(-.16))^(1/52)-1), "spp3" = -log((1+exp(-.2465))^(1/52)-1)),
                      #  K = c("spp1" = .2295, "spp2" = .16, "spp3" = .2465),
                      Weight_PreRecruit = (c("spp1" = .13/.39, "spp2" = .39/2.95, "spp3" = .19/1.12)),
@@ -459,7 +459,7 @@ run_simulation <-
     #load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-toy/20 year moveCov matrices/Final/Final_constanttemp_20yr.RData")
     
     #load increase temp data from Mars
-    load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_IncPop_IncTemp_environment.RData")
+    load("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_DecPop_IncTemp_environment.RData")
     
     
     #this starts the profiling
@@ -469,7 +469,7 @@ run_simulation <-
     
     
     start_time <- Sys.time() # record start time
-    p<-profmem::profmem({
+   # p<-profmem::profmem({
     
     res<- run_sim(sim_init = sim,
                   pop_init = Pop,
@@ -481,7 +481,7 @@ run_simulation <-
                   closure = NULL,
                   InParallel = TRUE,
                   nz = nonzero_idx)  #does it runin parallel? Doesnt seem like it
-    })
+   # })
     end_time <- Sys.time() # record end time
     tot_time <- end_time - start_time # calculate duration of lrren() example
     
@@ -500,7 +500,7 @@ library(parallel)
 
 nCoresToUse <- detectCores() - 1   #this show 16 cores but I think I have 6??
 
-nCoresToUse <- 4
+nCoresToUse <- 5
 
 
 cl <- parallel::makeCluster(nCoresToUse,revtunnel = TRUE, outfile = "", verbose = TRUE, master=nsl(Sys.info()['nodename'])) #options from https://stackoverflow.com/questions/41639929/r-cannot-makecluster-multinode-due-to-cannot-open-the-connection-error
@@ -515,7 +515,7 @@ parallel::stopCluster(cl)
 
 
 #save results
-save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_ConPop_IncTemp_RESULTS.RData")
+save.image("/net/home5/blevy/Bens_R_Projects/READ-PDB-blevy2-MFS2/Results/GB_3species_DecPop_IncTemp_RESULTS.RData")
 
 # 
 # #below throws an error
