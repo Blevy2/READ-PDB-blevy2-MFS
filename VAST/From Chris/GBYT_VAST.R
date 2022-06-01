@@ -12,7 +12,7 @@ library(ggplot2)
 set.seed <- 14159623
 
 # get data
-adios <- read.csv("ADIOS_SV_172909_GBK_NONE_survey_dist_map_fixed.csv",
+adios <- read.csv("VAST/From Chris/ADIOS_SV_172909_GBK_NONE_survey_dist_map_fixed.csv",
                   header = TRUE, stringsAsFactors = FALSE)
 head(adios)
 
@@ -43,11 +43,19 @@ example <- list(spring)
 example$Region <- "northwest_atlantic"
 example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210))
 
-settings <- make_settings(n_x = 50,
+settings <- make_settings(n_x = 500,
                           Region=example$Region, 
                           purpose="index", 
                           strata.limits=example$strata.limits, 
                           bias.correct=TRUE)
+
+
+# settings <- make_settings(n_x = 50,
+#                           Region=example$Region, 
+#                           purpose="index", 
+#                           strata.limits=example$strata.limits, 
+#                           bias.correct=TRUE,
+#                           FieldConfig= c("Omega1"="IID", "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0))
 settings
 
 fit <- fit_model(settings = settings,
