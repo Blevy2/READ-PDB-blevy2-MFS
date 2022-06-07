@@ -71,7 +71,7 @@ strat_mean_all <- vector("list",length(seq(n_spp)))
 
 for(s in seq(n_spp)){
   
-  strat_mean_all[[s]] <- vector("list",length(surv_noise)) 
+  strat_mean_all[[s]] <- vector("list",length(list_all)) 
 }
 
 
