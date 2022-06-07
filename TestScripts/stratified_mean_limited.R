@@ -367,6 +367,8 @@ library(ggplot2)
 ggplot(data=df,
        aes(x=iter,y=as.numeric(error))) +
   geom_point()+
+  ylim(0,1)+
+  stat_smooth(method = 'lm')+
   facet_grid(season ~ species)
 
 # 
