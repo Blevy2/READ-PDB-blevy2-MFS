@@ -6,12 +6,12 @@
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario <- "DecPop_ConTemp"
+scenario <- "IncPop_ConTemp"
 
 n_spp <- 3
 
 #survey results without noise
-list_all <- readRDS(paste("list_all_",scenario,".RDS",sep=""))
+list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 
 #simulation results
 result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
@@ -32,6 +32,57 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 
 
 
+#ADD TRUE MODEL POPULATION VALUES TO SURVEY DATA TABLES
+for(iter in seq(length(list_all))){
+  
+  temp <- matrix(data=0,nrow=length(list_all[[iter]][,1]),ncol=n_spp)
+  
+  for(samp in seq(length(list_all[[iter]][,1]))){
+    
+    x = as.numeric(list_all[[iter]][samp,2]) #x in second column
+    y = as.numeric(list_all[[iter]][samp,3]) #y in third column
+    wk = as.numeric(list_all[[iter]][samp,11]) #week in 11th column
+    yr = as.numeric(list_all[[iter]][samp,7]) #year in 7th column
+    
+    temp[samp,1] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp1"]],na.rm=T) #YT is spp1
+    temp[samp,2] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]],na.rm=T) #Cod is spp2
+    temp[samp,3] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]],na.rm=T) #Had is spp3
+  
+  }
+  colnames(temp) <- c("YT","Cod","Had") 
+  list_all[[iter]] <- cbind(list_all[[iter]],temp)
+  
+}
+
+#FIND MEAN VALUE BY SEASON USING ABOVE INFORMATION. USE MEAN OF TWO SURVEY WEEKS FOR EACH SEASON
+season_wks <- list(c(13,14),c(37,38))
+pop_by_season <- list()
+
+for(iter in seq(length(list_all))){
+for(s in short_names){ 
+  temp <- data.frame()
+  idx <- 1
+  for(yr in seq(3,22)){
+
+    for(season in seq(2)){
+
+      
+   
+    temp[idx,1] <- yr
+    temp[idx,2] <- season
+    
+    #use values in given year for weeks in specified season. only use single strata because entire population summariezed in each strata in above loop
+    temp[idx,3] <- mean(as.numeric(list_all[[iter]][((as.numeric(list_all[[iter]][,"year"]==yr)) & (as.numeric(list_all[[iter]][,"week"]) %in% season_wks[[season]]) & (as.numeric(list_all[[iter]][,"stratum"]==29)) ),s]))
+    
+    
+    idx <- idx + 1    
+  }  
+
+  }
+  colnames(temp) <- c("year","season","biomass")
+  pop_by_season[[s]][[iter]] <- temp
+  }
+}
 
 #BELOW WILL TAKE A MINUTE
 
@@ -248,8 +299,24 @@ for(s in short_names){
   #pull out strat mean calc
   SRS_data[[s]] <-  strat_mean_all[[s]][[iter]] 
   
-  #model value 
-  model[[s]][[iter]] <-  annual_species[[s]][[iter]][annual_species[[s]][[iter]]$season==1,"data"]
+  #model value (old way)
+  #model[[s]][[iter]] <-  annual_species[[s]][[iter]][annual_species[[s]][[iter]]$season==1,"data"]
+  # 
+  #  #SRS spring estimate
+  # SRS_spring[[s]][[iter]] <- strat_mean_all[[s]][[iter]][strat_mean_all[[s]][[iter]][,"season"]==1,"mean.yr.absolute"]
+  # 
+  # #SRS fall estimate
+  # SRS_fall[[s]][[iter]] <- strat_mean_all[[s]][[iter]][strat_mean_all[[s]][[iter]][,"season"]==2,"mean.yr.absolute"]
+  # 
+  # #calculate SPRING error from each iteration
+  # SRS_error_spring[[s]][[iter]] <- norm(model[[s]][[iter]] - SRS_spring[[s]][[iter]] , type="2") / norm(model[[s]][[iter]] , type ="2")
+  # 
+  # #calculate FALL error from each iteration
+  # SRS_error_fall[[s]][[iter]] <- norm(model[[s]][[iter]] - SRS_fall[[s]][[iter]] , type="2") / norm(model[[s]][[iter]] , type ="2")
+  # 
+  model_spring = pop_by_season[[s]][[iter]][pop_by_season[[s]][[iter]]$season==1,"biomass"]
+    
+  model_fall = pop_by_season[[s]][[iter]][pop_by_season[[s]][[iter]]$season==2,"biomass"]
   
   #SRS spring estimate
   SRS_spring[[s]][[iter]] <- strat_mean_all[[s]][[iter]][strat_mean_all[[s]][[iter]][,"season"]==1,"mean.yr.absolute"]
@@ -258,18 +325,19 @@ for(s in short_names){
   SRS_fall[[s]][[iter]] <- strat_mean_all[[s]][[iter]][strat_mean_all[[s]][[iter]][,"season"]==2,"mean.yr.absolute"]
   
   #calculate SPRING error from each iteration
-  SRS_error_spring[[s]][[iter]] <- norm(model[[s]][[iter]] - SRS_spring[[s]][[iter]] , type="2") / norm(model[[s]][[iter]] , type ="2")
+  SRS_error_spring[[s]][[iter]] <- norm(model_spring- SRS_spring[[s]][[iter]] , type="2") / norm(model_spring , type ="2")
   
   #calculate FALL error from each iteration
-  SRS_error_fall[[s]][[iter]] <- norm(model[[s]][[iter]] - SRS_fall[[s]][[iter]] , type="2") / norm(model[[s]][[iter]] , type ="2")
+  SRS_error_fall[[s]][[iter]] <- norm(model_fall - SRS_fall[[s]][[iter]] , type="2") / norm(model_fall , type ="2")
+  
   
     }
 
 
 long_names <- c("Yellowtail Flounder","Cod","Haddock")
 
-idx <-1
-par(mfrow = c(1,3), mar = c(1, 1, 1, 1))
+
+#par(mfrow = c(1,3), mar = c(1, 1, 1, 1))
 
 #for(s in short_names){
   # 
@@ -299,10 +367,17 @@ par(mfrow = c(1,3), mar = c(1, 1, 1, 1))
     geom_errorbar(data=as.data.frame(SRS_data[[1]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
     geom_point(data=as.data.frame(SRS_data[[1]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
     geom_line(data=as.data.frame(SRS_data[[1]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-    #plot model data
-    geom_point(data = as.data.frame(annual_species[[1]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
-    geom_line(data = as.data.frame(annual_species[[1]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
     
+      #plot model data
+      #this way plots annual data
+    #geom_point(data = as.data.frame(annual_species[[1]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+    #geom_line(data = as.data.frame(annual_species[[1]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+    
+      #this way plots data by season
+    geom_point(data = as.data.frame(pop_by_season[[1]][[iter]]), aes(x=as.numeric(year),y=biomass, group = season, color = "Model")) +
+    geom_line(data = as.data.frame(pop_by_season[[1]][[iter]]), aes(x=as.numeric(year),y=biomass, group =season, color = "Model")) +
+      
+      
     facet_wrap(~ season) +
     labs(x="year",y="Biomass", title = long_names[1], color ="" ) 
 
@@ -312,9 +387,15 @@ par(mfrow = c(1,3), mar = c(1, 1, 1, 1))
       geom_errorbar(data=as.data.frame(SRS_data[[2]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
       geom_point(data=as.data.frame(SRS_data[[2]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
       geom_line(data=as.data.frame(SRS_data[[2]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+      
       #plot model data
-      geom_point(data = as.data.frame(annual_species[[2]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
-      geom_line(data = as.data.frame(annual_species[[2]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+      #this way plots annual data
+      #geom_point(data = as.data.frame(annual_species[[2]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+      #geom_line(data = as.data.frame(annual_species[[2]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+     
+      #this way plots data by season
+      geom_point(data = as.data.frame(pop_by_season[[2]][[iter]]), aes(x=as.numeric(year),y=biomass, group = season, color = "Model")) +
+      geom_line(data = as.data.frame(pop_by_season[[2]][[iter]]), aes(x=as.numeric(year),y=biomass, group =season, color = "Model")) +
       
       facet_wrap(~ season) +
       labs(x="year",y="Biomass", title = long_names[2], color ="" )
@@ -325,9 +406,15 @@ par(mfrow = c(1,3), mar = c(1, 1, 1, 1))
       geom_errorbar(data=as.data.frame(SRS_data[[3]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
       geom_point(data=as.data.frame(SRS_data[[3]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
       geom_line(data=as.data.frame(SRS_data[[3]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+      
       #plot model data
-      geom_point(data = as.data.frame(annual_species[[3]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
-      geom_line(data = as.data.frame(annual_species[[3]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+      #this way plots annual data
+      #geom_point(data = as.data.frame(annual_species[[3]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+      #geom_line(data = as.data.frame(annual_species[[3]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+      
+      #this way plots data by season
+      geom_point(data = as.data.frame(pop_by_season[[3]][[iter]]), aes(x=as.numeric(year),y=biomass, group = season, color = "Model")) +
+      geom_line(data = as.data.frame(pop_by_season[[3]][[iter]]), aes(x=as.numeric(year),y=biomass, group =season, color = "Model")) +
       
       facet_wrap(~ season) +
       labs(x="year",y="Biomass", title = long_names[3], color ="" )

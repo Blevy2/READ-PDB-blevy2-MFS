@@ -105,11 +105,9 @@ print(unique_numbers)
 	  #prepare indices for each strata 
 	  index <- vector()  #empty vector
 	  
-	  un_idx <- 0  #unique_numbers index
-	  
+	 
 	  for(j in unique_numbers){
-	   	   
-	     un_idx <- un_idx+1
+	   
 	   	 index[j]<-0
 	    
 
@@ -118,7 +116,7 @@ print(unique_numbers)
 	  
 	  for(i in seq(1:length(strata_num))){
 
-	    if(strata_num[i] == unique_numbers[un_idx]){
+	    if(strata_num[i] == j){
 	      strata_index[i]<-index[strata_num[i]] +1
 	      index[strata_num[i]]<-index[strata_num[i]]+1
 	      
@@ -130,7 +128,7 @@ print(unique_numbers)
 	  }	  
 	  #have created matirx with 1 to n in correct strata and 0 elsewhere
 	  #store each in list
-	  strata_index_list[[un_idx]]<-strata_index
+	  strata_index_list[[j]]<-strata_index
 	  }
 	  
 	  
@@ -143,17 +141,31 @@ print(unique_numbers)
 	  #while you do keep track of strata number
 	  str_num <-vector()
 	  	   yrs <- vector()
-	  nstat_idx <- 0 #n_stations index	   
+		   
+	  
+	  
+	  #take n_stations and put in same entries/order as index so they match up in section below
+	  n_sta <- vector()
+	  unique_numbers_order <- sort(unique_numbers)
+	  idxxx<-1 
+	  for(j in unique_numbers_order){
+	    
+	    n_sta[j] <- n_stations[idxxx]
+	    idxxx<- idxxx+1
+	    
+	  }
+	  
+	  
 	  	   
 	  for(j in unique_numbers){
 	    print(j)
 	    #index[j] is how many total stations there are in each strata
 	    #currently dividing total number of samples evening among each strata
-	    nstat_idx <- nstat_idx +1
-	   if(index[j]>=(n_stations[[nstat_idx]]*(sim_init[["idx"]][["ny"]]-years_cut))){
-	     {my_sample <- sample(index[j],n_stations[[nstat_idx]]*(sim_init[["idx"]][["ny"]]-years_cut),replace = FALSE)}
+	  
+	   if(index[j]>=(n_sta[j]*(sim_init[["idx"]][["ny"]]-years_cut))){
+	     {my_sample <- sample(index[j],n_sta[j]*(sim_init[["idx"]][["ny"]]-years_cut),replace = FALSE)}
 	     }else{print("not enough sampling locations. sampling this strata with replacement")
-	                     my_sample <- sample(index[j],n_stations[[nstat_idx]]*(sim_init[["idx"]][["ny"]]-years_cut),replace = TRUE)
+	                     my_sample <- sample(index[j],n_sta[j]*(sim_init[["idx"]][["ny"]]-years_cut),replace = TRUE)
 	                     temp <- strata_num
 	                     temp[strata_num!=j]=-999
 	                     fields::image.plot(rotate(temp))}
@@ -171,10 +183,10 @@ print(unique_numbers)
 	   nsamps <- length(my_sample)
 	 #  print(nsamps)
 	    for(i in seq(1:nsamps)){
-	    coords <- c(coords,which(strata_index_list[[nstat_idx]]==my_sample[i]))
+	    coords <- c(coords,which(strata_index_list[[j]]==my_sample[i]))
 
 	    #record strata number
-	    str_num <-c(str_num,unique_numbers[nstat_idx])
+	    str_num <-c(str_num,j)
 	    
 	    #record year
 	   
@@ -211,7 +223,8 @@ print(unique_numbers)
 
 	      
 	      coord[1,1] <- ((pos-1) %% dim.mat[1]) +1  #xcoordinate
-	      coord[1,2] <- ((pos-1) %/% dim.mat[2]) +1 #y coordinate
+	      coord[1,2] <- ((pos-1) %/% dim.mat[1]) +1 #y coordinate
+	     # print(coord[1,2])
 	   #  show(pos)
 	   	      
 #	    coords <- pos2coord(pos=i,dim.mat = dim.mat)   #I extracted the above code from this function file 

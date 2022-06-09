@@ -70,7 +70,7 @@ for(strata in unique(surv_random$log.mat[,4])){
 
 fields::image.plot(rotate(hab$stratas))
 
-test <- matrix(0, nrow = length(hab$hab$spp1[1,]),ncol = length(hab$hab$spp1[,1]))
+test <- matrix(0, nrow = length(hab$hab$spp1[,1]),ncol = length(hab$hab$spp1[1,]))
 
 for(i in seq(length(surv_random$log.mat[,1]))){
   # print(surv_random$log.mat[i,2])
@@ -179,7 +179,7 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 strata_surv <- list()
 #pull out each strata survey info and store separately  
 
-temp <- matrix(unlist(surv_random$log.mat),ncol=n_cols, nrow=sum(strat_samp_tot))
+temp <- surv_random$log.mat
 idx <- 1
 for(i in seq(nstrata)){
   
