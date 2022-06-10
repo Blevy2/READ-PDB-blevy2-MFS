@@ -968,9 +968,9 @@ res[["pop_bios_sd"]] <- pop_bios_sd
 #ADD TRUE MODEL POPULATION VALUES TO SURVEY DATA TABLES
 
   
-  temp <- matrix(data=0,nrow=length(list_all[[iter]][,1]),ncol=n_spp)
+  temp <- matrix(data=0,nrow=length(list_all[[1]][,1]),ncol=n_spp)
   
-  for(samp in seq(length(list_all[[iter]][,1]))){
+  for(samp in seq(length(list_all[[1]][,1]))){
     
     x = as.numeric(list_all[[1]][samp,2]) #x in second column
     y = as.numeric(list_all[[1]][samp,3]) #y in third column
@@ -1253,9 +1253,13 @@ lines(srs_spp1_fall$mean.yr.absolute)
 
 
 
+scenario <- "ConPop_ConTemp"
 
+#if you want to load in existing results, do so below
 
+res <- readRDS(paste("E:/READ-PDB-blevy2-MFS2/GB_Results/",scenario,"/res_",scenario,".RDS", sep=""))
 
+list_all <- readRDS(paste("E:/READ-PDB-blevy2-MFS2/GB_Results/",scenario,"/list_all_",scenario,".RDS", sep=""))
 
 
 #plot stratified calculation and population estimate on same plot
@@ -1286,20 +1290,20 @@ SRS_data <- list(data_spp1, data_spp2)
 names(SRS_data) <- c("spp1","spp2")
 
 #put in same folder and read in csvs automatircally
-SRS_data <- vector("list",n_spp)
+SRS_data <- list()
 
 
 #on external hardrive
 for(s in short_names){ 
-  path <- "E:\\READ-PDB-blevy2-MFS2\\GB_Results\\ConPop_IncTemp\\"
-  SRS_data[[s]] <- read_csv(file = paste(path,s,"_SRS_GB_allstrata_ConPop_IncTemp.csv",sep=""))
+  path <- paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\",sep="")
+  SRS_data[[s]] <- read.csv(file = paste(path,s,"_SRS_GB_allstrata_",scenario,".csv",sep=""))
   
 }
 
 #on NOAA server
 for(s in short_names){ 
   path <- "Results\\"
-  SRS_data[[s]] <- read_csv(file = paste(s,"_SRS_GB_excludestrata_ConPop_IncTemp.csv",sep=""))
+  SRS_data[[s]] <- read.csv(file = paste(s,"_SRS_GB_excludestrata_ConPop_IncTemp.csv",sep=""))
   
 }
 
@@ -1310,7 +1314,7 @@ long_names <- c("Yellowtail Flounder","Cod","Haddock")
 
 
 
-pdf(file=paste("Results/SRS_excludestrata_ConPop_IncTemp.pdf",sep=""))
+pdf(file=paste("Results/SRS_allstrata_",scenario,".pdf",sep=""))
 
 
 #NEW WAY PLOTTING 3 TOGETHER ON SAME PAGE

@@ -6,7 +6,7 @@
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario <- "IncPop_ConTemp"
+scenario <- "ConPop_IncTemp"
 
 n_spp <- 3
 
@@ -447,16 +447,24 @@ df_fall <- tibble(iter = rep(1:length(list_all),n_spp),
 
 df <- rbind(df_fall,df_spring)
 
+
+#create data frame containing mean values for each group
+means <- ddply(df, .(species,season), summarise, mean = mean(as.numeric(error)))
+
 #Error scatterplots
 
+#1) to plot a single scenario, run just cc below and print(cc)
+#2) to plot two scenarios on top of each other, store the first as cc and then run code below doing cc +
 
 library(ggplot2)
-ggplot(data=df,
+cc<-ggplot(data=df,
        aes(x=iter,y=as.numeric(error))) +
-  geom_point()+
+  geom_point(color="blue")+
   ylim(0,1)+
-  stat_smooth(method = 'lm')+
-  facet_grid(season ~ species)
+  facet_grid(season ~ species)+
+geom_hline(aes(yintercept = mean), data = means, color = "blue") 
+
+print(cc)
 
 # 
 # ggsave(filename = paste("Results/GB_error_plots/Individussssal_SRS_",scenario,".pdf",sep=""),
@@ -464,6 +472,12 @@ ggplot(data=df,
 # 
 
 
+
+#run this second to plot on top of each other
+cc+  geom_point(data=df,color="red",
+             aes(x=iter,y=as.numeric(error)))+
+   facet_grid(season ~ species) +
+  geom_hline(aes(yintercept = mean), data = means, color = "red")
 
 
 
