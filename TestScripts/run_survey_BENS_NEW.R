@@ -398,8 +398,6 @@ for(res in seq(length(result))){ #for each simulation result
 
 
 
-
-
 #garbage collection
 gc()
 
@@ -965,6 +963,67 @@ res[["pop_bios_sd"]] <- pop_bios_sd
 
 
 
+
+
+#ADD TRUE MODEL POPULATION VALUES TO SURVEY DATA TABLES
+
+  
+  temp <- matrix(data=0,nrow=length(list_all[[iter]][,1]),ncol=n_spp)
+  
+  for(samp in seq(length(list_all[[iter]][,1]))){
+    
+    x = as.numeric(list_all[[1]][samp,2]) #x in second column
+    y = as.numeric(list_all[[1]][samp,3]) #y in third column
+    wk = as.numeric(list_all[[1]][samp,11]) #week in 11th column
+    yr = as.numeric(list_all[[1]][samp,7])-2 #year in 7th column. subtract 2 because already removed 2 years
+   # print(wk)
+    #print(yr)
+    temp[samp,1] <- sum(res$pop_bios[[(wk+(52*(yr-1)))]][["YT"]],na.rm=T) #YT is spp1
+    temp[samp,2] <- sum(res$pop_bios[[(wk+(52*(yr-1)))]][["Cod"]],na.rm=T) #Cod is spp2
+    temp[samp,3] <- sum(res$pop_bios[[(wk+(52*(yr-1)))]][["Had"]],na.rm=T) #Had is spp3
+    
+  }
+  colnames(temp) <- c("YT","Cod","Had") 
+  temp <- cbind(list_all[[1]],temp)
+
+#FIND MEAN VALUE BY SEASON USING ABOVE INFORMATION. USE MEAN OF TWO SURVEY WEEKS FOR EACH SEASON
+season_wks <- list(c(13,14),c(37,38))
+pop_by_season <- list()
+
+
+  for(s in short_names){ 
+    temp2 <- data.frame()
+    idx <- 1
+    for(yr in seq(3,22)){
+      
+      for(season in seq(2)){
+        
+        
+        
+        temp2[idx,1] <- yr
+        temp2[idx,2] <- season
+        
+        #use values in given year for weeks in specified season. only use single strata because entire population summariezed in each strata in above loop
+        temp2[idx,3] <- mean(as.numeric(temp[((as.numeric(temp[,"year"]==yr)) & (as.numeric(temp[,"week"]) %in% season_wks[[season]]) & (as.numeric(temp[,"stratum"]==29)) ),s]))
+        
+        
+        idx <- idx + 1    
+      }  
+      
+    }
+    colnames(temp2) <- c("year","season","biomass")
+    pop_by_season[[s]] <- temp2
+  }
+
+
+
+
+
+
+
+
+
+
 ##################
 # Preparing things to plot
 ##################
@@ -1199,7 +1258,6 @@ lines(srs_spp1_fall$mean.yr.absolute)
 
 
 
-
 #plot stratified calculation and population estimate on same plot
 
 #first make model output have 2 seasons to match the stratified mean calcs
@@ -1231,34 +1289,113 @@ names(SRS_data) <- c("spp1","spp2")
 SRS_data <- vector("list",n_spp)
 
 
+#on external hardrive
 for(s in short_names){ 
   path <- "E:\\READ-PDB-blevy2-MFS2\\GB_Results\\ConPop_IncTemp\\"
   SRS_data[[s]] <- read_csv(file = paste(path,s,"_SRS_GB_allstrata_ConPop_IncTemp.csv",sep=""))
   
 }
 
+#on NOAA server
+for(s in short_names){ 
+  path <- "Results\\"
+  SRS_data[[s]] <- read_csv(file = paste(s,"_SRS_GB_excludestrata_ConPop_IncTemp.csv",sep=""))
+  
+}
+
+
 
 long_names <- c("Yellowtail Flounder","Cod","Haddock")
 
-idx <-1
-for(s in short_names){
+
+
+
+pdf(file=paste("Results/SRS_excludestrata_ConPop_IncTemp.pdf",sep=""))
+
+
+#NEW WAY PLOTTING 3 TOGETHER ON SAME PAGE
+
+#YTF
+p1<- ggplot() +
+  #plot stratified calculation data
+  geom_errorbar(data=as.data.frame(SRS_data[["YT"]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+  geom_point(data=as.data.frame(SRS_data[["YT"]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+  geom_line(data=as.data.frame(SRS_data[["YT"]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
   
-  #initiate ggplot
-  p<- ggplot() +
-    #plot stratified calculation data
-    geom_errorbar(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
-    geom_point(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-    geom_line(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
-    #plot model data
-    geom_point(data = as.data.frame(annual_species[[s]]), aes(x=year,y=data, group =season, color = "Model")) +
-    geom_line(data = as.data.frame(annual_species[[s]]), aes(x=year,y=data, group =season, color = "Model")) +
-    
-    facet_wrap(~ season) +
-    labs(x="year",y="Biomass", title = long_names[idx], color ="" ) 
-  idx<-idx+1
+  #plot model data
+  #this way plots annual data
+  #geom_point(data = as.data.frame(annual_species[[1]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+  #geom_line(data = as.data.frame(annual_species[[1]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
   
-  print(p)
-}
+  #this way plots data by season
+  geom_point(data = as.data.frame(pop_by_season[["YT"]]), aes(x=as.numeric(year),y=biomass, group = season, color = "Model")) +
+  geom_line(data = as.data.frame(pop_by_season[["YT"]]), aes(x=as.numeric(year),y=biomass, group =season, color = "Model")) +
+  
+  
+  facet_wrap(~ season) +
+  labs(x="year",y="Biomass", title = long_names[1], color ="" ) 
+
+#COD
+p2<- ggplot() +
+  #plot stratified calculation data
+  geom_errorbar(data=as.data.frame(SRS_data[["Cod"]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+  geom_point(data=as.data.frame(SRS_data[["Cod"]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+  geom_line(data=as.data.frame(SRS_data[["Cod"]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+  
+  #plot model data
+  #this way plots annual data
+  #geom_point(data = as.data.frame(annual_species[[2]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+  #geom_line(data = as.data.frame(annual_species[[2]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+  
+  #this way plots data by season
+  geom_point(data = as.data.frame(pop_by_season[["Cod"]]), aes(x=as.numeric(year),y=biomass, group = season, color = "Model")) +
+  geom_line(data = as.data.frame(pop_by_season[["Cod"]]), aes(x=as.numeric(year),y=biomass, group =season, color = "Model")) +
+  
+  facet_wrap(~ season) +
+  labs(x="year",y="Biomass", title = long_names[2], color ="" )
+
+#HAD
+p3<- ggplot() +
+  #plot stratified calculation data
+  geom_errorbar(data=as.data.frame(SRS_data[["Had"]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+  geom_point(data=as.data.frame(SRS_data[["Had"]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+  geom_line(data=as.data.frame(SRS_data[["Had"]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+  
+  #plot model data
+  #this way plots annual data
+  #geom_point(data = as.data.frame(annual_species[[3]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+  #geom_line(data = as.data.frame(annual_species[[3]][[iter]]), aes(x=as.numeric(year),y=data, group =season, color = "Model")) +
+  
+  #this way plots data by season
+  geom_point(data = as.data.frame(pop_by_season[["Had"]]), aes(x=as.numeric(year),y=biomass, group = season, color = "Model")) +
+  geom_line(data = as.data.frame(pop_by_season[["Had"]]), aes(x=as.numeric(year),y=biomass, group =season, color = "Model")) +
+  
+  facet_wrap(~ season) +
+  labs(x="year",y="Biomass", title = long_names[3], color ="" )
+
+gridExtra::grid.arrange(p1,p2,p3,nrow=3)
+
+dev.off()
+
+# idx <-1
+# for(s in short_names){
+#   
+#   #initiate ggplot
+#   p<- ggplot() +
+#     #plot stratified calculation data
+#     geom_errorbar(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+#     geom_point(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+#     geom_line(data=as.data.frame(SRS_data[[s]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+#     #plot model data
+#     geom_point(data = as.data.frame(annual_species[[s]]), aes(x=year,y=data, group =season, color = "Model")) +
+#     geom_line(data = as.data.frame(annual_species[[s]]), aes(x=year,y=data, group =season, color = "Model")) +
+#     
+#     facet_wrap(~ season) +
+#     labs(x="year",y="Biomass", title = long_names[idx], color ="" ) 
+#   idx<-idx+1
+#   
+#   print(p)
+# }
 # 
 # #spp1 plot
 # 
