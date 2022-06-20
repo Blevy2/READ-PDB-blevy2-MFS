@@ -175,3 +175,22 @@ impliments the optimizations scheme by calling the below codes.
 run_sim_param_estimate.R is run_sim with everything removed except for recruitment and population dynamics. This code is called by param_estimate.R to fit recruitment parameters for desired scenario (increasing, decreasing, constant populations)
 
 init_pop_Bens_param_estimate.R is an edit of init_pop_Bens used to initialize the population during parameter estimation. The main difference here is instead of creating an initial spatial population, the initial pop is a scalar value
+
+stratified_mean_limited.R is a script that calculates the stratified mean from survey values for each individual simulation (rather than summarizing all into single value). Then it calculates the error between the seasonal estimates and the
+true seasonal values from the model. Finally the script will plot each individual estimate with each simulation and save as a 100 page pdf and also saves error values from each to create a scatter plot. 
+If we want to compare scatterplots for included all strata in mean calcs vs not including all, we need to run the script twice. FIrst time to create gg object 'cc', second time to add cc to second scatterplot
+
+Percent_area_occupied.R is a script used to calculate the percent of the population that is in each strata and plot them over time. This can be used to see species shift as temp shifts
+
+movement_check.R is a script that can be used to compare spatial model results with observation data from surveys. Use this to set movement values like lambda
+
+run_on_ada.R is a bare bones version of GB_3species used to run on Steven Fiedlers computer named ada
+
+compile_results.R is a script used to take individual simulation runs that would come from Steven Fiedlers linux computer and put them into an object called result to match the output from NOAA servers so that I was able to run the survey on them
+
+x_y_to_lat_lon.R is a test script I used to practice reading in x,y locations from a survey and converting them into lat lon coordinates by relating them to the related habitat raster
+
+
+
+
+
