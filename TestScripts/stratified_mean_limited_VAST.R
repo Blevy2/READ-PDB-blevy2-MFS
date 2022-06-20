@@ -244,9 +244,11 @@ for(iter in seq(length(list_all))){
   
 }
 
+#initial scenario folder
+dir.create( paste0(getwd(),"/VAST/",scenario)) #create folder to store upcoming subfolders
 
 names(strat_mean_all) <- short_names
-saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scenario))
+saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scenario,".RDS"))
 
 
 
@@ -313,7 +315,7 @@ exclude <- list(c(0),c(0),c(0)) #3 species
 
 
 
-for(iter in seq(length(list_all))){
+for(iter in seq(10)){
   
   #pull out survey  
   surv_random_VAST <- list_all[[iter]]
@@ -353,7 +355,7 @@ spring <- adios %>%
   filter(Season == "SPRING") %>%
   # filter(YEAR >= 2009) %>%
  # mutate(mycatch = paste0(s,"_samp",sep="")) %>%  #OLD WAY DIDNT WORK
-  unite("mycatch",  paste0(s,"","_samp"),remove=F) %>% #NEW WAY
+  tidyr::unite("mycatch",  paste0(s,"","_samp"),remove=F) %>% #NEW WAY
   dplyr::select(Year = year,
          Catch_KG = mycatch,
          Lat = Lat,
@@ -365,7 +367,7 @@ fall <- adios %>%
   filter(Season == "FALL") %>%
   # filter(YEAR >= 2009) %>%
   # mutate(mycatch = paste0(s,"_samp",sep="")) %>%  #OLD WAY DIDNT WORK
-  unite("mycatch",  paste0(s,"","_samp"),remove=F) %>% #NEW WAY
+  tidyr::unite("mycatch",  paste0(s,"","_samp"),remove=F) %>% #NEW WAY
   dplyr::select(Year = year,
          Catch_KG = mycatch,
          Lat = Lat,
@@ -402,7 +404,7 @@ example$strata.limits <- strata.limits[[s]]
 #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
 
 #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
-settings <- make_settings(n_x = 500,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
                           Region=example$Region,
                           purpose="index2",
                           strata.limits=example$strata.limits,
@@ -473,9 +475,9 @@ setwd(orig.dir)
 
 #save all individual fits
 VAST_fit_all <- list(VAST_fit_spring,VAST_fit_fall)
-names(VAST_fit) <- c("spring","fall")
+names(VAST_fit_all) <- c("spring","fall")
 
-saveRDS(VAST_fit_all,paste0(getwd(),"/VAST/",scenario,"/VAST_fit_all_",scenario))
+saveRDS(VAST_fit_all,paste0(getwd(),"/VAST/",scenario,"/VAST_fit_all_",scenario,".RDS"))
 
 
 
