@@ -315,7 +315,7 @@ exclude <- list(c(0),c(0),c(0)) #3 species
 
 
 
-for(iter in seq(10)){
+for(iter in seq(length(list_all))){
   
   #pull out survey  
   surv_random_VAST <- list_all[[iter]]
