@@ -290,14 +290,14 @@ cell_sz <- mean(cell_size)
 VAST_fit_spring <- list() #all model fit info
 VAST_fit_fall <- list()
 
-
-
+#original project directory so we can switch back to it
+orig.dir <- getwd()
 
 #individual strata limits
 strata.limits <- list()
 strata.limits[["YT"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #THESE ARE YTF STRATA
-strata.limits[["Cod"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250)) #THESE ARE YTF STRATA
-strata.limits[["Had"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE YTF STRATA
+strata.limits[["Cod"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
+strata.limits[["Had"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE HAD STRATA
 
 
 #initial scenario folder
@@ -324,7 +324,7 @@ for(iter in seq(length(list_all))){
   
  
   
-  setwd("C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-MFS2")
+  setwd(orig.dir)
    
     #create directories first time through
     if(iter == 1){
@@ -443,7 +443,7 @@ plot_biomass_index(VAST_fit_spring[[s]][[iter]])
 # par_hat_sp = TMB:::as.list.sdreport( VAST_fit_spring[[iter]]$parameter_estimates$SD, what="Estimate", report=TRUE )
 
 
-setwd("C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-MFS2")
+setwd(orig.dir)
 setwd(paste0(getwd(),"/VAST/",scenario))
 
 #FALL FIT
@@ -469,7 +469,7 @@ plot_biomass_index(VAST_fit_fall[[s]][[iter]])
 
 
 #reset working directory
-setwd("C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-MFS2")
+setwd(orig.dir)
 
 #save all individual fits
 VAST_fit_all <- list(VAST_fit_spring,VAST_fit_fall)
