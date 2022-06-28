@@ -7,7 +7,7 @@
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario <- "ConPop_ConTemp"
+scenario <- "ConPop_IncTemp"
 
 n_spp <- 3
 
@@ -301,6 +301,55 @@ strata.limits[["YT"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 117
 strata.limits[["Cod"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
 strata.limits[["Had"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE HAD STRATA
 
+#make_settings seems like the way to impliment most desired settings
+
+# settings <- make_settings(n_x = 50,
+#                           Region=example$Region, 
+#                           purpose="index2", 
+#                           strata.limits=example$strata.limits, 
+#                           bias.correct=TRUE)
+#ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
+
+#WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
+settings_species <- list()
+
+#first attempt at settings. failed on ConPop_IncTemp exclude strata interation #56 fall
+settings_species[["YT"]] <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                          Region=example$Region,
+                          purpose="index2",
+                          strata.limits=example$strata.limits,
+                          bias.correct=TRUE,
+                          FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0))
+
+#second attempt which fixes the previous fail
+settings_species[["YT"]] <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                          Region=example$Region,
+                          purpose="index2",
+                          strata.limits=example$strata.limits,
+                          bias.correct=TRUE,
+                          FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0),
+                          RhoConfig = c("Beta1" = 0, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 0))
+#' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
+#'   which is the recommended way of generating this input for beginning users.
+#dafault FieldConfig settings:
+# if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
+
+#settings
+
+settings_species[["Cod"]] <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                          Region=example$Region,
+                          purpose="index2",
+                          strata.limits=example$strata.limits,
+                          bias.correct=TRUE,
+                          FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+
+settings_species[["Had"]] <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                                            Region=example$Region,
+                                            purpose="index2",
+                                            strata.limits=example$strata.limits,
+                                            bias.correct=TRUE,
+                                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+
 
 #initial scenario folder
 dir.create( paste0(getwd(),"/VAST/",scenario)) #create folder to store upcoming subfolders
@@ -394,30 +443,10 @@ example <- list(spring)
 example$Region <- "northwest_atlantic"
 example$strata.limits <- strata.limits[[s]] 
 
-#make_settings seems like the way to impliment most desired settings
+settings <- settings_species[[s]]
 
-# settings <- make_settings(n_x = 50,
-#                           Region=example$Region, 
-#                           purpose="index2", 
-#                           strata.limits=example$strata.limits, 
-#                           bias.correct=TRUE)
-#ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
 
-#WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
-settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                          Region=example$Region,
-                          purpose="index2",
-                          strata.limits=example$strata.limits,
-                          bias.correct=TRUE,
-                          FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0))
-#' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
-#'   which is the recommended way of generating this input for beginning users.
-#dafault FieldConfig settings:
-# if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
-
-#settings
-
-setwd(paste0(getwd(),"/VAST/",scenario))
+setwd(paste0(getwd(),"/VAST/",scenario,"/",s))
 
 #SPRING FIT
 VAST_fit_spring[[s]][[iter]] <- fit_model(settings = settings,
@@ -430,12 +459,18 @@ VAST_fit_spring[[s]][[iter]] <- fit_model(settings = settings,
                  "v_i"=spring[,'Vessel'])
 
 #1- THIS PART SAVES CSV AND PNG FOR THE INDEX VALUE
-dir.create( paste0(getwd(),"/",s,"/spring/iter",iter))
+dir.create( paste0(getwd(),"/spring/iter",iter,sep=""))
 
-setwd(paste0(getwd(),"/",s,"/spring/iter",iter))
+setwd(paste0(getwd(),"/spring/iter",iter))
 
 plot_biomass_index(VAST_fit_spring[[s]][[iter]])
 
+#copy parameter files into iteration folder
+file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/parameter_estimates.txt",sep="") 
+            ,to =paste(orig.dir,"/VAST/",scenario,"/",s,"/spring/iter",iter,"/parameter_estimates.txt",sep=""))
+
+file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/parameter_estimates.RData",sep="") 
+            ,to =paste(orig.dir,"/VAST/",scenario,"/",s,"/spring/iter",iter,"/parameter_estimates.RDATA",sep=""))
 
 #DECIDED NOT TO CALCULATE VALUES DIRECTLY BELOW BECAUSE NOT CONFIDENT OUTPUT WOULD BE SAME 
 #
@@ -445,8 +480,7 @@ plot_biomass_index(VAST_fit_spring[[s]][[iter]])
 # par_hat_sp = TMB:::as.list.sdreport( VAST_fit_spring[[iter]]$parameter_estimates$SD, what="Estimate", report=TRUE )
 
 
-setwd(orig.dir)
-setwd(paste0(getwd(),"/VAST/",scenario))
+setwd(paste(orig.dir,"/VAST/",scenario,"/",s,sep=""))
 
 #FALL FIT
 VAST_fit_fall[[s]][[iter]] <- fit_model(settings = settings,
@@ -458,11 +492,18 @@ VAST_fit_fall[[s]][[iter]] <- fit_model(settings = settings,
                                      "a_i"=as.numeric(fall[,'AreaSwept_km2']), 
                                      "v_i"=fall[,'Vessel'])
 
-dir.create( paste0(getwd(),"/",s,"/fall/iter",iter))
+dir.create( paste0(getwd(),"/fall/iter",iter,sep=""))
 
-setwd(paste0(getwd(),"/",s,"/fall/iter",iter))
+setwd(paste0(getwd(),"/fall/iter",iter))
 
 plot_biomass_index(VAST_fit_fall[[s]][[iter]])
+
+#copy parameter files into iteration folder
+file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/parameter_estimates.txt",sep="") 
+            ,to =paste(orig.dir,"/VAST/",scenario,"/",s,"/fall/iter",iter,"/parameter_estimates.txt",sep=""))
+
+file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/parameter_estimates.RData",sep="") 
+            ,to =paste(orig.dir,"/VAST/",scenario,"/",s,"/fall/iter",iter,"/parameter_estimates.RDATA",sep=""))
 
 
 }
