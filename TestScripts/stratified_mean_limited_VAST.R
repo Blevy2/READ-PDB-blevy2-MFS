@@ -301,54 +301,6 @@ strata.limits[["YT"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 117
 strata.limits[["Cod"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
 strata.limits[["Had"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE HAD STRATA
 
-#make_settings seems like the way to impliment most desired settings
-
-# settings <- make_settings(n_x = 50,
-#                           Region=example$Region, 
-#                           purpose="index2", 
-#                           strata.limits=example$strata.limits, 
-#                           bias.correct=TRUE)
-#ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
-
-#WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
-settings_species <- list()
-
-#first attempt at settings. failed on ConPop_IncTemp exclude strata interation #56 fall
-settings_species[["YT"]] <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                          Region=example$Region,
-                          purpose="index2",
-                          strata.limits=example$strata.limits,
-                          bias.correct=TRUE,
-                          FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0))
-
-#second attempt which fixes the previous fail
-settings_species[["YT"]] <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                          Region=example$Region,
-                          purpose="index2",
-                          strata.limits=example$strata.limits,
-                          bias.correct=TRUE,
-                          FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0),
-                          RhoConfig = c("Beta1" = 0, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 0))
-#' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
-#'   which is the recommended way of generating this input for beginning users.
-#dafault FieldConfig settings:
-# if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
-
-#settings
-
-settings_species[["Cod"]] <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                          Region=example$Region,
-                          purpose="index2",
-                          strata.limits=example$strata.limits,
-                          bias.correct=TRUE,
-                          FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
-
-settings_species[["Had"]] <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                                            Region=example$Region,
-                                            purpose="index2",
-                                            strata.limits=example$strata.limits,
-                                            bias.correct=TRUE,
-                                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
 
 
 #initial scenario folder
@@ -364,7 +316,7 @@ exclude <- list(c(0),c(0),c(0)) #3 species
 
 
 
-for(iter in seq(length(list_all))){
+for(iter in 56){
   
   #pull out survey  
   surv_random_VAST <- list_all[[iter]]
@@ -443,7 +395,54 @@ example <- list(spring)
 example$Region <- "northwest_atlantic"
 example$strata.limits <- strata.limits[[s]] 
 
-settings <- settings_species[[s]]
+
+
+#WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
+
+if(s == "YT"){
+#first attempt at settings. failed on ConPop_IncTemp exclude strata interation #56 fall
+# settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+#                                           Region=example$Region,
+#                                           purpose="index2",
+#                                           strata.limits=example$strata.limits,
+#                                           bias.correct=TRUE,
+#                                           FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0))
+
+#second attempt which fixes the previous fail
+settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                                          Region=example$Region,
+                                          purpose="index2",
+                                          strata.limits=example$strata.limits,
+                                          bias.correct=TRUE,
+                                          FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0),
+                                          RhoConfig = c("Beta1" = 0, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 0))
+#' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
+#'   which is the recommended way of generating this input for beginning users.
+#dafault FieldConfig settings:
+# if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
+
+#settings
+}
+
+if(s == "Cod"){
+settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                                            Region=example$Region,
+                                            purpose="index2",
+                                            strata.limits=example$strata.limits,
+                                            bias.correct=TRUE,
+                                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+}
+
+if(s == "Had"){
+settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                                            Region=example$Region,
+                                            purpose="index2",
+                                            strata.limits=example$strata.limits,
+                                            bias.correct=TRUE,
+                                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+}
+
+
 
 
 setwd(paste0(getwd(),"/VAST/",scenario,"/",s))
@@ -482,6 +481,57 @@ file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/parameter_estimates.R
 
 setwd(paste(orig.dir,"/VAST/",scenario,"/",s,sep=""))
 
+
+example <- list(fall)
+example$Region <- "northwest_atlantic"
+example$strata.limits <- strata.limits[[s]] 
+
+
+#WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
+
+if(s == "YT"){
+  #first attempt at settings. failed on ConPop_IncTemp exclude strata interation #56 fall
+  # settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+  #                                           Region=example$Region,
+  #                                           purpose="index2",
+  #                                           strata.limits=example$strata.limits,
+  #                                           bias.correct=TRUE,
+  #                                           FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0))
+  
+  #second attempt which fixes the previous fail
+  settings_species[["YT"]] <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                                            Region=example$Region,
+                                            purpose="index2",
+                                            strata.limits=example$strata.limits,
+                                            bias.correct=TRUE,
+                                            FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0),
+                                            RhoConfig = c("Beta1" = 0, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 0))
+  #' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
+  #'   which is the recommended way of generating this input for beginning users.
+  #dafault FieldConfig settings:
+  # if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
+  
+  #settings
+}
+
+if(s == "Cod"){
+  settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                             Region=example$Region,
+                             purpose="index2",
+                             strata.limits=example$strata.limits,
+                             bias.correct=TRUE,
+                             FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+}
+
+if(s == "Had"){
+  settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                             Region=example$Region,
+                             purpose="index2",
+                             strata.limits=example$strata.limits,
+                             bias.correct=TRUE,
+                             FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+}
+
 #FALL FIT
 VAST_fit_fall[[s]][[iter]] <- fit_model(settings = settings,
                                      "Lat_i"=as.numeric(fall[,'Lat']), 
@@ -518,7 +568,7 @@ setwd(orig.dir)
 VAST_fit_all <- list(VAST_fit_spring,VAST_fit_fall)
 names(VAST_fit_all) <- c("spring","fall")
 
-saveRDS(VAST_fit_all,paste0(getwd(),"/VAST/",scenario,"/VAST_fit_all_",scenario,".RDS"))
+saveRDS(VAST_fit_all,paste0(getwd(),"/VAST/",scenario,"_excludestrata_IndParams","/VAST_fit_all_",scenario,".RDS"))
 
 
 
@@ -840,11 +890,11 @@ df_SRS_fall <- tibble(iter = rep(1:length(list_all),n_spp),
              Model = rep(rep("Strat. Mean",length(list_all)),n_spp),
              )
 
-df_SRS <- rbind(df_SRS_fall,df_SRS_spring)
+df_SRS <- rbind(as.data.frame(df_SRS_fall),as.data.frame(df_SRS_spring))
 
 
 #create data frame containing mean values for each group
-means_SRS <- ddply(df_SRS, .(species,season), summarise, mean = mean(as.numeric(error)), Model = "Strat. Mean")
+means_SRS <- ddply(df_SRS, .(species,season), summarise, mean = mean(as.numeric(unlist(error)),na.rm=T), Model = "Strat. Mean")
 
 
 
@@ -868,7 +918,7 @@ df_VAST_fall <- tibble(iter = rep(1:length(list_all),n_spp),
 df_VAST <- rbind(df_VAST_fall,df_VAST_spring)
 
 #create data frame containing mean values for each group
-means_VAST <- ddply(df_VAST, .(species,season), summarise, mean = mean(as.numeric(error)), Model = "VAST")
+means_VAST <- ddply(df_VAST, .(species,season), summarise, mean = mean(as.numeric(unlist(error))), Model = "VAST")
 
 
 #combine both of previous data into single object for plotting
@@ -906,7 +956,7 @@ library(ggplot2)
 
 #both scatterplots together
 both_scat <-ggplot(data=df,
-                   aes(x=iter,y=as.numeric(error),color=Model)) +
+                   aes(x=iter,y=as.numeric(unlist(error)),color=Model)) +
   geom_point()+
   ylim(0,1)+
   facet_grid(season ~ species)+
