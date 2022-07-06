@@ -30,7 +30,7 @@
 #' @export
 
 BENS_init_survey <- function (sim_init = NULL, design = 'fixed_station', n_stations = 50, 
-			     start_day = 90, stations_per_day = 5, Qs = NULL, strata_coords = NULL, strata_num = NULL, years_cut = 0) {
+			     start_day = 90, stations_per_day = 5, Qs = NULL, strata_coords = NULL, strata_num = NULL, years_cut = 0, suppress = FALSE) {
 
 	# useful indexes
 	idx       <- sim_init[["idx"]]
@@ -94,7 +94,7 @@ BENS_init_survey <- function (sim_init = NULL, design = 'fixed_station', n_stati
 	    new_strat <- c(new_strat,unique(strata_num[i,]))
 	     }
 	  unique_numbers <- unique(new_strat[(new_strat>0)&(!is.na(new_strat))]) #avoid NA and 0 values
-print(unique_numbers)
+if(suppress==FALSE){print(unique_numbers)}
 	  
 #setup list that 1 entry for each strata
 	  strata_index_list <- vector(mode = "list", length = max(unique_numbers,na.rm = T))
@@ -132,7 +132,7 @@ print(unique_numbers)
 	  }
 	  
 	  
-	  print(index)
+if(suppress==FALSE){print(index)}
 	  
 	  #go through each strata_index_list, choose correct number of random stations
 	  #translate back to index for given strata
@@ -158,13 +158,13 @@ print(unique_numbers)
 	  
 	  	   
 	  for(j in unique_numbers){
-	    print(j)
+	  if(suppress == FALSE){print(j)}
 	    #index[j] is how many total stations there are in each strata
 	    #currently dividing total number of samples evening among each strata
 	  
 	   if(index[j]>=(n_sta[j]*(sim_init[["idx"]][["ny"]]-years_cut))){
 	     {my_sample <- sample(index[j],n_sta[j]*(sim_init[["idx"]][["ny"]]-years_cut),replace = FALSE)}
-	     }else{print("not enough sampling locations. sampling this strata with replacement")
+	     }else{if(suppress==FALSE){print("not enough sampling locations. sampling this strata with replacement")}
 	                     my_sample <- sample(index[j],n_sta[j]*(sim_init[["idx"]][["ny"]]-years_cut),replace = TRUE)
 	                     temp <- strata_num
 	                     temp[strata_num!=j]=-999
