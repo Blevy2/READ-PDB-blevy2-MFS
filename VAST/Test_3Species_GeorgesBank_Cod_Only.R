@@ -15,7 +15,7 @@ library(ggplot2)
 surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario <- "ConPop_IncTemp"
+scenario <- "IncPop_ConTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 surv_random_sample <- list_all[[1]]
@@ -57,27 +57,17 @@ for(i in seq(length(surv_random_sample[,1]))){
 }
 
 
-library(spatstat.geom)
-#plot lat and lon coordinates to check that they look correct
-all_points <- spatstat.geom::ppp(x=lon,y=lat, marks = surv_random_sample[,"stratum"] , window=owin(c(-70.99, -65) ,c(40,43)))
-plot(all_points, use.marks=T) #here we see the stratas appear which makes me feel like it worked
-
 
 #add columns to survey table
 surv_random_sample <- cbind(surv_random_sample,lat,lon)
 colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Season","Lat","Lon")
 
 
-#following from Chris' file...
+library(spatstat.geom)
+#plot lat and lon coordinates to check that they look correct
+all_points <- spatstat.geom::ppp(x=lon,y=lat, marks = surv_random_sample[,"stratum"] , window=owin(c(-70.99, -65) ,c(40,43)))
+plot(all_points, use.marks=T) #here we see the stratas appear which makes me feel like it worked
 
-adios <- as.data.frame(surv_random_sample)
-
-head(adios)
-
-#remove samples from strata outside cod habitat
-strata_species <- list()
-strata_species[["Cod"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25)
-adios <- adios[(adios$stratum %in% strata_species[["Cod"]]),]
 
 
 #FIGURE OUT HOW BIG EACH CELL OF RASTER IS IN KM^2 TO SET AREASWEPT_KM2 SETTING BELOW
@@ -124,120 +114,254 @@ cell_str <- surv_random$cells_per_strata[!is.na(surv_random$cells_per_strata)]
 area_per_cell <- st_area/cell_str
 
 
-#PULLING OUT YELLOTWTAIL FLOUNDER IN THIS SCRIPT
+#following from https://gis.stackexchange.com/questions/200420/calculate-area-for-each-polygon-in-r
 
-# format for use in VAST
-spring <- adios %>%
-  filter(Season == "SPRING") %>%
- # filter(YEAR >= 2009) %>%
-  mutate(mycatch = Cod_samp) %>%
-  select(Year = year,
-         Catch_KG = mycatch,
-         Lat = Lat,
-         Lon = Lon) %>%
-  mutate(Vessel = "missing",
-         AreaSwept_km2 = mean(cell_size)) #CORRECT AREA SWEPT?
-summary(spring)
-names(spring)
-
-
-# reorder the data for use in VAST
-#DOESNT SEEM TO BE USED BELOW...??
-nrows <- length(spring[,1])
-reorder <- sample(1:nrows, nrows, replace = FALSE)
-spring_reorder <- spring
-spring_reorder[1:nrows, ] <- spring[reorder, ]
-head(spring)
-head(spring_reorder)
-
-
-# model with original data and default settings (Poisson link)
-example <- list(spring)
-example$Region <- "northwest_atlantic"
-example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
-
-#make_settings seems like the way to impliment most desired settings
-
-settings <- make_settings(n_x = 1000,
-                          Region=example$Region,
-                          purpose="index2",
-                          strata.limits=example$strata.limits,
-                          bias.correct=TRUE)
-#ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
-
-#WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
-settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                          Region=example$Region,
-                          purpose="index2",
-                          strata.limits=example$strata.limits,
-                          bias.correct=TRUE,
-                          FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
-#' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
-#'   which is the recommended way of generating this input for beginning users.
-#dafault FieldConfig settings:
-# if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
-
-settings
+#check coordinate system
+crs(GB_strata)
+#add area value to GB_strata
+GB_strata$area_sqkm <- area(GB_strata)/1000000
+#number of cells in each strata...
+cell_str <- surv_random$cells_per_strata[!is.na(surv_random$cells_per_strata)]
+#area per cell...
+area_per_cell <- GB_strata$area_sqkm/cell_str
 
 
 
+orig.dir <- getwd()
 
-#######################################################################################
-# Try this first
-#######################################################################################
-
-fit <- fit_model(settings = settings,
-                 "Lat_i"=as.numeric(spring[,'Lat']), 
-                 "Lon_i"=as.numeric(spring[,'Lon']), 
-                 "t_i"=as.numeric(spring[,'Year']), 
-                 "c_i"=as.numeric(rep(0,nrow(spring))), 
-                 "b_i"=as.numeric(spring[,'Catch_KG']), 
-                 "a_i"=as.numeric(spring[,'AreaSwept_km2']), 
-                 "v_i"=spring[,'Vessel'])
-
-#silent = TRUE might stop output in console
-
-# 
-# #######################################################################################
-# #Try second if issues with first run
-# #######################################################################################
-# 
-# #logkappa1 keeps running into bounds so followed github suggestion here: https://github.com/James-Thorson-NOAA/VAST/issues/300
-# 
-# fit_orig = fit_model(settings = settings,
-#                      "Lat_i"=as.numeric(spring[,'Lat']), 
-#                      "Lon_i"=as.numeric(spring[,'Lon']), 
-#                      "t_i"=as.numeric(spring[,'Year']), 
-#                      "c_i"=as.numeric(rep(0,nrow(spring))), 
-#                      "b_i"=as.numeric(spring[,'Catch_KG']), 
-#                      "a_i"=as.numeric(spring[,'AreaSwept_km2']), 
-#                      "v_i"=spring[,'Vessel'],
-#                      run_model=FALSE)
-# 
-# Lower <- fit_orig$tmb_list$Lower
-# # Change some bounds in Lower using grep(.) etc. (couldnt get this to work)
-# #instead, i see that logkappa1 is in Lower[24] so change this value
-# Lower[24] <- -10
-# 
-# fit = fit_model( settings = settings,
-#                  "Lat_i"=as.numeric(spring[,'Lat']), 
-#                  "Lon_i"=as.numeric(spring[,'Lon']), 
-#                  "t_i"=as.numeric(spring[,'Year']), 
-#                  "c_i"=as.numeric(rep(0,nrow(spring))), 
-#                  "b_i"=as.numeric(spring[,'Catch_KG']), 
-#                  "a_i"=as.numeric(spring[,'AreaSwept_km2']), 
-#                  "v_i"=spring[,'Vessel'],
-#                  lower=Lower )
-
-#generates index csv and all plots including index plot (takes longer)
-plot(fit)
-
-#generates ONLY index csv and index plot (very quick)
-plot_biomass_index(fit, PlotName = "index2") #DirName = paste(directory) PlotName = paste(name) 
+#change directory
+setwd(paste(orig.dir,"/VAST", sep=""))
+#create new one
+dir.create(paste(getwd(),"/",scenario,sep=""))
 
 
+#Cod      
+exclude <- c(23,24,25)
+
+#exclude none
+exclude <- c(0)
+
+strata_species <-  c(13,14,15,16,17,18,19,20,21,22,23,24,25)
 
 
-#compare 
+#do some model selection things
+model_aic <- list()
+
+for(j in 1:4){
+  
+  if(j == 1) {obsmodel <- c(2, 0); run <- 1}
+  if(j == 2) {obsmodel <- c(2, 1); run <- 3} #model selection
+  if(j == 3) {obsmodel <- c(1, 0); run <- 4}
+  if(j == 4) {obsmodel <- c(1, 1); run <- 5}
+  
+  #create directory for model specific output
+  dir.create(paste(getwd(),"/",scenario,"/Cod",sep=""))
+  dir.create(paste(getwd(),"/",scenario,"/Cod/obsmodel",j,sep=""))
+  setwd((paste(getwd(),"/",scenario,"/Cod",sep="")))
+  
+ 
+  #set survey
+  adios <- as.data.frame(surv_random_sample)
+  adios <- adios[(adios$stratum %in% strata_species),]
+  adios <- adios[!(adios$stratum %in% exclude),]
+  
+  head(adios)
+  
+  
+  #PULLING OUT COD IN THIS SCRIPT
+  
+  # format for use in VAST
+  spring <- adios %>%
+    filter(Season == "SPRING") %>%
+    # filter(YEAR >= 2009) %>%
+    mutate(mycatch = Cod) %>%
+    select(Year = year,
+           Catch_KG = mycatch,
+           Lat = Lat,
+           Lon = Lon) %>%
+    mutate(Vessel = "missing",
+           AreaSwept_km2 = mean(cell_size)) #CORRECT AREA SWEPT?
+  # summary(spring)
+  # names(spring)
+  
+
+  
+  # model with original data and default settings (Poisson link)
+  example <- list(spring)
+  example$Region <- "northwest_atlantic"
+  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210,  1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
+  
+  #make_settings seems like the way to implement most desired settings
+
+  settings <- make_settings(n_x = 500,
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,
+                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0),
+                            ObsModel = obsmodel)
+  #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
+  
+  #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
+  # settings <- make_settings(n_x = 500,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+  #                           Region=example$Region,
+  #                           purpose="index2",
+  #                           strata.limits=example$strata.limits,
+  #                           bias.correct=TRUE,
+  #                           FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0),
+  #                           ObsModel = obsmodel)
+  #' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
+  #'   which is the recommended way of generating this input for beginning users.
+  #dafault FieldConfig settings:
+  # if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
+  
+  #settings
+  
+  #setwd("C:\\Users\\benjamin.levy\\Desktop\\Github\\READ-PDB-blevy2-MFS2\\VAST\\ConPop_IncTemp_exclude_most")
+  
+  
+  
+  #######################################################################################
+  # Try this first
+  #######################################################################################
+  
+  fit_spring <- try(fit_model(settings = settings,
+                          "Lat_i"=as.numeric(spring[,'Lat']), 
+                          "Lon_i"=as.numeric(spring[,'Lon']), 
+                          "t_i"=as.numeric(spring[,'Year']), 
+                          "c_i"=as.numeric(rep(0,nrow(spring))), 
+                          "b_i"=as.numeric(spring[,'Catch_KG']), 
+                          "a_i"=as.numeric(spring[,'AreaSwept_km2']), 
+                          "v_i"=spring[,'Vessel']), 
+                          silent = TRUE)
+  
+  model_aic[["spring"]][[j]] <- fit_spring$parameter_estimates$AIC
+  
+  #create directory for season specific output
+  dir.create(paste(getwd(),"/obsmodel",j,"/spring",sep=""))
+  setwd(paste(getwd(),"/obsmodel",j,"/spring",sep=""))
+  #silent = TRUE might stop output in console
+  
+  plot_biomass_index(fit_spring)
+  
+  
+  #copy parameter files into iteration folder
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/obsmodel",j,"/spring/settings.txt",sep=""))
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
+  
+  saveRDS(fit_spring,file = paste(getwd(),"/fit_spring.RDS",sep=""))
+  
+  
+   
+  
+  setwd('..') #move up one directory
+  dir.create(paste(getwd(),"/fall",sep="")) #create fall directory
+  
+  setwd('..') #move up one directory
+  
+  fall <- adios %>%
+    filter(Season == "FALL") %>%
+    # filter(YEAR >= 2009) %>%
+    mutate(mycatch = Cod) %>%
+    select(Year = year,
+           Catch_KG = mycatch,
+           Lat = Lat,
+           Lon = Lon) %>%
+    mutate(Vessel = "missing",
+           AreaSwept_km2 = mean(cell_size)) #CORRECT AREA SWEPT?
+  # summary(fall)
+  # names(fall)
+
+  
+  # model with original data and default settings (Poisson link)
+  example <- list(fall)
+  example$Region <- "northwest_atlantic"
+  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210,1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
+  
+  #make_settings seems like the way to impliment most desired settings
+  
+  settings <- make_settings(n_x = 500,
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,  
+                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0),
+                            ObsModel = obsmodel)
+  #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
+  
+  #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
+  # settings <- make_settings(n_x = 500,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+  #                           Region=example$Region,
+  #                           purpose="index2",
+  #                           strata.limits=example$strata.limits,
+  #                           bias.correct=TRUE,
+  #                           FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0),
+  #                           RhoConfig = c("Beta1" = 0, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 0))
+  #' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
+  #'   which is the recommended way of generating this input for beginning users.
+  #dafault FieldConfig settings:
+  # if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
+  
+  #######################################################################################
+  # Try this first
+  #######################################################################################
+  
+  fit_fall <- try(fit_model(settings = settings,
+                        "Lat_i"=as.numeric(fall[,'Lat']), 
+                        "Lon_i"=as.numeric(fall[,'Lon']), 
+                        "t_i"=as.numeric(fall[,'Year']), 
+                        "c_i"=as.numeric(rep(0,nrow(fall))), 
+                        "b_i"=as.numeric(fall[,'Catch_KG']), 
+                        "a_i"=as.numeric(fall[,'AreaSwept_km2']), 
+                        "v_i"=fall[,'Vessel']), 
+                  silent = TRUE)
+  
+  model_aic[["fall"]][[j]] <- fit_fall$parameter_estimates$AIC
+  
+  #silent = TRUE might stop output in console
+  
+  setwd(paste(getwd(),"/obsmodel",j,"/fall",sep=""))  #set it
+  
+  plot_biomass_index(fit_fall)
+  
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/obsmodel",j,"/fall/settings.txt",sep=""))
+  
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
+  
+  saveRDS(fit_fall,file = paste(getwd(),"/fit_fall.RDS",sep=""))
+  
+  #go back to scenario directory before moving to next model case
+  setwd('..')
+  setwd('..')
+  setwd('..')
+  setwd('..')
+  
+}
+
+
+saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Cod/model_aic.RDS",sep=""))
+
+   
+  
+
+
+
+
+
+
 
 
