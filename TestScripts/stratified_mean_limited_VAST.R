@@ -21,8 +21,43 @@ list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\l
 #simulation results
 result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
 
-#random survey locations
+
+###############################
+#LOAD JUST ONE OF THE FOLLOWING
+
+#1- single set of random survey locations used in stratified mean analysis
 surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
+
+#2- generate 100 different survey locations
+
+#I have decided to sample the following amounts from each stratum PER SEASON
+#"01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300"
+#THESE ARE PER SEASON. WILL BE TWICE AS MANY PER YEAR TOTAL
+strata_samples <- c(10,4,3,14,4,4,8,6,4,4,6,7,3,10,3)
+source("R/BENS_init_survey.R")
+#load enviroment for given scenario
+load(paste("E:/READ-PDB-blevy2-MFS2/GB_Results/",scenario,"/GB_3species_",scenario,"_environment.RData",sep=""))
+#read in habitat matrix
+hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
+#to rotate matrix before fields::image.plot
+rotate <- function(x) t(apply(x, 2, rev))
+#CURRENTLY NEED TO MAKE SURE THAT N_STATIONS*#YEARS / #STRATA IS A WHOLE NUMBER OTHERWISE DAY, TOW, YEAR WONT LINEUP WITH NUMBER OF STATIONS
+#ALSO NEED N_STATION TO BE DIVISIBLE BY STATIONS_PER_DAY
+#ALSO NEED N_STATIONS / STATIONS_PER_DAY <= 52 otherwise wont get to all of them in a year results in NA in the matrix
+surv_random <- list()
+for(i in seq(100)){
+  print(i)
+nstat <- 2*strata_samples #this is total samples per year per strata 
+surv_random[[i]] <- BENS_init_survey(sim_init = sim,design = 'random_station', n_stations = nstat, 
+                                start_day = 1, stations_per_day = 1, Qs = c("spp1" = 1, "spp2"= 1),
+                                strata_coords = hab$strata, strata_num = hab$stratas, 
+                                years_cut = 2, #if running 22 years, remove first 2 years 
+                                suppress = TRUE
+)
+
+}
+###############################
+
 
 #spp1 spp2 spp3
 short_names <- c("YT","Cod","Had") 
