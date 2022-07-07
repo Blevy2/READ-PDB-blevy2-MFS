@@ -147,7 +147,7 @@ strata_species <-  c(13,14,15,16,17,18,19,20,21,22,23,24,25)
 #do some model selection things
 model_aic <- list()
 
-for(j in 1:4){
+for(j in 2){
   
   if(j == 1) {obsmodel <- c(2, 0); run <- 1}
   if(j == 2) {obsmodel <- c(2, 1); run <- 3} #model selection
@@ -360,6 +360,34 @@ saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Cod/model_aic.RDS",sep=""
 
 
 
+
+#In the event I forgot to save model_aic above, this chunk will extract aic values from each model fit
+
+scen <- "IncPop_ConTemp"
+
+orig.dir <- getwd()
+
+modl_aic <- list()
+
+for(j in 1:4){
+  for(sn in c("spring","fall")){
+ 
+    fit <- try(readRDS(paste(orig.dir,"/VAST/",scen,"/Cod/obsmodel",j,"/",sn,"/fit_",sn,".RDS",sep="") ), silent = TRUE)
+     
+     modl_aic[[sn]][[j]] <- try(fit$parameter_estimates$AIC, silent = TRUE)
+     
+     }
+}
+
+
+saveRDS(modl_aic, file = paste(getwd(),"/VAST/",scen,"/Cod/model_aic.RDS",sep=""))
+
+
+
+
+
+#read in old model_aic to extract values
+aic <- readRDS(file = paste(getwd(),"/VAST/",scen,"/Cod/model_aic.RDS",sep=""))
 
 
 

@@ -15,9 +15,9 @@ library(ggplot2)
 surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario <- "ConPop_ConTemp"
+scenario <- "ConPop_IncTemp"
 #survey results without noise
-list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_more_",scenario,".RDS",sep=""))
+list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 surv_random_sample <- list_all[[1]]
 ################################################################################
 
@@ -172,7 +172,7 @@ for(j in 1:4){
   spring <- adios %>%
     filter(Season == "SPRING") %>%
     # filter(YEAR >= 2009) %>%
-    mutate(mycatch = Had_samp) %>%
+    mutate(mycatch = Had) %>%
     select(Year = year,
            Catch_KG = mycatch,
            Lat = Lat,
@@ -204,7 +204,8 @@ for(j in 1:4){
                             purpose="index2",
                             strata.limits=example$strata.limits,
                             bias.correct=TRUE,
-                            ObsModel = obsmodel)
+                            ObsModel = obsmodel,
+                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
   #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
   
   #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
@@ -274,7 +275,7 @@ for(j in 1:4){
   fall <- adios %>%
     filter(Season == "FALL") %>%
     # filter(YEAR >= 2009) %>%
-    mutate(mycatch = Had_samp) %>%
+    mutate(mycatch = Had) %>%
     select(Year = year,
            Catch_KG = mycatch,
            Lat = Lat,
@@ -306,7 +307,8 @@ for(j in 1:4){
                             purpose="index2",
                             strata.limits=example$strata.limits,
                             bias.correct=TRUE,
-                            ObsModel = obsmodel)
+                            ObsModel = obsmodel,
+                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
   #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
   
   #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
