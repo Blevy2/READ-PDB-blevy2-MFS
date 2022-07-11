@@ -15,7 +15,7 @@ library(ggplot2)
 surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario <- "ConPop_IncTemp"
+scenario <- "DecPop_IncTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 surv_random_sample <- list_all[[1]]
@@ -369,6 +369,39 @@ for(j in 1:4){
 
 
 saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Had/model_aic.RDS",sep=""))
+
+
+
+
+
+
+#In the event I forgot to save model_aic above, this chunk will extract aic values from each model fit
+
+scen <- "ConPop_ConTemp"
+
+orig.dir <- getwd()
+
+modl_aic <- list()
+
+for(j in 1:4){
+  for(sn in c("spring","fall")){
+    
+    fit <- try(readRDS(paste(orig.dir,"/VAST/",scen,"/Had/obsmodel",j,"/",sn,"/fit_",sn,".RDS",sep="") ), silent = TRUE)
+    
+    modl_aic[[sn]][[j]] <- try(fit$parameter_estimates$AIC, silent = TRUE)
+    
+  }
+}
+
+
+saveRDS(modl_aic, file = paste(getwd(),"/VAST/",scen,"/Had/model_aic.RDS",sep=""))
+
+
+
+
+
+#read in old model_aic to extract values
+aic <- readRDS(file = paste(getwd(),"/VAST/",scen,"/Had/model_aic.RDS",sep=""))
 
 
 
