@@ -6,7 +6,7 @@
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario <- "ConPop_IncTemp"
+scenario <- "DecPop_IncTemp"
 
 n_spp <- 3
 
@@ -31,14 +31,37 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 ##################################################################################################
 
 
+library(raster)
+library(sp)
+library(TMB)
+library(VAST)
+library(dplyr)
+library(ggplot2)
+
+#read in habitat matrix
+hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
+
+#read in GB strata
+#haddock contains all stratas used
+Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Had_Weighted_AdaptFalse_RASTER_res2.RDS")
+#plot(Had_ras)
+
+#translate habitat matrix back into raster
+hab_ras <-raster(hab$hab$spp3)
+extent(hab_ras) <- extent(Had_ras)
+#plot(hab_ras)
 
 #ADD TRUE MODEL POPULATION VALUES TO SURVEY DATA TABLES
+
 for(iter in seq(length(list_all))){
-  
-  temp <- matrix(data=0,nrow=length(list_all[[iter]][,1]),ncol=n_spp)
+  print(iter)
+  temp <- matrix(data=0,nrow=length(list_all[[iter]][,1]),ncol=n_spp) 
+  lat <- vector()
+  lon <- vector()
   
   for(samp in seq(length(list_all[[iter]][,1]))){
     
+    #ADDING TRUE POPULATION
     x = as.numeric(list_all[[iter]][samp,2]) #x in second column
     y = as.numeric(list_all[[iter]][samp,3]) #y in third column
     wk = as.numeric(list_all[[iter]][samp,11]) #week in 11th column
@@ -48,11 +71,21 @@ for(iter in seq(length(list_all))){
     temp[samp,2] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]],na.rm=T) #Cod is spp2
     temp[samp,3] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]],na.rm=T) #Had is spp3
     
+    #ADDING LAT LON LOCATIONS
+    rw <- as.numeric(list_all[[iter]][samp,"x"])  #x in col 2
+    cl <- as.numeric(list_all[[iter]][samp,"y"]) #y in col 3
+    
+    lon[samp] <- xFromCol(hab_ras, col = cl)
+    lat[samp] <- yFromRow(hab_ras, row = rw)
+    
   }
-  colnames(temp) <- c("YT","Cod","Had") 
+  temp <- cbind(temp,lat,lon)
+  colnames(temp) <- c("YT","Cod","Had","Latitude","Longitude") 
   list_all[[iter]] <- cbind(list_all[[iter]],temp)
-  
+  colnames(list_all[[iter]]) <- c("station_no","x","y","stratum","day","tow","year","YT_samp","Cod_samp","Had_samp","week","Season","YT_pop","Cod_pop","Had_pop","Lat","Lon")
 }
+
+
 
 #FIND MEAN VALUE BY SEASON USING ABOVE INFORMATION. USE MEAN OF TWO SURVEY WEEKS FOR EACH SEASON
 season_wks <- list(c(13,14),c(37,38))
@@ -71,8 +104,8 @@ for(iter in seq(length(list_all))){
         temp[idx,1] <- yr
         temp[idx,2] <- season
         
-        #use values in given year for weeks in specified season. only use single strata because entire population summariezed in each strata in above loop
-        temp[idx,3] <- mean(as.numeric(list_all[[iter]][((as.numeric(list_all[[iter]][,"year"]==yr)) & (as.numeric(list_all[[iter]][,"week"]) %in% season_wks[[season]]) & (as.numeric(list_all[[iter]][,"stratum"]==29)) ),s]))
+        #use values in given year for weeks in specified season. only use single strata because entire population summarized in each strata in above loop
+        temp[idx,3] <- mean(as.numeric(list_all[[iter]][((as.numeric(list_all[[iter]][,"year"]==yr)) & (as.numeric(list_all[[iter]][,"week"]) %in% season_wks[[season]]) & (as.numeric(list_all[[iter]][,"stratum"]==29)) ),paste(s,"_pop",sep="")]))
         
         
         idx <- idx + 1    
@@ -84,10 +117,11 @@ for(iter in seq(length(list_all))){
   }
 }
 
+
 #BELOW WILL TAKE A MINUTE
 
 #choose some strata to exclude, if desired
-exclude_strata <- FALSE
+exclude_strata <- TRUE
 
 ifelse(exclude_strata, 
        #George's Bank Setup by species
@@ -125,6 +159,7 @@ for(s in seq(n_spp)){
   
   strat_mean_all[[s]] <- vector("list",length(list_all)) 
 }
+
 
 
 
@@ -174,7 +209,7 @@ for(iter in seq(length(list_all))){
     
     
     
-    temp <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = paste0("spp", s, sep="")  )   # if strata=NULL, the function will use the unique strata set found in df
+    temp <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = paste0(short_names[s],"_samp", sep="")  )   # if strata=NULL, the function will use the unique strata set found in df
     # View(temp)
     strat_mean_all[[s]][[iter]] <- temp %>%
       mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
@@ -192,6 +227,13 @@ for(iter in seq(length(list_all))){
   
   
 }
+
+#initial scenario folder
+dir.create( paste0(getwd(),"/VAST/",scenario)) #create folder to store upcoming subfolders
+
+names(strat_mean_all) <- short_names
+saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scenario,".RDS"))
+
 
 
 names(strat_mean_all) <- short_names
@@ -282,15 +324,17 @@ pdf(file=paste("Results/GB_error_plots/Individual_SRS_",scenario,".pdf",sep=""))
 nyears <- 20
 
 #for error calculation
+if(exclude_strata == TRUE){
 SRS_error_spring_exclude <- list()
 SRS_error_fall_exclude <- list()
 SRS_spring_exclude <- list()
-SRS_fall_exclude <- list()
+SRS_fall_exclude <- list()}
 
+if(exclude_strata == FALSE){
 SRS_error_spring_allstrata <- list()
 SRS_error_fall_allstrata <- list()
 SRS_spring_allstrata <- list()
-SRS_fall_allstrata <- list()
+SRS_fall_allstrata <- list()}
 
 #plot stratified calculation and population estimate on same plot
 
@@ -469,6 +513,7 @@ df_spring_allstrata <- tibble(iter = rep(1:length(list_all),n_spp),
                     species = c(rep("YTF",length(list_all)),rep("Cod",length(list_all)),rep("Had",length(list_all))),
                     
                     season = rep(rep("spring",length(list_all)),n_spp),
+                    Type = rep(rep("All Strata",length(list_all)),n_spp)
 )
 
 df_fall_allstrata <- tibble(iter = rep(1:length(list_all),n_spp),
@@ -476,6 +521,7 @@ df_fall_allstrata <- tibble(iter = rep(1:length(list_all),n_spp),
                   species = c(rep("YTF",length(list_all)),rep("Cod",length(list_all)),rep("Had",length(list_all))),
                   
                   season = rep(rep("fall",length(list_all)),n_spp),
+                  Type = rep(rep("All Strata",length(list_all)),n_spp)
 )
 
 }
@@ -487,6 +533,7 @@ if(exclude_strata == TRUE){
                       species = c(rep("YTF",length(list_all)),rep("Cod",length(list_all)),rep("Had",length(list_all))),
                       
                       season = rep(rep("spring",length(list_all)),n_spp),
+                      Type = rep(rep("Exclude Strata",length(list_all)),n_spp)
   )
   
   df_fall_exclude <- tibble(iter = rep(1:length(list_all),n_spp),
@@ -494,41 +541,54 @@ if(exclude_strata == TRUE){
                     species = c(rep("YTF",length(list_all)),rep("Cod",length(list_all)),rep("Had",length(list_all))),
                     
                     season = rep(rep("fall",length(list_all)),n_spp),
+                    Type = rep(rep("Exclude Strata",length(list_all)),n_spp)
   )
   
 }
 
 
-ifelse(exclude_strata == FALSE, df <- rbind(df_fall_allstrata,df_spring_allstrata), df <- rbind(df_fall_exclude,df_spring_exclude))
+ifelse(exclude_strata == FALSE, df_allstrata <- rbind(df_fall_allstrata,df_spring_allstrata), df_exclude <- rbind(df_fall_exclude,df_spring_exclude))
 
 
 #create data frame containing mean values for each group
-ifelse(exclude_strata == FALSE,
-       means_sd_allstrata <- ddply(df, .(species,season), summarise, mean = mean(as.numeric(error)), std_dev = sd(as.numeric(error))),
-       means_sd_exclude <- ddply(df, .(species,season), summarise, mean = mean(as.numeric(error)), std_dev = sd(as.numeric(error)))
-)
+if(exclude_strata == FALSE){
+       means_sd_allstrata <- ddply(df_allstrata, .(species,season), summarise, mean = mean(as.numeric(error)), std_dev = sd(as.numeric(error)), Type = Type)
+       
+}
 
-ifelse(exclude_strata == FALSE,
-       means_sd <- means_sd_allstrata ,
-       means_sd <- means_sd_exclude
-)
+if(exclude_strata == TRUE){
+       means_sd_exclude <- ddply(df_exclude, .(species,season), summarise, mean = mean(as.numeric(error)), std_dev = sd(as.numeric(error)), Type = Type)
+}
 
 
 #Error scatterplots
 
-#1) to plot a single scenario, run just cc below and print(cc)
-#2) to plot two scenarios on top of each other, store the first as cc and then run code below doing cc +
+#1) to plot a single scenario, run desired section below
+#2) to plot two scenarios on top of each other, run both scenarios and then the bottom most chunk benlow
 
+#PLOT JUST ALL STRATA RESULTS
 library(ggplot2)
-cc<-ggplot(data=df,
+allstrata_scatter <-ggplot(data=df_allstrata,
            aes(x=iter,y=as.numeric(error))) +
   geom_point(color="blue")+
   ylim(0,1)+
   facet_grid(season ~ species)+
-  geom_hline(aes(yintercept = mean), data = means_sd, color = "blue") 
+  geom_hline(aes(yintercept = mean), data = means_sd_allstrata, color = "blue") 
 
-print(cc)
+print(allstrata_scatter)
 
+
+
+#PLOT JUST EXCLUDE STRATA RESULTS
+library(ggplot2)
+exclude_scatter <-ggplot(data=df_exclude,
+                   aes(x=iter,y=as.numeric(error))) +
+  geom_point(color="blue")+
+  ylim(0,1)+
+  facet_grid(season ~ species)+
+  geom_hline(aes(yintercept = mean), data = means_sd_exclude, color = "blue") 
+
+print(exclude_scatter)
 # 
 # ggsave(filename = paste("Results/GB_error_plots/Individussssal_SRS_",scenario,".pdf",sep=""),
 #        plot = last_plot())
@@ -536,11 +596,57 @@ print(cc)
 
 
 
-#run this second to plot on top of each other
-cc+  geom_point(data=df,color="red",
-                aes(x=iter,y=as.numeric(error)))+
-  facet_grid(season ~ species) +
-  geom_hline(aes(yintercept = mean), data = means_sd, color = "red")
+#PLOT BOTH SCATTERPLOTS TOGETHER
+df_both <- rbind(df_allstrata,df_exclude)
+means_sd_both <- rbind(means_sd_allstrata,means_sd_exclude)
+library(ggplot2)
+both_scat <-ggplot(data=df_both,
+                   aes(x=iter,y=as.numeric(unlist(error)),color=Type)) +
+  geom_point()+
+  ylim(0,1)+
+  facet_grid(season ~ species)+
+  geom_hline(aes(yintercept = mean, color = Type), data = means_sd_both) 
+
+print(both_scat)
+
+
+#calculate change in mean value between all strata and exclude strata
+
+#YTF
+YTF_mean_spring_all <- unique(means_sd_allstrata[((means_sd_allstrata$species=="YTF") & (means_sd_allstrata$season=="spring")), 3 ])
+YTF_mean_spring_exclude <- unique(means_sd_exclude[((means_sd_exclude$species=="YTF") & (means_sd_exclude$season=="spring")), 3 ])
+YTF_mean_change_spring <- YTF_mean_spring_all - YTF_mean_spring_exclude
+
+YTF_mean_fall_all <- unique(means_sd_allstrata[((means_sd_allstrata$species=="YTF") & (means_sd_allstrata$season=="fall")), 3 ])
+YTF_mean_fall_exclude <- unique(means_sd_exclude[((means_sd_exclude$species=="YTF") & (means_sd_exclude$season=="fall")), 3 ])
+YTF_mean_change_fall <- YTF_mean_fall_all - YTF_mean_fall_exclude
+
+#Cod
+Cod_mean_spring_all <- unique(means_sd_allstrata[((means_sd_allstrata$species=="Cod") & (means_sd_allstrata$season=="spring")), 3 ])
+Cod_mean_spring_exclude <- unique(means_sd_exclude[((means_sd_exclude$species=="Cod") & (means_sd_exclude$season=="spring")), 3 ])
+Cod_mean_change_spring <- Cod_mean_spring_all - Cod_mean_spring_exclude
+
+Cod_mean_fall_all <- unique(means_sd_allstrata[((means_sd_allstrata$species=="Cod") & (means_sd_allstrata$season=="fall")), 3 ])
+Cod_mean_fall_exclude <- unique(means_sd_exclude[((means_sd_exclude$species=="Cod") & (means_sd_exclude$season=="fall")), 3 ])
+Cod_mean_change_fall <- Cod_mean_fall_all - Cod_mean_fall_exclude
+
+
+#Had
+Had_mean_spring_all <- unique(means_sd_allstrata[((means_sd_allstrata$species=="Had") & (means_sd_allstrata$season=="spring")), 3 ])
+Had_mean_spring_exclude <- unique(means_sd_exclude[((means_sd_exclude$species=="Had") & (means_sd_exclude$season=="spring")), 3 ])
+Had_mean_change_spring <- Had_mean_spring_all - Had_mean_spring_exclude
+
+Had_mean_fall_all <- unique(means_sd_allstrata[((means_sd_allstrata$species=="Had") & (means_sd_allstrata$season=="fall")), 3 ])
+Had_mean_fall_exclude <- unique(means_sd_exclude[((means_sd_exclude$species=="Had") & (means_sd_exclude$season=="fall")), 3 ])
+Had_mean_change_fall <- Had_mean_fall_all - Had_mean_fall_exclude
+
+
+
+#view mean and sd values
+View(unique(means_sd_both))
+
+
+remove(result)
 
 
 

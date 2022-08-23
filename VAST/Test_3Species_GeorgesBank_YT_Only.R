@@ -6,6 +6,7 @@ library(TMB)
 library(VAST)
 library(dplyr)
 library(ggplot2)
+library(beepr)
 
 #FIRST READ IN SURVEY VALUES AND ADD COLUMNS THAT CONVERY X,Y INTO LAT,LON
 
@@ -15,10 +16,40 @@ library(ggplot2)
 surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario <- "DecPop_IncTemp"
+scenario <- "IncPop_IncTemp_8_2"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
-surv_random_sample <- list_all[[1]]
+
+exclude_strata <- TRUE
+
+#for Conpop_ConTemp (also used for IncTemp) run 1 shows decent constant value with single spike early on
+#for Incpop_ConTemp (also used for IncTemp) run 77 shows strong increase for yellowtail
+#for DecPop_ConTemp run 25 shows clear decrease with small values towards the end
+#for DecPop_IncTemp run 13 shows clear decrease with small values towards the end
+surv_random_sample <- list_all[[77]]
+################################################################################
+
+
+################################################################################
+#read in true survey values as a test
+
+#read in point data and convert to ppp
+gis.name <- "C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\Plot_survey\\ADIOS_SV_172909_GBK_NONE_survey_dist_map_fixed.csv"
+gis=as.data.frame( read.csv(file= gis.name, header=T) )
+gis$CatchWt <- gis$CATCH_WT_CAL
+gis$CatchWt[is.na(gis$CatchWt)] <- 0
+gis$year <- gis$YEAR
+gis$Lon <- gis$LONGITUDE
+gis$Lat <- gis$LATITUDE
+gis$stratum <- substr(gis$STRATUM,2,3)
+gis$Season <- gis$SEASON
+#replace NA with 0
+gis$CATCH_WT_CAL[is.na(gis$CATCH_WT_CAL)] <- 0
+#ONLY TAKE MORE RECENT ONES?
+#spring.gis <- spring.gis[spring.gis$Year>2009,]
+gis <- gis[gis$year>=2009,]
+gis$YTF <- gis$CatchWt
+surv_random_sample <- gis
 ################################################################################
 
 #read in habitat matrix
@@ -61,17 +92,6 @@ for(i in seq(length(surv_random_sample[,1]))){
 surv_random_sample <- cbind(surv_random_sample,lat,lon)
 colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Season","Lat","Lon")
 
-
-
-
-library(spatstat.geom)
-#plot lat and lon coordinates to check that they look correct
-all_points <- spatstat.geom::ppp(x=lon,y=lat, marks = surv_random_sample[,"stratum"] , window=owin(c(-70.99, -65) ,c(40,43)))
-plot(all_points, use.marks=T) #here we see the stratas appear which makes me feel like it worked
-
-
-
-
 #FIGURE OUT HOW BIG EACH CELL OF RASTER IS IN KM^2 TO SET AREASWEPT_KM2 SETTING BELOW
 
 #get sizes of all cells in raster [km2]
@@ -83,6 +103,21 @@ cell_size<-cell_size[!is.na(cell_size)]
 #check range and mean value of cells
 range(cell_size)
 mean(cell_size)
+
+
+
+
+
+
+
+
+
+library(spatstat.geom)
+#plot lat and lon coordinates to check that they look correct
+all_points <- spatstat.geom::ppp(x=lon,y=lat, marks = surv_random_sample[,"stratum"] , window=owin(c(-70.99, -65) ,c(40,43)))
+plot(all_points, use.marks=T) #here we see the stratas appear which makes me feel like it worked
+
+
 
 
 #load gb polygon which has area info in it
@@ -142,27 +177,41 @@ dir.create(paste(getwd(),"/",scenario,sep=""))
 
 
 #YT         
-exclude <- c(13,14,15,17,18)
+ifelse(exclude_strata==TRUE, exclude <- c(13,14,15,17,18), exclude <- c(0) )
 
-#exclude none
-exclude <- c(0)
-
-strata_species <-  c(13,14,15,16,17,18,19,20,21)
+strata_species <-  c(13,14,15,16,17,18,19,20,21) #c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)#
 
 #do some model selection things
 model_aic <- list()
 
-for(j in 1:4){
+for(j in 1:6){
   
+  # OLD ONES FROM CHUCK ADAMS' PAPER WITH CHRIS AND LIZ
+  # if(j == 1) {obsmodel <- c(2, 0); run <- 1}
+  # if(j == 2) {obsmodel <- c(2, 1); run <- 3} #model selection
+  # if(j == 3) {obsmodel <- c(1, 0); run <- 4}
+  # if(j == 4) {obsmodel <- c(1, 1); run <- 5}
+  
+  # NEW ONES BASED ON CHRIS C'S RECOMMENDATION
   if(j == 1) {obsmodel <- c(2, 0); run <- 1}
-  if(j == 2) {obsmodel <- c(2, 1); run <- 3} #model selection
-  if(j == 3) {obsmodel <- c(1, 0); run <- 4}
-  if(j == 4) {obsmodel <- c(1, 1); run <- 5}
+  if(j == 2) {obsmodel <- c(2, 1); run <- 2} #model selection
+  if(j == 3) {obsmodel <- c(4, 0); run <- 3}
+  if(j == 4) {obsmodel <- c(4, 1); run <- 4}
+  if(j == 5) {obsmodel <- c(9, 0); run <- 5}
+  if(j == 6) {obsmodel <- c(9, 1); run <- 6}
+  
   
   #create directory for model specific output
   dir.create(paste(getwd(),"/",scenario,"/YT",sep=""))
-  dir.create(paste(getwd(),"/",scenario,"/YT/obsmodel",j,sep=""))
-  setwd((paste(getwd(),"/",scenario,"/YT",sep="")))
+  
+  ifelse(exclude_strata==TRUE, 
+         {dir.create(paste(getwd(),"/",scenario,"/YT/ExcludeStrata",sep=""))
+           str_dir <- "ExcludeStrata"},
+         {dir.create(paste(getwd(),"/",scenario,"/YT/AllStrata",sep=""))
+           str_dir <- "AllStrata"})
+  
+  dir.create(paste(getwd(),"/",scenario,"/YT/",str_dir,"/obsmodel",j,sep=""))
+  setwd((paste(getwd(),"/",scenario,"/YT/",str_dir,sep="")))
   
   #following from Chris' file...
   
@@ -201,7 +250,7 @@ for(j in 1:4){
   # model with original data and default settings (Poisson link)
   example <- list(spring)
   example$Region <- "northwest_atlantic"
-  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #THESE ARE YTF STRATA
+  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE YTF STRATA
   
   #make_settings seems like the way to impliment most desired settings
   
@@ -214,13 +263,23 @@ for(j in 1:4){
   #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
   
   #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
+  
+  # FC1 <- matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
+  # FC1[2,1] <-0
+  # FC1[2,2] <-0
+  
+  FC1 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
+  
+  #FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0
+  
   settings <- make_settings(n_x = 500,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
                             Region=example$Region,
                             purpose="index2",
                             strata.limits=example$strata.limits,
                             bias.correct=TRUE,
-                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0),
-                            ObsModel = obsmodel)
+                            FieldConfig= FC1,
+                            ObsModel = obsmodel,
+                            knot_method = "samples")
   #' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
   #'   which is the recommended way of generating this input for beginning users.
   #dafault FieldConfig settings:
@@ -240,11 +299,12 @@ for(j in 1:4){
                           "Lat_i"=as.numeric(spring[,'Lat']), 
                           "Lon_i"=as.numeric(spring[,'Lon']), 
                           "t_i"=as.numeric(spring[,'Year']), 
-                          "c_i"=as.numeric(rep(0,nrow(spring))), 
+                          "c_iz"=as.numeric(rep(0,nrow(spring))), 
                           "b_i"=as.numeric(spring[,'Catch_KG']), 
-                          "a_i"=as.numeric(spring[,'AreaSwept_km2']), 
-                          "v_i"=spring[,'Vessel']), 
+                          "a_i"=as.numeric(spring[,'AreaSwept_km2'])), 
                           silent = TRUE)
+  beep(sound=8)
+  
   
   model_aic[["spring"]][[j]] <- fit_spring$parameter_estimates$AIC
   
@@ -252,22 +312,22 @@ for(j in 1:4){
   dir.create(paste(getwd(),"/obsmodel",j,"/spring",sep=""))
   setwd(paste(getwd(),"/obsmodel",j,"/spring",sep=""))
   #silent = TRUE might stop output in console
+  saveRDS(fit_spring,file = paste(getwd(),"/fit_spring.RDS",sep=""))
   
-  plot_biomass_index(fit_spring)
+#  plot_biomass_index(fit_spring)
   
-  
+  plot(fit_spring)
   #copy parameter files into iteration folder
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/obsmodel",j,"/spring/settings.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
   
-  saveRDS(fit_spring,file = paste(getwd(),"/fit_spring.RDS",sep=""))
   
   
   
@@ -280,7 +340,7 @@ for(j in 1:4){
   fall <- adios %>%
     filter(Season == "FALL") %>%
     # filter(YEAR >= 2009) %>%
-    mutate(mycatch = YT_samp) %>%
+    mutate(mycatch = YTF) %>%
     select(Year = year,
            Catch_KG = mycatch,
            Lat = Lat,
@@ -303,17 +363,24 @@ for(j in 1:4){
   # model with original data and default settings (Poisson link)
   example <- list(fall)
   example$Region <- "northwest_atlantic"
-  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #THESE ARE YTF STRATA
+  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE YTF STRATA
   
   #make_settings seems like the way to impliment most desired settings
+  
+  # FC2 <- matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
+  # FC2[2,1] <-0 
+  # FC2[2,2] <-0 
+  
+  FC2 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,
                             purpose="index2",
                             strata.limits=example$strata.limits,
                             bias.correct=TRUE,  
-                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0),
-                            ObsModel = obsmodel)
+                            FieldConfig= FC2,
+                            ObsModel = obsmodel,
+                            knot_method = "samples")
   #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
   
   #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
@@ -337,11 +404,12 @@ for(j in 1:4){
                         "Lat_i"=as.numeric(fall[,'Lat']), 
                         "Lon_i"=as.numeric(fall[,'Lon']), 
                         "t_i"=as.numeric(fall[,'Year']), 
-                        "c_i"=as.numeric(rep(0,nrow(fall))), 
+                        "c_iz"=as.numeric(rep(0,nrow(fall))), 
                         "b_i"=as.numeric(fall[,'Catch_KG']), 
-                        "a_i"=as.numeric(fall[,'AreaSwept_km2']), 
-                        "v_i"=fall[,'Vessel']), 
+                        "a_i"=as.numeric(fall[,'AreaSwept_km2'])), 
                         silent = TRUE)
+  beep(sound=8)
+  
   
   model_aic[["fall"]][[j]] <- fit_fall$parameter_estimates$AIC
   
@@ -349,22 +417,24 @@ for(j in 1:4){
   
   setwd(paste(getwd(),"/obsmodel",j,"/fall",sep=""))  #set it
   
-  plot_biomass_index(fit_fall)
-  
-  
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/obsmodel",j,"/fall/settings.txt",sep=""))
-  
-  
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
-  
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
-  
   saveRDS(fit_fall,file = paste(getwd(),"/fit_fall.RDS",sep=""))
+ # plot_biomass_index(fit_fall)
+  
+  plot(fit_fall)
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
+  
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
+  
   
   #go back to scenario directory before moving to next model case
+  setwd('..')
   setwd('..')
   setwd('..')
   setwd('..')
@@ -373,7 +443,7 @@ for(j in 1:4){
 }
 
 
-saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/YT/model_aic.RDS",sep=""))
+saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/YT/",str_dir,"/model_aic.RDS",sep=""))
 
 
 
