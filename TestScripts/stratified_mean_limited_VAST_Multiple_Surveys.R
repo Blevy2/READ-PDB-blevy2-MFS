@@ -8,7 +8,11 @@
 #THINGS WE NEED
 ##################################################################################################
 
+#ConPop_ConTemp use simulation #53
+
 scenario <- "ConPop_ConTemp"
+
+scenario_num <- 53 #specific simulation iteration to sample
 
 n_spp <- 3
 
@@ -27,7 +31,7 @@ surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"
 
 #1- single set of random survey locations used in stratified mean analysis
 #survey results without noise
-list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
+#list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 
 
 #2- generate 100 different survey locations
@@ -48,7 +52,7 @@ rotate <- function(x) t(apply(x, 2, rev))
 #ALSO NEED N_STATIONS / STATIONS_PER_DAY <= 52 otherwise wont get to all of them in a year results in NA in the matrix
 surv_random_list <- list()
 list_all <- list()
-for(i in seq(10)){
+for(i in seq(5)){
   print(i)
 nstat <- 2*strata_samples #this is total samples per year per strata 
 surv_random_list[[i]] <- BENS_init_survey(sim_init = sim,design = 'random_station', n_stations = nstat, 
@@ -188,7 +192,7 @@ for(iter in seq(length(surv_random_list))){#for each simulation result
       
       
       for(k in seq(n_spp)){
-        strata_surv[[iter]][[s]][i,paste0("spp", k)] <- result[[iter]][["pop_bios"]][[(week+(52*(year-1)))]][[paste0("spp", k)]][x,y]
+        strata_surv[[iter]][[s]][i,paste0("spp", k)] <- result[[scenario_num]][["pop_bios"]][[(week+(52*(year-1)))]][[paste0("spp", k)]][x,y]
       }
     }
     
@@ -262,9 +266,9 @@ for(iter in seq(length(list_all))){
     wk = as.numeric(list_all[[iter]][samp,11]) #week in 11th column
     yr = as.numeric(list_all[[iter]][samp,7]) #year in 7th column
     
-    temp[samp,1] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp1"]],na.rm=T) #YT is spp1
-    temp[samp,2] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]],na.rm=T) #Cod is spp2
-    temp[samp,3] <- sum(result[[iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]],na.rm=T) #Had is spp3
+    temp[samp,1] <- sum(result[[scenario_num]]$pop_bios[[(wk+(52*(yr-1)))]][["spp1"]],na.rm=T) #YT is spp1
+    temp[samp,2] <- sum(result[[scenario_num]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]],na.rm=T) #Cod is spp2
+    temp[samp,3] <- sum(result[[scenario_num]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]],na.rm=T) #Had is spp3
     
     #ADDING LAT LON LOCATIONS
     rw <- as.numeric(list_all[[iter]][samp,"x"])  #x in col 2
@@ -281,9 +285,7 @@ for(iter in seq(length(list_all))){
 }
 
 #SAVE INDIVIDUAL LIST_ALL AS THEY COME OUT SO DONT HAVE TO REDO THEM
-saveRDS(list_all,paste("list_all_more_",scenario,".RDS",sep=""))
-
-
+saveRDS(list_all, paste0(getwd(),"/VAST/",scenario,"/list_all_more_",scenario,".RDS"))
 
 
 #FIND MEAN VALUE BY SEASON USING ABOVE INFORMATION. USE MEAN OF TWO SURVEY WEEKS FOR EACH SEASON
@@ -504,7 +506,7 @@ exclude <- list(c(0),c(0),c(0)) #3 species
 
 
 
-for(iter in 56){
+for(iter in seq(length(list_all))){
   
   #pull out survey  
   surv_random_VAST <- list_all[[iter]]
@@ -583,51 +585,47 @@ example <- list(spring)
 example$Region <- "northwest_atlantic"
 example$strata.limits <- strata.limits[[s]] 
 
-
+#found via model selection through AIC values. same for all 3 species
+obsmodel <- c(2, 1)
 
 #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
 
 if(s == "YT"){
-#first attempt at settings. failed on ConPop_IncTemp exclude strata interation #56 fall
-# settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-#                                           Region=example$Region,
-#                                           purpose="index2",
-#                                           strata.limits=example$strata.limits,
-#                                           bias.correct=TRUE,
-#                                           FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0))
+  
+#  FC <- matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
+# FC[2,1] <-0  
+# FC[2,2] <-0 
 
-#second attempt which fixes the previous fail
-settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                                          Region=example$Region,
-                                          purpose="index2",
-                                          strata.limits=example$strata.limits,
-                                          bias.correct=TRUE,
-                                          FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0),
-                                          RhoConfig = c("Beta1" = 0, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 0))
-#' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
-#'   which is the recommended way of generating this input for beginning users.
-#dafault FieldConfig settings:
-# if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
+  FC = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
 
-#settings
+  settings <- make_settings(n_x = 500,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,
+                           FieldConfig= FC,
+                            ObsModel = obsmodel)
 }
 
 if(s == "Cod"){
-settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                                            Region=example$Region,
-                                            purpose="index2",
-                                            strata.limits=example$strata.limits,
-                                            bias.correct=TRUE,
-                                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+  settings <- make_settings(n_x = 500,
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,
+                            FieldConfig= FC,
+                            ObsModel = obsmodel)
 }
 
 if(s == "Had"){
-settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                                            Region=example$Region,
-                                            purpose="index2",
-                                            strata.limits=example$strata.limits,
-                                            bias.correct=TRUE,
-                                            FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+  settings <- make_settings(n_x = 500,
+                          Region=example$Region,
+                          purpose="index2",
+                          strata.limits=example$strata.limits,
+                          bias.correct=TRUE,
+                          ObsModel = obsmodel,
+                          FieldConfig= FC)
+
 }
 
 
@@ -650,7 +648,12 @@ dir.create( paste0(getwd(),"/spring/iter",iter,sep=""))
 
 setwd(paste0(getwd(),"/spring/iter",iter))
 
-plot_biomass_index(VAST_fit_spring[[s]][[iter]])
+#plot_biomass_index(VAST_fit_spring[[s]][[iter]])
+
+plot(VAST_fit_spring[[s]][[iter]])
+
+file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/settings.txt",sep="") 
+            ,to =paste(orig.dir,"/VAST/",scenario,"/",s,"/spring/iter",iter,"/settings.txt",sep=""))
 
 #copy parameter files into iteration folder
 file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/parameter_estimates.txt",sep="") 
@@ -678,47 +681,36 @@ example$strata.limits <- strata.limits[[s]]
 #WHEN ADDING ADDITIONAL FIELDCONFIG SETTINGS ALL 4 SETTINGS BELOW MUST BE INCLUDED
 
 if(s == "YT"){
-  #first attempt at settings. failed on ConPop_IncTemp exclude strata interation #56 fall
-  # settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-  #                                           Region=example$Region,
-  #                                           purpose="index2",
-  #                                           strata.limits=example$strata.limits,
-  #                                           bias.correct=TRUE,
-  #                                           FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0))
-  
-  #second attempt which fixes the previous fail
-  settings_species[["YT"]] <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                                            Region=example$Region,
-                                            purpose="index2",
-                                            strata.limits=example$strata.limits,
-                                            bias.correct=TRUE,
-                                            FieldConfig= c("Omega1"=0, "Epsilon1"=0, "Omega2"=0, "Epsilon2"=0),
-                                            RhoConfig = c("Beta1" = 0, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 0))
-  #' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
-  #'   which is the recommended way of generating this input for beginning users.
-  #dafault FieldConfig settings:
-  # if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
-  
-  #settings
+  settings <- make_settings(n_x = 500,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,
+                            FieldConfig= FC,
+                            ObsModel = obsmodel)
 }
 
 if(s == "Cod"){
-  settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                             Region=example$Region,
-                             purpose="index2",
-                             strata.limits=example$strata.limits,
-                             bias.correct=TRUE,
-                             FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+  settings <- make_settings(n_x = 500,
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,
+                            FieldConfig= FC,
+                            ObsModel = obsmodel)
 }
 
 if(s == "Had"){
-  settings <-  make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
-                             Region=example$Region,
-                             purpose="index2",
-                             strata.limits=example$strata.limits,
-                             bias.correct=TRUE,
-                             FieldConfig= c("Omega1"=1, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=0))
+  settings <- make_settings(n_x = 500,
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,
+                            ObsModel = obsmodel,
+                            FieldConfig= FC)
+  
 }
+
 
 #FALL FIT
 VAST_fit_fall[[s]][[iter]] <- fit_model(settings = settings,
@@ -734,7 +726,12 @@ dir.create( paste0(getwd(),"/fall/iter",iter,sep=""))
 
 setwd(paste0(getwd(),"/fall/iter",iter))
 
-plot_biomass_index(VAST_fit_fall[[s]][[iter]])
+#plot_biomass_index(VAST_fit_fall[[s]][[iter]])
+
+plot(VAST_fit_fall[[s]][[iter]])
+
+file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/settings.txt",sep="") 
+            ,to =paste(orig.dir,"/VAST/",scenario,"/",s,"/fall/iter",iter,"/settings.txt",sep=""))
 
 #copy parameter files into iteration folder
 file.rename(from= paste(orig.dir,"/VAST/",scenario,"/",s,"/parameter_estimates.txt",sep="") 
@@ -756,7 +753,7 @@ setwd(orig.dir)
 VAST_fit_all <- list(VAST_fit_spring,VAST_fit_fall)
 names(VAST_fit_all) <- c("spring","fall")
 
-saveRDS(VAST_fit_all,paste0(getwd(),"/VAST/",scenario,"_excludestrata_IndParams","/VAST_fit_all_",scenario,".RDS"))
+saveRDS(VAST_fit_all,paste0(getwd(),"/VAST/",scenario,"/VAST_fit_all_",scenario,".RDS"))
 
 
 
@@ -836,7 +833,7 @@ saveRDS(VAST_fit_all,paste0(getwd(),"/VAST/",scenario,"_excludestrata_IndParams"
 
 
 
-pdf(file=paste("Results/GB_error_plots/Individual_SRS_",scenario,".pdf",sep=""))
+pdf(file=paste0(getwd(),"/VAST/",scenario,"/Individual_SRS_",scenario,".pdf",sep=""))
 
 
 nyears <- 20
@@ -859,7 +856,7 @@ vast.dir <- paste("VAST/",scenario,sep="")
 
 #first make model output have 2 seasons to match the stratified mean calcs
 
-for(iter in seq(length(list_all))){
+for(iter in seq(2)){
   
   print(iter)
   
