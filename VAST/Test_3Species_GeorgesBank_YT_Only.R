@@ -523,7 +523,7 @@ for(j in 1:6){
   
  
   #plot covariate respopne, if applicable 
-  if(covariates == "TRUE"){
+
     print("PLOTTING COVARIATE RESPONSE")
     pdf(file=paste(getwd(),"/",cov_used,"_cov_res_spring",".pdf",sep=""))
     fittt = fit_spring
@@ -531,6 +531,7 @@ for(j in 1:6){
     catchability_data_full = fittt$effects$catchability_data_full
     
     # Plot 1st linear predictor, but could use `transformation` to apply link function
+    
     pred = Effect.fit_model( fittt,
                              focal.predictors = c("Temp"),
                              which_formula = "X1",
@@ -538,6 +539,19 @@ for(j in 1:6){
                              transformation = list(link=identity, inverse=identity) )
     plot(pred)
     
+    pred = Effect.fit_model( fittt,
+                             focal.predictors = c("Habitat"),
+                             which_formula = "X2",
+                             xlevels = 100,
+                             transformation = list(link=identity, inverse=identity) )
+    plot(pred)
+    
+    pred = Effect.fit_model( fittt,
+                             focal.predictors = c("Temp"),
+                             which_formula = "X2",
+                             xlevels = 100,
+                             transformation = list(link=identity, inverse=identity) )
+    plot(pred)
     # 
     # pred2 = Effect.fit_model( fittt,
     #                           focal.predictors = c("Temp"),
@@ -588,8 +602,7 @@ for(j in 1:6){
 
     dev.off()
     remove(fittt)
-    }
-
+    
     
   remove(fit_spring)
   
@@ -634,7 +647,7 @@ for(j in 1:6){
   # FC2[2,1] <-0 
   # FC2[2,2] <-0 
   
-  FC2 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
+  FC2 = c("Omega1" = 1, "Epsilon1" = 0, "Omega2" = 1, "Epsilon2" = 0) 
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,
@@ -667,14 +680,14 @@ for(j in 1:6){
     
     
     #Chris C idea for including 2 covariates
-    # X1_formula = ~ poly(Temp, degree=2 )
-    # X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+    X1_formula = ~ poly(Temp, degree=2 )
+    X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
     # X1_formula = ~ 1
     # X2_formula = ~ poly(Habitat, degree=3 )
     
     #HABITAT AND TEMP
-    X1_formula = ~ poly(Habitat, degree=2 )
-    X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+    # X1_formula = ~ poly(Habitat, degree=2 )
+    # X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
     
 
     fit_fall <- try(fit_model(settings = settings,
@@ -731,7 +744,7 @@ for(j in 1:6){
   
   
   #plot covariate respopne, if applicable 
-  if(covariates == "TRUE"){
+
     print("PLOTTING COVARIATE RESPONSE")
     pdf(file=paste(getwd(),"/",cov_used,"_cov_res_fall",".pdf",sep=""))
     fittt = fit_fall
@@ -739,8 +752,23 @@ for(j in 1:6){
     catchability_data_full = fittt$effects$catchability_data_full
     
     # Plot 1st linear predictor, but could use `transformation` to apply link function
+
+    pred = Effect.fit_model( fittt,
+                             focal.predictors = c("Temp"),
+                             which_formula = "X1",
+                             xlevels = 100,
+                             transformation = list(link=identity, inverse=identity) )
+    plot(pred)
+    
     pred = Effect.fit_model( fittt,
                              focal.predictors = c("Habitat"),
+                             which_formula = "X2",
+                             xlevels = 100,
+                             transformation = list(link=identity, inverse=identity) )
+    plot(pred)
+    
+        pred = Effect.fit_model( fittt,
+                             focal.predictors = c("Temp"),
                              which_formula = "X2",
                              xlevels = 100,
                              transformation = list(link=identity, inverse=identity) )
@@ -797,7 +825,7 @@ for(j in 1:6){
   dev.off()
   
   remove(fittt)
-  }
+  
   
 
   
