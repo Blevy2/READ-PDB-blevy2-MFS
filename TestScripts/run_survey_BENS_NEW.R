@@ -67,8 +67,7 @@ for(strata in unique(surv_random$log.mat[,4])){
 
 
 #make sure samples are in correct strata
-
-fields::image.plot(rotate(hab$stratas))
+fields::image.plot(rotate(hab$stratas), axes =F)
 
 test <- matrix(0, nrow = length(hab$hab$spp1[,1]),ncol = length(hab$hab$spp1[1,]))
 
@@ -83,6 +82,52 @@ for(i in seq(length(surv_random$log.mat[,1]))){
 fields::image.plot(rotate(test)) #colors in this plot should match the previous plot above
 
 
+
+
+
+#plot survey for viewing and presentations (doesnt work well, use below instead)
+library(ggplot2)
+ggplot(data = as.data.frame(surv_random$log.mat[surv_random$log.mat[,"year"]==3,], aes(x=x, y=y))) +
+  geom_point(aes(x=y,y=x,color = strata, shape = as.character(year)))
+
+
+test <- matrix(0, nrow = length(hab$hab$spp1[,1]),ncol = length(hab$hab$spp1[1,]))
+temp <- surv_random$log.mat[surv_random$log.mat[,"year"]==3,]
+for(i in seq(length(temp[,1]))){
+  # print(surv_random$log.mat[i,2])
+  # print(surv_random$log.mat[i,4])
+  # print( surv_random$log.mat[i,4])
+  test[temp[i,2],temp[i,3]] <-temp[i,4]
+  
+}
+
+fields::image.plot(rotate(test)) #colors in this plot should match the previous plot above
+
+
+
+#translate x y into lat lon
+lat <- vector()
+lon <- vector()
+surv_random_sample <- surv_random$log.mat
+
+for(i in seq(length(surv_random_sample[,1]))){
+  if(surv_random_sample[i,"year"]==3){
+  rw <- as.numeric(surv_random_sample[i,"x"])  #x in col 2
+  cl <- as.numeric(surv_random_sample[i,"y"]) #y in col 3
+  
+  lon[i] <- xFromCol(Had_ras, col = cl)
+  lat[i] <- yFromRow(Had_ras, row = rw)
+  }
+}
+surv_lat_lon <- cbind(lat,lon)
+names(surv_lat_lon) <- c("Lat","Lon")
+
+surv_lat_lon <- raster(surv_lat_lon)
+extent(surv_lat_lon) <- extent(Had_ras)
+
+points <- ppp(surv_lat_lon[,2],surv_lat_lon[,1],owin(c(-70, -65.6) ,c(40.1,42.8) ))
+plot.ppp(points)
+plot(GB_had_strata,add=T)
 
 #RUN BELOW IF JUST RAN SINGLE ITERATION
 #result <- list()

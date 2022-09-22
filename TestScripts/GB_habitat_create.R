@@ -1,7 +1,7 @@
 #will create the "hab" object for mixfish sim using previously created habiats for each species
 
 #for working in just R
-setwd("C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-toy/")
+setwd("C:/Users/benjamin.levy/Desktop/Github/READ-PDB-blevy2-MFS2/")
 
 
 
@@ -413,7 +413,8 @@ saveRDS(hab, file="hab_GB_3species.RDS")
 
 
 
-
+#load habitat
+hab <- readRDS("hab_GB_3species.RDS")
 
 
 
@@ -423,7 +424,8 @@ saveRDS(hab, file="hab_GB_3species.RDS")
 #constant temp gradient
 #moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
 
-moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
+#increasing temp gradient
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
 
 
 #order: , Yellowtail, Cod, Haddock
@@ -433,6 +435,12 @@ tol_list <- list("spp1" = list("mu" = 9, "va" = 4),  #Yellowtail
 
 
 
+
+spp_names <- c("Yellowtail Flounder","Cod","Haddock")
+
+spp_names_short <- c("YTF","COD","HAD")
+
+month_nm <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
 
 
@@ -486,7 +494,6 @@ for(k in seq(12)){
 
 
 
-#PLOT SINGLE YEAR EACH ON OWN PAGE. GOOD FOR CONSTANT TEMP SITUATION
   for(i in seq(52)){
  
     
@@ -606,12 +613,12 @@ for(s in seq_len(length(hab[["hab"]]))) {
     #col = grey(seq(1,0,l = 51)), 
     if(!i %in% spwn_wk[[s]]) {
       temp_rotate <- rotate( move_cov_wk_spp)
-      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F,zlim = c(zmin[s],zmax[s]))
+      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F,zlim = c(zmin[s],zmax[s]), col = c(rev(heat.colors(50))[5:50]))
     }
     # col = grey(seq(1,0,l = 51)),
     if(i %in% spwn_wk[[s]]) {
       temp_rotate <- rotate( move_cov_wk_spp)
-      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F, zlim = c(zmin[s],zmax[s]) )
+      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F, zlim = c(zmin[s],zmax[s]), col = c(rev(heat.colors(50))[5:50]) )
     }
     #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
     #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
@@ -645,12 +652,12 @@ for(s in seq_len(length(hab[["hab"]]))) {
     #col = grey(seq(1,0,l = 51)), 
     if(!i %in% spwn_wk[[s]]) {
       temp_rotate <- rotate(move_cov_wk_spp)
-      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F, zlim = c(zmin[s],zmax[s]))
+      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F, zlim = c(zmin[s],zmax[s]), col = c(rev(heat.colors(50))[5:50]))
     }
     # col = grey(seq(1,0,l = 51)),
     if(i %in% spwn_wk[[s]]) {
       temp_rotate <- rotate( move_cov_wk_spp)
-      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F, zlim = c(zmin[s],zmax[s]) )
+      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F, zlim = c(zmin[s],zmax[s]), col = c(rev(heat.colors(50))[5:50]) )
     }
     #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
     #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))  month_nm[floor(i/(13/3))+1] ,
@@ -733,12 +740,12 @@ for(s in seq_len(length(hab[["hab"]]))) {
       #col = grey(seq(1,0,l = 51)), 
       if(!i %in% spwn_wk[[s]]) {
         temp_rotate <- rotate( move_cov_wk_spp)
-        fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F, zlim = c(zmin[s],zmax[s]))
+        fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F, zlim = c(zmin[s],zmax[s]), col = c(rev(heat.colors(50))[5:50]))
       }
       # col = grey(seq(1,0,l = 51)),
       if(i %in% spwn_wk[[s]]) {
         temp_rotate <- rotate( move_cov_wk_spp)
-        fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F, zlim = c(zmin[s],zmax[s]) )
+        fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F, zlim = c(zmin[s],zmax[s]), col = c(rev(heat.colors(50))[5:50]) )
       }
       #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
       #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
@@ -832,7 +839,7 @@ for(s in seq_len(length(hab[["hab"]]))) {
       temp_rotate <- temp_rotate/sum(temp_rotate,na.rm=T)
       #print(sum(temp_rotate,na.rm=T))
       
-      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F )
+      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F , col = c("#4e83ed",rev(heat.colors(50))[5:50]))
     }
     # col = grey(seq(1,0,l = 51)),
     if(i %in% spwn_wk[[s]]) {
@@ -840,7 +847,7 @@ for(s in seq_len(length(hab[["hab"]]))) {
       temp_rotate <- temp_rotate/sum(temp_rotate,na.rm=T)
       #print(sum(temp_rotate))
       
-      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F )
+      fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 1, axes = F , col = c("#4e83ed",rev(heat.colors(50))[5:50]))
     }
     #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
     #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
@@ -875,12 +882,12 @@ for(s in seq_len(length(hab[["hab"]]))) {
     #col = grey(seq(1,0,l = 51)), 
     if(!i %in% spwn_wk[[s]]) {
       temp_rotate <- rotate(hab[["hab"]][[paste0('spp',s)]]^2 *move_cov_wk_spp)
-      fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 2, axes = F)
+      fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 2, axes = F, col = c("#4e83ed",rev(heat.colors(50))[5:50]))
     }
     # col = grey(seq(1,0,l = 51)),
     if(i %in% spwn_wk[[s]]) {
       temp_rotate <- rotate(hab[["spwn_hab"]][[paste0('spp',s)]]^2 * move_cov_wk_spp)
-      fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 1, axes = F )
+      fields::image.plot(temp_rotate/sum(temp_rotate,na.rm=T), cex.axis = 1.5, cex.main = 1, axes = F , col = c("#4e83ed",rev(heat.colors(50))[5:50]))
     }
     #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
     #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))

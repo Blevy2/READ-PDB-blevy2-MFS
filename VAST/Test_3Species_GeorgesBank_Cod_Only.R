@@ -8,6 +8,8 @@ library(dplyr)
 library(ggplot2)
 library(beepr)
 
+orig.dir <- getwd()
+
 #FIRST READ IN SURVEY VALUES AND ADD COLUMNS THAT CONVERY X,Y INTO LAT,LON
 
 
@@ -21,6 +23,10 @@ scenario <- "ConPop_ConTemp_7_29"
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 
 exclude_strata <- TRUE
+
+covariates <- TRUE
+
+cov_used <- "Temp"
 
 #for ConPop_ConTemp iteration 13 is pretty good
 #for ConPop_IncTemp iteration 1 is pretty good
@@ -46,6 +52,13 @@ hab_ras <-raster(hab$hab$spp3)
 extent(hab_ras) <- extent(Had_ras)
 plot(hab_ras)
 
+
+#load increasing or constant temp gradient based on scenario
+tmp <- substr(scenario,8,10)
+
+if(tmp == "Con"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"stTemp_HaddockStrata_res2",sep=""))}
+if(tmp == "Inc"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"rTemp_HaddockStrata_res2",sep=""))}
+
 #ADD COLUMNS TO SURVEY THAT CONTAIN LAT/LON INFORMATION
 
 #longitude is NS. These are X values or rows
@@ -56,6 +69,7 @@ plot(hab_ras)
 
 lat <- vector()
 lon <- vector()
+temperature <- vector()
 
 for(i in seq(length(surv_random_sample[,1]))){
   
@@ -65,13 +79,17 @@ for(i in seq(length(surv_random_sample[,1]))){
   lon[i] <- xFromCol(hab_ras, col = cl)
   lat[i] <- yFromRow(hab_ras, row = rw)
   
+  #record covarite temp
+  wk =  as.numeric(surv_random_sample[i,"week"])  
+  yr = as.numeric(surv_random_sample[i,"year"]) 
+  
+  temperature[i] <- moveCov$cov.matrix[[52*(yr-1)+wk]][rw,cl]
 }
 
 
-
 #add columns to survey table
-surv_random_sample <- cbind(surv_random_sample,lat,lon)
-colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Season","Lat","Lon")
+surv_random_sample <- cbind(surv_random_sample,lat,lon,temperature)
+colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Season","Lat","Lon","Temp")
 
 
 #FIGURE OUT HOW BIG EACH CELL OF RASTER IS IN KM^2 TO SET AREASWEPT_KM2 SETTING BELOW
@@ -144,7 +162,7 @@ area_per_cell <- GB_strata$area_sqkm/cell_str
 
 
 
-orig.dir <- getwd()
+
 
 #change directory
 setwd(paste(orig.dir,"/VAST", sep=""))
@@ -153,14 +171,27 @@ dir.create(paste(getwd(),"/",scenario,sep=""))
 
 
 #Cod      
-ifelse(exclude_strata==TRUE, exclude <- exclude <- c(23,24,25), exclude <- c(0) )
-
+ifelse(exclude_strata==TRUE, exclude <- c(23,24,25), exclude <- c(0) )
+ifelse(exclude_strata==TRUE, exclude_full <- c(1230,1240,1250), exclude_full <- c(0) )
 
 strata_species <-  c(13,14,15,16,17,18,19,20,21,22,23,24,25)
 
 
 #do some model selection things
 model_aic <- list()
+
+#SAMPLE DATA
+adios <- as.data.frame(surv_random_sample)
+adios <- adios[(adios$stratum %in% strata_species),]
+adios <- adios[!(adios$stratum %in% exclude),]
+
+#covariates
+#create covariate data
+covdata <- data.frame(cbind(adios[,"Temp"],adios[,"Lat"],adios[,"Lon"],adios[,"year"],adios[,"Season"]))
+names(covdata) <- c("Temp","Lat","Lon","Year","Season")
+
+covdata_fall <- covdata[covdata$Season=="FALL",1:4] #remove season
+covdata_spring <- covdata[covdata$Season=="SPRING",1:4]
 
 for(j in 1:6){
   
@@ -182,21 +213,17 @@ for(j in 1:6){
   #create directory for model specific output
   dir.create(paste(getwd(),"/",scenario,"/Cod",sep=""))
   
+  ifelse(covariates==TRUE,{cov_dir <- paste("_with_",cov_used,sep="")},{cov_dir <- ""})
+  
   ifelse(exclude_strata==TRUE, 
-         {dir.create(paste(getwd(),"/",scenario,"/Cod/ExcludeStrata",sep=""))
+         {dir.create(paste(getwd(),"/",scenario,"/Cod/ExcludeStrata",cov_dir,sep=""))
            str_dir <- "ExcludeStrata"},
-         {dir.create(paste(getwd(),"/",scenario,"/Cod/AllStrata",sep=""))
+         {dir.create(paste(getwd(),"/",scenario,"/Cod/AllStrata",cov_dir,sep=""))
            str_dir <- "AllStrata"})
   
-  dir.create(paste(getwd(),"/",scenario,"/Cod/",str_dir,"/obsmodel",j,sep=""))
+  dir.create(paste(getwd(),"/",scenario,"/Cod/",str_dir,cov_dir,"/obsmodel",j,sep=""))
   
-  setwd((paste(getwd(),"/",scenario,"/Cod/",str_dir,sep="")))
-  
- 
-  #set survey
-  adios <- as.data.frame(surv_random_sample)
-  adios <- adios[(adios$stratum %in% strata_species),]
-  adios <- adios[!(adios$stratum %in% exclude),]
+  setwd((paste(getwd(),"/",scenario,"/Cod/",str_dir,cov_dir,sep="")))
   
   head(adios)
   
@@ -217,12 +244,13 @@ for(j in 1:6){
   # summary(spring)
   # names(spring)
   
-
+  GB_strat <- c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210,  1220, 1230, 1240, 1250)
+  GB_strat <- GB_strat[!(GB_strat %in% exclude_full)]
   
   # model with original data and default settings (Poisson link)
   example <- list(spring)
   example$Region <- "northwest_atlantic"
-  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210,  1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
+  example$strata.limits <- data.frame(Georges_Bank = GB_strat) #THESE ARE COD STRATA
   
   
   
@@ -262,15 +290,29 @@ for(j in 1:6){
   #######################################################################################
   # Try this first
   #######################################################################################
-  
-  fit_spring <- try(fit_model(settings = settings,
-                              "Lat_i"=as.numeric(spring[,'Lat']), 
-                              "Lon_i"=as.numeric(spring[,'Lon']), 
-                              "t_i"=as.numeric(spring[,'Year']), 
-                              "c_iz"=as.numeric(rep(0,nrow(spring))), 
-                              "b_i"=as.numeric(spring[,'Catch_KG']), 
-                              "a_i"=as.numeric(spring[,'AreaSwept_km2'])), 
-                    silent = TRUE)
+  ifelse(covariates == "TRUE",{
+    print("USING COVARIATES")
+    fit_spring <- try(fit_model(settings = settings,
+                                "Lat_i"=as.numeric(spring[,'Lat']), 
+                                "Lon_i"=as.numeric(spring[,'Lon']), 
+                                "t_i"=as.numeric(spring[,'Year']), 
+                                "c_iz"=as.numeric(rep(0,nrow(spring))), 
+                                "b_i"=as.numeric(spring[,'Catch_KG']), 
+                                "a_i"=as.numeric(spring[,'AreaSwept_km2']),
+                                covariate_data = covdata_spring), 
+                      silent = TRUE)
+  },{
+    print("NOT USING COVARIATES")
+    fit_spring <- try(fit_model(settings = settings,
+                                "Lat_i"=as.numeric(spring[,'Lat']), 
+                                "Lon_i"=as.numeric(spring[,'Lon']), 
+                                "t_i"=as.numeric(spring[,'Year']), 
+                                "c_iz"=as.numeric(rep(0,nrow(spring))), 
+                                "b_i"=as.numeric(spring[,'Catch_KG']), 
+                                "a_i"=as.numeric(spring[,'AreaSwept_km2'])), 
+                      silent = TRUE)
+  })
+ 
   beep(sound=8)
   
   
@@ -289,16 +331,18 @@ for(j in 1:6){
   
   plot(fit_spring)
   
+  remove(fit_spring)
+  
   #copy parameter files into iteration folder
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
 
   
   
@@ -326,7 +370,7 @@ for(j in 1:6){
   # model with original data and default settings (Poisson link)
   example <- list(fall)
   example$Region <- "northwest_atlantic"
-  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210,1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
+  example$strata.limits <- data.frame(Georges_Bank = GB_strat) #THESE ARE COD STRATA
   
   
   FC2 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
@@ -358,15 +402,28 @@ for(j in 1:6){
   #######################################################################################
   # Try this first
   #######################################################################################
-  
+  ifelse(covariates == "TRUE",{
+    print("USING COVARIATES")
   fit_fall <- try(fit_model(settings = settings,
                             "Lat_i"=as.numeric(fall[,'Lat']), 
                             "Lon_i"=as.numeric(fall[,'Lon']), 
                             "t_i"=as.numeric(fall[,'Year']), 
                             "c_iz"=as.numeric(rep(0,nrow(fall))), 
                             "b_i"=as.numeric(fall[,'Catch_KG']), 
-                            "a_i"=as.numeric(fall[,'AreaSwept_km2'])), 
+                            "a_i"=as.numeric(fall[,'AreaSwept_km2']),
+                            covariate_data = covdata_fall), 
                   silent = TRUE)
+  },{
+    print("NOT USING COVARIATES")
+    fit_fall <- try(fit_model(settings = settings,
+                              "Lat_i"=as.numeric(fall[,'Lat']), 
+                              "Lon_i"=as.numeric(fall[,'Lon']), 
+                              "t_i"=as.numeric(fall[,'Year']), 
+                              "c_iz"=as.numeric(rep(0,nrow(fall))), 
+                              "b_i"=as.numeric(fall[,'Catch_KG']), 
+                              "a_i"=as.numeric(fall[,'AreaSwept_km2'])), 
+                    silent = TRUE)
+  })
   beep(sound=8)
   
   
@@ -383,15 +440,17 @@ for(j in 1:6){
   
   plot(fit_fall)
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
+  remove(fit_fall)
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
   
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,"/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/Cod/",str_dir,cov_dir,"/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
 
   
   #go back to scenario directory before moving to next model case
@@ -404,7 +463,7 @@ for(j in 1:6){
 }
 
 
-saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Cod/",str_dir,"/model_aic.RDS",sep=""))
+saveRDS(model_aic, file = paste(orig.dir,"/VAST","/",scenario,"/Cod/",str_dir,cov_dir,"/model_aic.RDS",sep=""))
 
    
   

@@ -8,6 +8,8 @@ library(dplyr)
 library(ggplot2)
 library(beepr)
 
+orig.dir <- getwd()
+
 #FIRST READ IN SURVEY VALUES AND ADD COLUMNS THAT CONVERY X,Y INTO LAT,LON
 
 
@@ -16,17 +18,23 @@ library(beepr)
 surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario <- "IncPop_IncTemp_8_2"
+scenario <- "ConPop_ConTemp_7_29"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 
-exclude_strata <- TRUE
+exclude_strata <- FALSE
+
+covariates <- TRUE
+
+cov_used <- "CovSettings_A2"  #"Temp_LinearBasic" 
 
 #for Conpop_ConTemp (also used for IncTemp) run 1 shows decent constant value with single spike early on
 #for Incpop_ConTemp (also used for IncTemp) run 77 shows strong increase for yellowtail
 #for DecPop_ConTemp run 25 shows clear decrease with small values towards the end
 #for DecPop_IncTemp run 13 shows clear decrease with small values towards the end
-surv_random_sample <- list_all[[77]]
+surv_random_sample <- list_all[[1]]
+
+setwd(orig.dir)
 ################################################################################
 
 
@@ -54,17 +62,28 @@ surv_random_sample <- gis
 
 #read in habitat matrix
 hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
-
+names(hab$hab) <- c("YT","Cod","Had")
 #read in GB strata
 
 #haddock contains all stratas used
 Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Had_Weighted_AdaptFalse_RASTER_res2.RDS")
 plot(Had_ras)
+#load others to extract covariate values
+#Yellowtail
+YT_ras <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/Yell_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(YT_ras)
+#Cod
+Cod_ras <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(Cod_ras)
 
 #translate habitat matrix back into raster
-hab_ras <-raster(hab$hab$spp3)
+hab_ras <-raster(hab$hab$Had)
 extent(hab_ras) <- extent(Had_ras)
 plot(hab_ras)
+
+#create Haddock matrix
+Had_matrix <- as.matrix(Had_ras)
+
 
 #ADD COLUMNS TO SURVEY THAT CONTAIN LAT/LON INFORMATION
 
@@ -74,8 +93,16 @@ plot(hab_ras)
 #latitude is EW, These are Y values or columns
 #obtained via latitude = xFromCol(raster,col= )
 
+#load increasing or constant temp gradient based on scenario
+tmp <- substr(scenario,8,10)
+  
+if(tmp == "Con"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"stTemp_HaddockStrata_res2",sep=""))}
+if(tmp == "Inc"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"rTemp_HaddockStrata_res2",sep=""))}
+
 lat <- vector()
 lon <- vector()
+temperature <- vector()
+hab_cov <- list()
 
 for(i in seq(length(surv_random_sample[,1]))){
   
@@ -85,14 +112,38 @@ for(i in seq(length(surv_random_sample[,1]))){
   lon[i] <- xFromCol(hab_ras, col = cl)
   lat[i] <- yFromRow(hab_ras, row = rw)
   
+  #record covarite temp
+  wk =  as.numeric(surv_random_sample[i,"week"])  
+  yr = as.numeric(surv_random_sample[i,"year"]) 
+ 
+  temperature[i] <- moveCov$cov.matrix[[52*(yr-1)+wk]][rw,cl]
+
+  #This uses the normalized habitat values, which are extremely small 
+  #and therefore may have been interfering with parameter estimation
+  # hab_cov[["YT"]][i] <- hab$hab[["YT"]][rw,cl]
+  # hab_cov[["Cod"]][i] <- hab$hab[["Had"]][rw,cl]
+  # hab_cov[["Had"]][i] <- hab$hab[["Had"]][rw,cl]
+
+  #Instead try using non-normalize values
+  hab_cov[["YT"]][i] <- YT_ras[rw,cl]
+  hab_cov[["Cod"]][i] <- Cod_ras[rw,cl]
+  hab_cov[["Had"]][i] <- Had_ras[rw,cl]
+
+  #replace NA with 0
+  if(is.na(hab_cov[["YT"]][i])){hab_cov[["YT"]][i]<-0}
+  if(is.na(hab_cov[["Cod"]][i])){hab_cov[["Cod"]][i]<-0}
+  if(is.na(hab_cov[["Had"]][i])){hab_cov[["Had"]][i]<-0}
+  
 }
 
 
 #add columns to survey table
-surv_random_sample <- cbind(surv_random_sample,lat,lon)
-colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Season","Lat","Lon")
+temp <- cbind.data.frame(surv_random_sample[,1:(length(surv_random_sample[1,])-1)],as.numeric(lat),lon,temperature, hab_cov[["YT"]], hab_cov[["Cod"]], hab_cov[["Had"]])
 
-#FIGURE OUT HOW BIG EACH CELL OF RASTER IS IN KM^2 TO SET AREASWEPT_KM2 SETTING BELOW
+x<-matrix(as.numeric(unlist(temp)),nrow = nrow(temp))
+surv_random_sample<-cbind.data.frame(x,surv_random_sample[,length(surv_random_sample[1,])])
+colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Lat","Lon","Temp","Hab_YT","Hab_Cod","Hab_Had","Season")
+
 
 #get sizes of all cells in raster [km2]
 cell_size<-raster::area(hab_ras, na.rm=TRUE, weights=FALSE)
@@ -103,8 +154,6 @@ cell_size<-cell_size[!is.na(cell_size)]
 #check range and mean value of cells
 range(cell_size)
 mean(cell_size)
-
-
 
 
 
@@ -168,7 +217,7 @@ area_per_cell <- GB_strata$area_sqkm/cell_str
 
 
 
-orig.dir <- getwd()
+
 
 #change directory
 setwd(paste(orig.dir,"/VAST", sep=""))
@@ -178,11 +227,86 @@ dir.create(paste(getwd(),"/",scenario,sep=""))
 
 #YT         
 ifelse(exclude_strata==TRUE, exclude <- c(13,14,15,17,18), exclude <- c(0) )
+ifelse(exclude_strata==TRUE, exclude_full <- c(1130,1140,1150,1170,1180), exclude_full <- c(0) )
 
 strata_species <-  c(13,14,15,16,17,18,19,20,21) #c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)#
 
 #do some model selection things
 model_aic <- list()
+
+#SAMPLE DATA
+  adios <- as.data.frame(surv_random_sample)
+  adios <- adios[(adios$stratum %in% strata_species),]
+  adios <- adios[!(adios$stratum %in% exclude),]
+  
+
+  
+  #covariates
+  #create covariate data
+  covdata <- data.frame(cbind.data.frame(as.numeric(adios[,"Lat"]),as.numeric(adios[,"Lon"]),adios[,"x"],adios[,"y"],adios[,"week"],adios[,"year"],as.numeric(adios[,"Temp"]),as.numeric(adios[,"Hab_YT"]),adios[,"Season"]))
+  names(covdata) <- c("Lat","Lon","x","y","Week","Year","Temp","Habitat","Season")
+  
+  
+  
+#################################################################################
+  #IF USING A STATIC COVARIATE DATA, SUCH AS HABITAT, DEPTH, SEDIMENT SIZE ETC
+  
+  
+  #THIS CHUNK ATTEMPTS TO CREATE COVARITE DATA FOR TEMP AND HABITAT
+  #per the covariate wiki example, go through covariate table and copy each static habitat value for each of the years
+  years <- seq(3,22)
+  temp_cov <- data.frame()
+  for(row in seq(length(covdata[,1]))){
+    #repeat each row the correct number of times
+    temp = covdata[rep(row,length(years)),]
+    
+    #remove temporally changing covariate(s) USED TO DO THIS BUT WONT RUN. INSTEAD NEED TO RECORD ACTUAL TEMP FOR GIVEN WEEK/YEAR
+    #temp$Temp = NA
+    temper <- vector()
+    for(i in seq(length(years))){
+      rw <- covdata[row,"x"]
+      cl <- covdata[row,"y"]
+      wk =  covdata[row,"Week"]  #same location, different year
+      yr = years[i]
+    
+      temper[i] <- moveCov$cov.matrix[[52*(yr-1)+wk]][rw,cl]
+    }
+    temp$Temp = temper
+    
+    #change year column to years we are using
+    temp$Year = years
+  
+    temp_cov <- rbind.data.frame(temp_cov,temp)
+    
+    
+  }
+
+  
+                #lat, lon, year, temp, habitat
+  covdata <- temp_cov[,c(1,2,6,7,8,9)]
+  names(covdata) <- c("Lat","Lon","Year","Temp","Habitat","Season")
+  
+  
+  
+  #THIS CHUNK ATTEMPTS TO CREATE COVARITE DATA FOR JUST HABITAT
+  #per the covariate wiki example, go through covariate table and copy each static habitat value for each of the years
+  covdata$Year <- NA
+  
+#################################################################################  
+
+  #HABITAT AND TEMP
+  #INCLUDE LAT, LON, YEAR, TEMP, HABITAT (1:5)
+  covdata_fall <- covdata[covdata$Season=="FALL",c(1:5)]
+  covdata_spring <- covdata[covdata$Season=="SPRING",c(1:5)]
+  #View(covdata_fall)
+  
+  #JUST TEMP
+  #INCLUDE LAT, LON, YEAR, TEMP
+  covdata_fall <- covdata[covdata$Season=="FALL",c(1,2,6,7)]
+  covdata_spring <- covdata[covdata$Season=="SPRING",c(1,2,6,7)]
+#################################################################################
+
+  
 
 for(j in 1:6){
   
@@ -204,20 +328,20 @@ for(j in 1:6){
   #create directory for model specific output
   dir.create(paste(getwd(),"/",scenario,"/YT",sep=""))
   
+  ifelse(covariates==TRUE,{cov_dir <- paste("_with_",cov_used,sep="")},{cov_dir <- ""})
+  
   ifelse(exclude_strata==TRUE, 
-         {dir.create(paste(getwd(),"/",scenario,"/YT/ExcludeStrata",sep=""))
+         {dir.create(paste(getwd(),"/",scenario,"/YT/ExcludeStrata",cov_dir,sep=""))
            str_dir <- "ExcludeStrata"},
-         {dir.create(paste(getwd(),"/",scenario,"/YT/AllStrata",sep=""))
+         {dir.create(paste(getwd(),"/",scenario,"/YT/AllStrata",cov_dir,sep=""))
            str_dir <- "AllStrata"})
   
-  dir.create(paste(getwd(),"/",scenario,"/YT/",str_dir,"/obsmodel",j,sep=""))
-  setwd((paste(getwd(),"/",scenario,"/YT/",str_dir,sep="")))
   
-  #following from Chris' file...
   
-  adios <- as.data.frame(surv_random_sample)
-  adios <- adios[(adios$stratum %in% strata_species),]
-  adios <- adios[!(adios$stratum %in% exclude),]
+  dir.create(paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,sep=""))
+  setwd((paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,sep="")))
+  
+ 
   
   head(adios)
   
@@ -234,6 +358,12 @@ for(j in 1:6){
            Lon = Lon) %>%
     mutate(Vessel = "missing",
            AreaSwept_km2 = mean(cell_size)) #CORRECT AREA SWEPT?
+  
+  #Test for years with zero tows
+  # test <-  spring %>%
+  #   group_by(Year) %>%
+  #   summarize(yearly_catch = sum(Catch_KG), yearly_mean_catch = mean(Catch_KG))
+  # 
   # summary(spring)
   # names(spring)
   
@@ -248,9 +378,17 @@ for(j in 1:6){
   
   
   # model with original data and default settings (Poisson link)
+  GB_strat <- c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)
+    #remove strata, if desired
+  GB_strat <- GB_strat[!(GB_strat %in% exclude_full)]
+  
   example <- list(spring)
   example$Region <- "northwest_atlantic"
-  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE YTF STRATA
+  example$strata.limits <- data.frame(Georges_Bank = GB_strat) #c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE YTF STRATA
+  
+  # if(covariates == TRUE){
+  #   example$covariate_data[,'Year'] = NA as.numeric(covdata_spring[,'year'])
+  #   example$covariate_data[,'Temp'] = covdata_spring$Temp}
   
   #make_settings seems like the way to impliment most desired settings
   
@@ -268,9 +406,10 @@ for(j in 1:6){
   # FC1[2,1] <-0
   # FC1[2,2] <-0
   
-  FC1 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
+  FC1 = c("Omega1" = 1, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 0) 
   
   #FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0
+  
   
   settings <- make_settings(n_x = 500,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
                             Region=example$Region,
@@ -294,18 +433,70 @@ for(j in 1:6){
   #######################################################################################
   # Try this first
   #######################################################################################
+  ifelse(covariates == "TRUE",{
+  print("USING COVARIATES")
   
+  #try domed-shaped response for temp and linear for habitat
+    
+  #Chris C idea for including 2 covariates
+  X1_formula = ~ poly(Temp, degree=2 )
+  X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+
+  # X1_formula = ~ 1
+  # X2_formula = ~ poly(Habitat, degree=3 )
+  
+    # X1_formula = ~poly(Temp, degree = 2)
+    # X2_formula = ~poly(Temp, degree = 2)
+    
+  
+  # # #JUST TEMP
+  # X1_formula = ~ poly(Temp, degree=2 )
+  # X2_formula = ~ poly(Temp, degree=2 )
+  #   #TEMP and HABITAT
+  
+  #JUST HABITAT
+  # X1_formula = ~ poly(Habitat, degree=2 )
+  # X2_formula = ~ poly(Habitat, degree=2 )
+    
+  # #TEMP and HABITAT
+  # X1_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+  # X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+  #   
+  # 
+  # X1_formula = ~ poly(Habitat, degree=2 )
+  # X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+    
+    
   fit_spring <- try(fit_model(settings = settings,
                           "Lat_i"=as.numeric(spring[,'Lat']), 
                           "Lon_i"=as.numeric(spring[,'Lon']), 
                           "t_i"=as.numeric(spring[,'Year']), 
                           "c_iz"=as.numeric(rep(0,nrow(spring))), 
                           "b_i"=as.numeric(spring[,'Catch_KG']), 
-                          "a_i"=as.numeric(spring[,'AreaSwept_km2'])), 
+                          "a_i"=as.numeric(spring[,'AreaSwept_km2']),
+                          X1_formula = X1_formula,
+                          X2_formula = X2_formula,
+                          covariate_data = covdata_spring,
+                          optimize_args=list("lower"=-Inf,"upper"=Inf)),
                           silent = TRUE)
+
+                       #   optimize_args=list("lower"=-Inf,"upper"=Inf)),
+                          
+  },{
+    print("NOT USING COVARIATES")
+    fit_spring <- try(fit_model(settings = settings,
+                                "Lat_i"=as.numeric(spring[,'Lat']), 
+                                "Lon_i"=as.numeric(spring[,'Lon']), 
+                                "t_i"=as.numeric(spring[,'Year']), 
+                                "c_iz"=as.numeric(rep(0,nrow(spring))), 
+                                "b_i"=as.numeric(spring[,'Catch_KG']), 
+                                "a_i"=as.numeric(spring[,'AreaSwept_km2'])), 
+                                silent = TRUE)
+
+  })
   beep(sound=8)
-  
-  
+ 
+      
   model_aic[["spring"]][[j]] <- fit_spring$parameter_estimates$AIC
   
     #create directory for season specific output
@@ -317,18 +508,90 @@ for(j in 1:6){
 #  plot_biomass_index(fit_spring)
   
   plot(fit_spring)
+
+  
   #copy parameter files into iteration folder
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
   
-  
+ 
+  #plot covariate respopne, if applicable 
+  if(covariates == "TRUE"){
+    print("PLOTTING COVARIATE RESPONSE")
+    pdf(file=paste(getwd(),"/",cov_used,"_cov_res_spring",".pdf",sep=""))
+    fittt = fit_spring
+    covariate_data_full = fittt$effects$covariate_data_full
+    catchability_data_full = fittt$effects$catchability_data_full
+    
+    # Plot 1st linear predictor, but could use `transformation` to apply link function
+    pred = Effect.fit_model( fittt,
+                             focal.predictors = c("Temp"),
+                             which_formula = "X1",
+                             xlevels = 100,
+                             transformation = list(link=identity, inverse=identity) )
+    plot(pred)
+    
+    # 
+    # pred2 = Effect.fit_model( fittt,
+    #                           focal.predictors = c("Temp"),
+    #                           which_formula = "X2",
+    #                           xlevels = 100,
+    #                           transformation = list(link=identity, inverse=identity) )
+    # plot(pred2)
+    # 
+    # pred3 = Effect.fit_model( fittt,
+    #                           focal.predictors = c("Habitat"),
+    #                           which_formula = "X2",
+    #                           xlevels = 100,
+    #                           transformation = list(link=identity, inverse=identity) )
+    # plot(pred3)
+    # 
+    
+    #####################
+    # pdp package
+    #####################
+#    
+#     
+#     #might need to add yea rback in to habitat
+# #    fittt$covariate_data$Year=covdata_spring$Year
+#     
+#     library(pdp)
+#     
+#     # Make function to interface with pdp
+#     pred.fun = function( object, newdata ){
+#       predict( x=object,
+#                Lat_i = object$data_frame$Lat_i,
+#                Lon_i = object$data_frame$Lon_i,
+#                t_i = object$data_frame$t_i,
+#                a_i = object$data_frame$a_i,
+#                what = "P1_iz",
+#                new_covariate_data = newdata,
+#                do_checks = FALSE )
+#     }
+#     
+#     # Run partial
+#     Partial = partial( object = fittt,
+#                        pred.var = "Habitat",
+#                        pred.fun = pred.fun,
+#                        train = fittt$covariate_data )
+#     
+#     # Make plot using ggplot2
+#     library(ggplot2)
+#     autoplot(Partial)
+
+    dev.off()
+    remove(fittt)
+    }
+
+    
+  remove(fit_spring)
   
   
   
@@ -363,7 +626,7 @@ for(j in 1:6){
   # model with original data and default settings (Poisson link)
   example <- list(fall)
   example$Region <- "northwest_atlantic"
-  example$strata.limits <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE YTF STRATA
+  example$strata.limits <- data.frame(Georges_Bank = GB_strat) #c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE YTF STRATA
   
   #make_settings seems like the way to impliment most desired settings
   
@@ -399,16 +662,48 @@ for(j in 1:6){
   #######################################################################################
   # Try this first
   #######################################################################################
-  
-  fit_fall <- try(fit_model(settings = settings,
-                        "Lat_i"=as.numeric(fall[,'Lat']), 
-                        "Lon_i"=as.numeric(fall[,'Lon']), 
-                        "t_i"=as.numeric(fall[,'Year']), 
-                        "c_iz"=as.numeric(rep(0,nrow(fall))), 
-                        "b_i"=as.numeric(fall[,'Catch_KG']), 
-                        "a_i"=as.numeric(fall[,'AreaSwept_km2'])), 
-                        silent = TRUE)
-  beep(sound=8)
+  ifelse(covariates == "TRUE",{
+    print("USING COVARIATES")
+    
+    
+    #Chris C idea for including 2 covariates
+    # X1_formula = ~ poly(Temp, degree=2 )
+    # X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+    # X1_formula = ~ 1
+    # X2_formula = ~ poly(Habitat, degree=3 )
+    
+    #HABITAT AND TEMP
+    X1_formula = ~ poly(Habitat, degree=2 )
+    X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+    
+
+    fit_fall <- try(fit_model(settings = settings,
+                              "Lat_i"=as.numeric(fall[,'Lat']), 
+                              "Lon_i"=as.numeric(fall[,'Lon']), 
+                              "t_i"=as.numeric(fall[,'Year']), 
+                              "c_iz"=as.numeric(rep(0,nrow(fall))), 
+                              "b_i"=as.numeric(fall[,'Catch_KG']), 
+                              "a_i"=as.numeric(fall[,'AreaSwept_km2']),
+                              X1_formula = X1_formula,
+                              X2_formula = X2_formula,
+                              covariate_data = covdata_fall),
+                              
+                              silent = TRUE)
+    
+  },{
+    print("NOT USING COVARIATES")
+    fit_fall <- try(fit_model(settings = settings,
+                              "Lat_i"=as.numeric(fall[,'Lat']), 
+                              "Lon_i"=as.numeric(fall[,'Lon']), 
+                              "t_i"=as.numeric(fall[,'Year']), 
+                              "c_iz"=as.numeric(rep(0,nrow(fall))), 
+                              "b_i"=as.numeric(fall[,'Catch_KG']), 
+                              "a_i"=as.numeric(fall[,'AreaSwept_km2'])), 
+                    silent = TRUE)
+ 
+  })
+  beep(sound=8) 
+ 
   
   
   model_aic[["fall"]][[j]] <- fit_fall$parameter_estimates$AIC
@@ -422,17 +717,93 @@ for(j in 1:6){
   
   plot(fit_fall)
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
+
+  
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
   
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,"/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
   
   
+  #plot covariate respopne, if applicable 
+  if(covariates == "TRUE"){
+    print("PLOTTING COVARIATE RESPONSE")
+    pdf(file=paste(getwd(),"/",cov_used,"_cov_res_fall",".pdf",sep=""))
+    fittt = fit_fall
+    covariate_data_full = fittt$effects$covariate_data_full
+    catchability_data_full = fittt$effects$catchability_data_full
+    
+    # Plot 1st linear predictor, but could use `transformation` to apply link function
+    pred = Effect.fit_model( fittt,
+                             focal.predictors = c("Habitat"),
+                             which_formula = "X2",
+                             xlevels = 100,
+                             transformation = list(link=identity, inverse=identity) )
+    plot(pred)
+    
+    # 
+    # pred2 = Effect.fit_model( fittt,
+    #                           focal.predictors = c("Temp"),
+    #                           which_formula = "X2",
+    #                           xlevels = 100,
+    #                           transformation = list(link=identity, inverse=identity) )
+    # plot(pred2)
+    # 
+    # pred3 = Effect.fit_model( fittt,
+    #                           focal.predictors = c("Habitat"),
+    #                           which_formula = "X2",
+    #                           xlevels = 100,
+    #                           transformation = list(link=identity, inverse=identity) )
+    # plot(pred3)
+    # 
+    
+    #####################
+    # pdp package
+    #####################
+    #    
+    #     
+    #     #might need to add yea rback in to habitat
+    # #    fittt$covariate_data$Year=covdata_spring$Year
+    #     
+    #     library(pdp)
+    #     
+    #     # Make function to interface with pdp
+    #     pred.fun = function( object, newdata ){
+    #       predict( x=object,
+    #                Lat_i = object$data_frame$Lat_i,
+    #                Lon_i = object$data_frame$Lon_i,
+    #                t_i = object$data_frame$t_i,
+    #                a_i = object$data_frame$a_i,
+    #                what = "P1_iz",
+    #                new_covariate_data = newdata,
+    #                do_checks = FALSE )
+    #     }
+    #     
+    #     # Run partial
+    #     Partial = partial( object = fittt,
+    #                        pred.var = "Habitat",
+    #                        pred.fun = pred.fun,
+    #                        train = fittt$covariate_data )
+    #     
+    #     # Make plot using ggplot2
+    #     library(ggplot2)
+    #     autoplot(Partial)
+  
+  dev.off()
+  
+  remove(fittt)
+  }
+  
+
+  
+  remove(fit_fall)
+  
+    
   #go back to scenario directory before moving to next model case
   setwd('..')
   setwd('..')
@@ -443,12 +814,131 @@ for(j in 1:6){
 }
 
 
-saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/YT/",str_dir,"/model_aic.RDS",sep=""))
+saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,"/model_aic.RDS",sep=""))
+
+
+
 
 
 
 #######################################################################################
 #Try second if issues with first run
+#######################################################################################
+
+#logkappa1 keeps running into bounds so followed github suggestion here: https://github.com/James-Thorson-NOAA/VAST/issues/300
+
+ifelse(covariates == "TRUE",{
+  print("USING COVARIATES")
+  
+  #try domed-shaped response for temp and linear for habitat
+  #THESE SHOULD BE ALREADY SET INSIDE THE LOOP
+  # # #JUST TEMP
+  # # X1_formula = ~ poly(as.numeric(Temp), degree=2 )
+  # # X2_formula = ~ poly(as.numeric(Temp), degree=2 )
+  # 
+  # #TEMP and HABITAT
+  # X1_formula = ~ poly(as.numeric(Temp), degree=2 ) + poly(as.numeric(Habitat), degree=1 )
+  # X2_formula = ~ poly(as.numeric(Temp), degree=2 ) + poly(as.numeric(Habitat), degree=1 )
+  # 
+  fit_orig_spring <- try(fit_model(settings = settings,
+                              "Lat_i"=as.numeric(spring[,'Lat']), 
+                              "Lon_i"=as.numeric(spring[,'Lon']), 
+                              "t_i"=as.numeric(spring[,'Year']), 
+                              "c_iz"=as.numeric(rep(0,nrow(spring))), 
+                              "b_i"=as.numeric(spring[,'Catch_KG']), 
+                              "a_i"=as.numeric(spring[,'AreaSwept_km2']),
+                              X1_formula = X1_formula,
+                              X2_formula = X2_formula,
+                              covariate_data = covdata_spring,
+                            run_model=FALSE),
+                    
+                    silent = TRUE)
+  
+},{
+  print("NOT USING COVARIATES")
+  fit_orig_spring <- try(fit_model(settings = settings,
+                              "Lat_i"=as.numeric(spring[,'Lat']), 
+                              "Lon_i"=as.numeric(spring[,'Lon']), 
+                              "t_i"=as.numeric(spring[,'Year']), 
+                              "c_iz"=as.numeric(rep(0,nrow(spring))), 
+                              "b_i"=as.numeric(spring[,'Catch_KG']), 
+                              "a_i"=as.numeric(spring[,'AreaSwept_km2']),
+                              run_model=FALSE), 
+                    silent = TRUE)
+  
+})
+
+Lower <- fit_orig_spring$tmb_list$Lower
+# Change some bounds in Lower using grep(.) etc. (couldnt get this to work)
+#instead, i see that logkappa1 is in Lower[24] so change this value
+Lower[["logkappa1"]]
+Lower[["logkappa1"]] <- -10
+
+
+ifelse(covariates == "TRUE",{
+  print("USING COVARIATES")
+  
+  FC1 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
+  
+  #FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0
+  
+  
+  settings <- make_settings(n_x = 1000,  #NEED ENOUGH KNOTS OR WILL HAVE ISSUES WITH PARAMETER FITTING
+                            Region=example$Region,
+                            purpose="index2",
+                            strata.limits=example$strata.limits,
+                            bias.correct=TRUE,
+                            FieldConfig= FC1,
+                            ObsModel = obsmodel,
+                            knot_method = "samples")
+  
+  fit_spring <- try(fit_model(settings = settings,
+                              "Lat_i"=as.numeric(spring[,'Lat']), 
+                              "Lon_i"=as.numeric(spring[,'Lon']), 
+                              "t_i"=as.numeric(spring[,'Year']), 
+                              "c_iz"=as.numeric(rep(0,nrow(spring))), 
+                              "b_i"=as.numeric(spring[,'Catch_KG']), 
+                              "a_i"=as.numeric(spring[,'AreaSwept_km2']),
+                              X1_formula = X1_formula,
+                              X2_formula = X2_formula,
+                              covariate_data = covdata_spring,
+                              lower=Lower),
+                    
+                    silent = TRUE)
+  
+},{
+  print("NOT USING COVARIATES")
+  fit_spring <- try(fit_model(settings = settings,
+                              "Lat_i"=as.numeric(spring[,'Lat']), 
+                              "Lon_i"=as.numeric(spring[,'Lon']), 
+                              "t_i"=as.numeric(spring[,'Year']), 
+                              "c_iz"=as.numeric(rep(0,nrow(spring))), 
+                              "b_i"=as.numeric(spring[,'Catch_KG']), 
+                              "a_i"=as.numeric(spring[,'AreaSwept_km2']),
+                              lower=Lower), 
+                    silent = TRUE)
+  
+})
+beep(sound=8) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################################################
+#ORIGINAL WAY BEFORE ADDING COVARIATES Try second if issues with first run
 #######################################################################################
 
 #logkappa1 keeps running into bounds so followed github suggestion here: https://github.com/James-Thorson-NOAA/VAST/issues/300

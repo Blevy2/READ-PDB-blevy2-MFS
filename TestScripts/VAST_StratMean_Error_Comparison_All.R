@@ -6,7 +6,10 @@
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario <- "IncPop_ConTemp_8_1"
+scenario <- "ConPop_IncTemp_8_1"
+
+#original project directory so we can switch back to it
+orig.dir <- getwd()
 
 n_spp <- 3
 
@@ -17,11 +20,20 @@ years_cut <- 2
 #survey results without noise
 list_all_temp <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
 
+#simulation results
+memory.limit(45000)
+result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
+
+
+#1- single set of random survey locations used in stratified mean analysis
+surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
+
 #pick specific simulation
 #For YT:
-#ConPop use run 1
-#for Incpop run 77 shows strong increase for yellowtail
-#for DecPop run 25 shows clear decrease with small values towards the end
+#for Conpop_ConTemp (also used for IncTemp) run 1 shows decent constant value with single spike early on
+#for Incpop_ConTemp (also used for IncTemp) run 77 shows strong increase for yellowtail
+#for DecPop_ConTemp run 25 shows clear decrease with small values towards the end
+#for DecPop_IncTemp run 13 shows clear decrease with small values towards the end
 
 #For Cod:
 #for ConPop_ConTemp iteration 13 is pretty good
@@ -39,23 +51,25 @@ list_all_temp <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario
 #DecPop_ConTemp 6 is pretty good
 #DecPop_IncTemp 9 is pretty good
 
-#CHOOSE WHICH SPECIES TO USE
-species <- "Had"
-
 exclude_strata <- TRUE
 
+covariates <- TRUE
+
+ifelse(covariates==TRUE,{cov_dir <- paste("_with_",cov_used,sep="")},{cov_dir <- ""})
+
 #choose which simulation iteration to use based on above
-good_iter <- 98
+#good_iter <- c(1,13,6) #ConPop_ConTemp
+good_iter <- c(1,1,3) #ConPop_IncTemp
+#good_iter <- c(77,63,98) #IncPop_ConTemp
+#good_iter <- c(77,44,100) #IncPop_IncTemp
+#good_iter <- c(25,18,6) #DecPop_ConTemp
+#good_iter <- c(13,44,9) #DecPop_IncTemp
+
 
 list_all <- list()
-list_all[[1]] <- list_all_temp[[good_iter]]
-
-#simulation results
-memory.limit(45000)
-result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
-
-#1- single set of random survey locations used in stratified mean analysis
-surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
+list_all[["YT"]] <- list_all_temp[[good_iter[1]]]
+list_all[["Cod"]] <- list_all_temp[[good_iter[2]]]
+list_all[["Had"]] <- list_all_temp[[good_iter[3]]]
 
 
 
@@ -63,7 +77,7 @@ surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"
 
 
 #spp1 spp2 spp3
-short_names <- c(species)   #fixed above
+short_names <- c("YT","Cod","Had")   #fixed above
 
 #strata that each species occupies. Used to calculate stratified random mean of each
 strata_species <- list()
@@ -73,7 +87,7 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 
 ##################################################################################################
 
-
+setwd(orig.dir)
 
 #ADD TRUE MODEL POPULATION VALUES TO SURVEY DATA TABLES
 #ALSO ADD LAT LON LOCATIONS TO TABLE AS WELL
@@ -112,9 +126,9 @@ for(iter in seq(length(list_all))){
     wk = as.numeric(list_all[[iter]][samp,11]) #week in 11th column
     yr = as.numeric(list_all[[iter]][samp,7]) #year in 7th column
     
-    temp[samp,1] <- sum(result[[good_iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp1"]],na.rm=T) #YT is spp1
-    temp[samp,2] <- sum(result[[good_iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]],na.rm=T) #Cod is spp2
-    temp[samp,3] <- sum(result[[good_iter]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]],na.rm=T) #Had is spp3
+    temp[samp,1] <- sum(result[[good_iter[iter]]]$pop_bios[[(wk+(52*(yr-1)))]][["spp1"]],na.rm=T) #YT is spp1
+    temp[samp,2] <- sum(result[[good_iter[iter]]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]],na.rm=T) #Cod is spp2
+    temp[samp,3] <- sum(result[[good_iter[iter]]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]],na.rm=T) #Had is spp3
     
     #ADDING LAT LON LOCATIONS
     rw <- as.numeric(list_all[[iter]][samp,"x"])  #x in col 2
@@ -166,7 +180,9 @@ for(s in short_names){
   }
 }
 
-
+pop_by_season[["YT"]] <- pop_by_season[["YT"]][[1]]  #YT should be first in list_all
+pop_by_season[["Cod"]] <- pop_by_season[["Cod"]][[2]] #Cod should be second in list_all
+pop_by_season[["Had"]] <- pop_by_season[["Had"]][[3]] #Had should be third in list_all
 
 
 
@@ -182,25 +198,20 @@ for(s in short_names){
 
 
 #choose some strata to exclude, if desired
-
-
 #George's Bank Setup by species
 #YT            Cod          Haddock
-if(species=="YT"){
-ifelse(exclude_strata==TRUE, exclude <- c(13,14,15,17,18), exclude <- c(0))
-}
 
-if(species=="Cod"){
-  ifelse(exclude_strata==TRUE, exclude <- c(23,24,25), exclude <- c(0))
-}
+exclude <- list()
 
-if(species=="Had"){
-  ifelse(exclude_strata==TRUE, exclude <- c(23,24,25,29,30), exclude <- c(0))
-}
+ifelse(exclude_strata==TRUE, 
+       {exclude[["YT"]] <- c(13,14,15,17,18)
+       exclude[["Cod"]] <- c(23,24,25)
+       exclude[["Had"]] <- c(23,24,25,29,30)}, 
+       {exclude[["YT"]] <- c(0)
+       exclude[["Cod"]] <- c(0)
+       exclude[["Had"]] <- c(0)})
 
-
-
-
+setwd(orig.dir)
 
 
 #BELOW WILL TAKE A MINUTE
@@ -304,30 +315,12 @@ for(iter in seq(length(list_all))){
 #initial scenario folder
 dir.create( paste0(getwd(),"/VAST/",scenario)) #create folder to store upcoming subfolders
 
-names(strat_mean_all) <- short_names
-saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scenario,".RDS"))
+strat_mean_all[["YT"]] <- strat_mean_all[[1]][[1]]  #YT should be first in list_all
+strat_mean_all[["Cod"]] <- strat_mean_all[[2]][[2]] #Cod should be second in list_all
+strat_mean_all[["Had"]] <- strat_mean_all[[3]][[3]] #Had should be third in list_all
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ifelse(exclude_strata==TRUE, strat_ex <- "excludestrata", strat_ex <- "allstrata")
+saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scenario,"_",strat_ex,".RDS"))
 
 
 
@@ -345,65 +338,91 @@ saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scena
 #load VAST fit index approximation, measure error with true value, store
 
 
-#original project directory so we can switch back to it
-orig.dir <- getwd()
-
 #individual strata limits
-strata.limits <- list()
-strata.limits[["YT"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #THESE ARE YTF STRATA
-strata.limits[["Cod"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
-strata.limits[["Had"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE HAD STRATA
+# strata.limits <- list()
+# strata.limits[["YT"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210)) #THESE ARE YTF STRATA
+# strata.limits[["Cod"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250)) #THESE ARE COD STRATA
+# strata.limits[["Had"]] <- data.frame(Georges_Bank = c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300)) #THESE ARE HAD STRATA
+
+#What I tested for all of them, but they dont always work in each scenario
+model_types <- list()
+model_types[["YT"]] <- c("obsmodel5","obsmodel6")
+model_types[["Cod"]] <- c("obsmodel1","obsmodel2","obsmodel5","obsmodel6")
+model_types[["Had"]] <- c("obsmodel1","obsmodel2","obsmodel5","obsmodel6")
 
 
-#initial scenario folder
-setwd( paste0(orig.dir,"/VAST/",scenario,"/",species,sep="")) #create folder to store upcoming subfolders
-
-
-
-
-
-
-
-
-
-
-
-
+#Use these for IncPop_IncTemp
+# model_types <- list()
+# model_types[["YT"]] <- c("obsmodel5","obsmodel6")
+# model_types[["Cod"]] <- c("obsmodel2","obsmodel5") #,"obsmodel6" didnt work
+# model_types[["Had"]] <- c("obsmodel1")
 
 
 
-
-
-
-
-
-model_types <- c("obsmodel1","obsmodel2","obsmodel3","obsmodel4","obsmodel5","obsmodel6")
+# ifelse(exclude_strata==TRUE,
+# {model_types[["YT"]] <- c("obsmodel5","obsmodel6")
+# model_types[["Cod"]] <- c("obsmodel1","obsmodel2","obsmodel5") #,"obsmodel6" didnt work
+# model_types[["Had"]] <- c("obsmodel1","obsmodel2","obsmodel5","obsmodel6")},
+# {model_types[["YT"]] <- c("obsmodel1","obsmodel2","obsmodel3","obsmodel4","obsmodel5","obsmodel6")
+# model_types[["Cod"]] <- c("obsmodel1","obsmodel2","obsmodel3","obsmodel4","obsmodel5","obsmodel6")
+# model_types[["Had"]] <- c("obsmodel1","obsmodel2","obsmodel3","obsmodel4","obsmodel5","obsmodel6")}
+# )
 
 Model_settings <- list()
 Model_AIC <- list()
 
+SRS_data_all <- list()
+SRS_data1 <- list()
+
 VAST_Model_error <- list()
+SRS_Model_error <- list()
 VAST_fit <- list()
 VAST_est <- list()
 
 FC_settings <- list()
-FC_settings[["spring"]] <- data.frame(row.names = model_types)
-FC_settings[["fall"]] <- data.frame(row.names = model_types)
+FC_settings[["YT"]][["spring"]] <- data.frame(row.names = model_types[["YT"]])
+FC_settings[["YT"]][["fall"]] <- data.frame(row.names = model_types[["YT"]])
+FC_settings[["Cod"]][["spring"]] <- data.frame(row.names = model_types[["Cod"]])
+FC_settings[["Cod"]][["fall"]] <- data.frame(row.names = model_types[["Cod"]])
+FC_settings[["Had"]][["spring"]] <- data.frame(row.names = model_types[["Had"]])
+FC_settings[["Had"]][["fall"]] <- data.frame(row.names = model_types[["Had"]])
 
-for(folder in model_types){
+
+#for getting into correct subfolder
+ifelse(exclude_strata==TRUE, 
+       {str_dir <- "ExcludeStrata"},
+       {str_dir <- "AllStrata"})
+
+
+
+#initial scenario folder
+setwd( paste0(orig.dir,"/VAST/",scenario,sep="")) #create folder to store upcoming subfolders
+
+for(s in short_names){
+for(folder in model_types[[s]]){
   
   print(folder)
   
   for(sn in c("fall","spring")){
     
-    fit <- readRDS(paste0(getwd(),"/",folder,"/",sn,"/fit_",sn,".RDS"))
+    try(fit <- readRDS(paste0(getwd(),"/",s,"/",str_dir,cov_dir,"/",folder,"/",sn,"/fit_",sn,".RDS")),silent=TRUE)
     
-    FC_settings[[sn]][folder,1] <- fit$settings$FieldConfig[[1]]
-    FC_settings[[sn]][folder,2] <- fit$settings$FieldConfig[[2]]
-    FC_settings[[sn]][folder,3] <- fit$settings$FieldConfig[[3]]
-    FC_settings[[sn]][folder,4] <- fit$settings$FieldConfig[[4]]
+    #set FC settings as N and then override them, if possible
+    FC_settings[[s]][[sn]][folder,1] <- "N"
+    FC_settings[[s]][[sn]][folder,2] <- "N"
+    FC_settings[[s]][[sn]][folder,3] <- "N"
+    FC_settings[[s]][[sn]][folder,4] <- "N"
+    try(FC_settings[[s]][[sn]][folder,1] <- fit$settings$FieldConfig[[1]],silent=TRUE)
+    try( FC_settings[[s]][[sn]][folder,2] <- fit$settings$FieldConfig[[2]],silent=TRUE)
+    try( FC_settings[[s]][[sn]][folder,3] <- fit$settings$FieldConfig[[3]],silent=TRUE)
+    try(FC_settings[[s]][[sn]][folder,4] <- fit$settings$FieldConfig[[4]],silent=TRUE)
     
-    VAST_fit[[folder]][[sn]] <-  read.csv(paste0(getwd(),"/",folder,"/",sn,"/Index.csv"), header=T)
+    try(VAST_fit[[s]][[folder]][[sn]] <-  read.csv(paste0(getwd(),"/",s,"/",str_dir,cov_dir,"/",folder,"/",sn,"/Index.csv"), header=T),silent=TRUE)
+    
+    #pull out strat mean calc
+    SRS_data_all[[s]][[folder]][["spring"]] <- strat_mean_all[[s]][strat_mean_all[[s]][,"season"]==1,]
+    SRS_data_all[[s]][[folder]][["fall"]] <- strat_mean_all[[s]][strat_mean_all[[s]][,"season"]==2,]
+    
     
     ifelse(sn == "spring",
            #add year & season to these
@@ -413,19 +432,19 @@ for(folder in model_types){
     season <- rep(2,years_sim-years_cut)})
     
     
-    VAST_est[[folder]][[sn]] <- cbind(VAST_fit[[folder]][[sn]],Year,season)
+   try(VAST_est[[s]][[folder]][[sn]] <- cbind(VAST_fit[[s]][[folder]][[sn]],Year,season),silent=TRUE)
+    SRS_data1[[s]][[folder]][[sn]] <- SRS_data_all[[s]][[folder]][[sn]][,c("mean.yr.absolute","year","season","sd.mean.yr.absolute")]
     
-    VF <- readRDS(paste0(getwd(),"/",folder,"/",sn,"/fit_",sn,".RDS",sep=""))
-    Model_AIC[[sn]][[folder]] <- VF$parameter_estimates$AIC
-    Model_settings[[sn]][[folder]] <- read.delim(paste0(getwd(),"/",folder,"/",sn,"/settings.txt",sep=""))
+    try(Model_AIC[[s]][[sn]][[folder]] <- fit$parameter_estimates$AIC,silent=TRUE)
+    try(Model_settings[[s]][[sn]][[folder]] <- read.delim(paste0(getwd(),"/",s,"/",str_dir,cov_dir,"/",folder,"/",sn,"/settings.txt",sep="")),silent=TRUE)
+    
+   try(remove(fit),silent=TRUE)
     
   }
   }
-  
-
-colnames(FC_settings[["spring"]]) <- c("Omega1","Epsilon1","Omega2","Epsilon2")
-colnames(FC_settings[["fall"]]) <- c("Omega1","Epsilon1","Omega2","Epsilon2")
-
+  colnames(FC_settings[[s]][["spring"]]) <- c("Omega1","Epsilon1","Omega2","Epsilon2")
+  colnames(FC_settings[[s]][["fall"]]) <- c("Omega1","Epsilon1","Omega2","Epsilon2")
+  }
 
 
 
@@ -441,65 +460,75 @@ colnames(FC_settings[["fall"]]) <- c("Omega1","Epsilon1","Omega2","Epsilon2")
 
 
 
-pdf(file=paste(getwd(),"/",scenario,"_ModelSelection_ErrorPlot.pdf",sep=""))
+
+
+
+pdf(file=paste(getwd(),"/",scenario,"_ErrorPlot_",str_dir,cov_dir,".pdf",sep=""))
 
 year_min <- 2 #in case you dont want to plot all of the years
 
-SRS_data <- list()
 VAST_data <- list()
+SRS_data <- list()
 Obsmodel_plot <- list()
 
 #plot stratified calculation and population estimate on same plot
 
 #first make model output have 2 seasons to match the stratified mean calcs
 
-for(iter in seq(length(list_all))){ #LIST_ALL WILL BE LENGTH 1 FROM ABOVE
+for(s in short_names){ #LIST_ALL WILL BE LENGTH 3 FROM ABOVE
   
-  print(iter)
-
-
-
-
-
-for(folder in model_types){
-
-
-
-for(s in short_names){ #SHORT NAMES CONTAINS ONLY SINGLE SPECIES NAME
- 
-
-
   
+for(folder in model_types[[s]]){
+
+
 
   #MODEL VALUES
-  model_spring = pop_by_season[[s]][[iter]][pop_by_season[[s]][[iter]]$season==1,"biomass"]
+  model_spring = pop_by_season[[s]][pop_by_season[[s]]$season==1,"biomass"]
     
-  model_fall = pop_by_season[[s]][[iter]][pop_by_season[[s]][[iter]]$season==2,"biomass"]
+  model_fall = pop_by_season[[s]][pop_by_season[[s]]$season==2,"biomass"]
  
   
   
   
 # 2NORM
 #   #calculate SPRING VAST error from each iteration
-#   VAST_Model_error[[s]][[iter]][[folder]][["spring"]] <- norm(model_spring- VAST_est[[folder]][["spring"]][,"Estimate"] , type="2") / norm(model_spring , type ="2")
+#   VAST_Model_error[[s]][[folder]][["spring"]] <- norm(model_spring- VAST_est[[s]][[folder]][["spring"]][,"Estimate"] , type="2") / norm(model_spring , type ="2")
 #   
 #   #calculate FALL VAST error from each iteration
-#   VAST_Model_error[[s]][[iter]][[folder]][["fall"]] <- norm(model_fall- VAST_est[[folder]][["fall"]][,"Estimate"] , type="2") / norm(model_fall , type ="2")
+#   VAST_Model_error[[s]][[folder]][["fall"]] <- norm(model_fall- VAST_est[[s]][[folder]][["fall"]][,"Estimate"] , type="2") / norm(model_fall , type ="2")
   
+  print(s)
+  print(folder)
   
+
   #ABSOLUTE SUM
   #calculate SPRING VAST error from each iteration
-  VAST_Model_error[[s]][[iter]][[folder]][["spring"]] <- sum(abs(model_spring- VAST_est[[folder]][["spring"]][,"Estimate"] )) / sum(abs(model_spring ))
-  
+  #set as 99 and then override if possible
+  VAST_Model_error[[s]][[folder]][["spring"]] <- 99
+  try(VAST_Model_error[[s]][[folder]][["spring"]] <- sum(abs(model_spring- VAST_est[[s]][[folder]][["spring"]][,"Estimate"] )) / sum(abs(model_spring )),silent=TRUE)
+  VAST_Model_error[[s]][[folder]][["fall"]] <- 99
   #calculate FALL VAST error from each iteration
-  VAST_Model_error[[s]][[iter]][[folder]][["fall"]] <- sum(abs(model_fall- VAST_est[[folder]][["fall"]][,"Estimate"] )) / sum(abs(model_fall ))
+  try(VAST_Model_error[[s]][[folder]][["fall"]] <- sum(abs(model_fall- VAST_est[[s]][[folder]][["fall"]][,"Estimate"] )) / sum(abs(model_fall )),silent=TRUE)
   
+  #calculate SPRING SRS error from each iteration
+  SRS_Model_error[[s]][[folder]][["spring"]] <- sum(abs(model_spring- SRS_data1[[s]][[folder]][["spring"]][,"mean.yr.absolute"] )) / sum(abs(model_spring ))
+  
+  #calculate FALL SRS error from each iteration
+  SRS_Model_error[[s]][[folder]][["fall"]] <- sum(abs(model_fall- SRS_data1[[s]][[folder]][["fall"]][,"mean.yr.absolute"] )) / sum(abs(model_fall ))
   
   
   #store VAST stuff to plot later
-  VAST_data[[s]][[folder]] <-  rbind(VAST_est[[folder]][["spring"]],VAST_est[[folder]][["fall"]])
+  #first load a blank version and override if possible
+  VAST_data[[s]][[folder]] <- readRDS(file = paste0(orig.dir,"/VAST/zero_VAST_est.RDS",sep="") )
+ 
+  #for decpop_contemp
+    #if(((!((s=="Cod"&folder=="obsmodel6")|(s=="Had"&folder=="obsmodel6"))))){ try(VAST_data[[s]][[folder]] <-  rbind(VAST_est[[s]][[folder]][["spring"]],VAST_est[[s]][[folder]][["fall"]]),silent=TRUE)}
   
-    }
+  if(length(VAST_est[[s]][[folder]][["fall"]][1,])>2){try(VAST_data[[s]][[folder]] <-  rbind(VAST_est[[s]][[folder]][["spring"]],VAST_est[[s]][[folder]][["fall"]]),silent=TRUE)}
+  
+  
+  SRS_data[[s]][[folder]] <- rbind(SRS_data1[[s]][[folder]][["spring"]],SRS_data1[[s]][[folder]][["fall"]])
+    
 
 
 long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
@@ -508,33 +537,52 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
   #NEW WAY PLOTTING 3 TOGETHER ON SAME PAGE
 
     #field config settings for plotting
-    FC_fall = c(FC_settings$fall[folder,1],FC_settings$fall[folder,2],FC_settings$fall[folder,3],FC_settings$fall[folder,4])
-    FC_spring = c(FC_settings$spring[folder,1],FC_settings$spring[folder,2],FC_settings$spring[folder,3],FC_settings$spring[folder,4])
+    FC_fall = c(FC_settings[[s]]$fall[folder,1],FC_settings[[s]]$fall[folder,2],FC_settings[[s]]$fall[folder,3],FC_settings[[s]]$fall[folder,4])
+    FC_spring = c(FC_settings[[s]]$spring[folder,1],FC_settings[[s]]$spring[folder,2],FC_settings[[s]]$spring[folder,3],FC_settings[[s]]$spring[folder,4])
     
     #store each obsmodel plot
 
-    Obsmodel_plot[[folder]] <- ggplot() +
+    Obsmodel_plot[[s]][[folder]] <- ggplot() +
 
       #this way plots data by season
-    geom_point(data = subset(as.data.frame(pop_by_season[[species]][[iter]]),year>=year_min), aes(x=as.numeric(year),y=biomass, group = season, color = "Model"),size=2) +
-    geom_line(data = subset(as.data.frame(pop_by_season[[species]][[iter]]),year>=year_min), aes(x=as.numeric(year),y=biomass, group =season, color = "Model"),size=1) +
+    geom_point(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=biomass, group = season, color = "Model"),size=2) +
+    geom_line(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=biomass, group =season, color = "Model"),size=1) +
 
     #plot VAST estimate
-    geom_errorbar(data=subset(VAST_data[[species]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season,ymin=Estimate-(1.96*Std..Error.for.Estimate), ymax=Estimate+(1.96*Std..Error.for.Estimate), color = "VAST Estimate"),width=.3) +
-    geom_point(data=subset(VAST_data[[species]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season, color = "VAST Estimate"))+
-    geom_line(data=subset(VAST_data[[species]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season, color = "VAST Estimate"))+
+    geom_errorbar(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season,ymin=Estimate-(1.96*Std..Error.for.Estimate), ymax=Estimate+(1.96*Std..Error.for.Estimate), color = "VAST Estimate"),width=.3) +
+    #geom_linerange(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season,ymin=Estimate-(1.96*Std..Error.for.Estimate), ymax=Estimate+(1.96*Std..Error.for.Estimate), color = "VAST Estimate")) +
+    geom_point(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season, color = "VAST Estimate"))+
+    geom_line(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season, color = "VAST Estimate"))+
 
-    facet_wrap(~ season) +
-    labs(x="year",y="Biomass", title = paste(folder,"  Sp_err=",round(VAST_Model_error[[s]][[iter]][[folder]][["spring"]],digits=3), "  FC=", toString(FC_fall), "  Fa_err=",round(VAST_Model_error[[s]][[iter]][[folder]][["fall"]],digits=3), "  FC=", toString(FC_spring), sep=""), color ="" )
+      
+    #plot stratified calculation data
+    geom_errorbar(data=as.data.frame(SRS_data[[s]][[folder]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean"),width=.3) +
+   # geom_linerange(data=as.data.frame(SRS_data[[s]][[folder]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean")) +
+    geom_point(data=as.data.frame(SRS_data[[s]][[folder]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+    geom_line(data=as.data.frame(SRS_data[[s]][[folder]]),aes(x=year,y=mean.yr.absolute,group=season, color = "Stratified Mean"))+
+      
+      
+    facet_wrap(~ season, ncol =1) +
+    # labs(x="year",y="Biomass", title = paste(folder,"  SeV=",round(VAST_Model_error[[s]][[folder]][["spring"]],digits=2),
+    #                                          "  FC=", toString(FC_spring), 
+    #                                          "  SeSM=",round(SRS_Model_error[[s]][[folder]][["spring"]],digits=2),
+    #                                          "  FeV=",round(VAST_Model_error[[s]][[folder]][["fall"]],digits=2),
+    #                                          "  FC=", toString(FC_fall),
+    #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
 
+      labs(x="year",y="Biomass", title = paste(s," ",folder,"  SeV=",round(VAST_Model_error[[s]][[folder]][["spring"]],digits=2),
+                                               "  SeSM=",round(SRS_Model_error[[s]][[folder]][["spring"]],digits=2),
+                                               "  FeV=",round(VAST_Model_error[[s]][[folder]][["fall"]],digits=2),
+                                               "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
 
+#one plot per page
+    print(Obsmodel_plot[[s]][[folder]])
 
-
-
-} 
-      gridExtra::grid.arrange(Obsmodel_plot[[1]],Obsmodel_plot[[2]],Obsmodel_plot[[3]],nrow=3)
-      gridExtra::grid.arrange(Obsmodel_plot[[4]],Obsmodel_plot[[5]],Obsmodel_plot[[6]],nrow=3)
+# for more than one plot per page
+      # gridExtra::grid.arrange(Obsmodel_plot[[1]],Obsmodel_plot[[2]],Obsmodel_plot[[3]],nrow=3)
+      # gridExtra::grid.arrange(Obsmodel_plot[[4]],Obsmodel_plot[[5]],Obsmodel_plot[[6]],nrow=3)
   
+}
 }
 
 dev.off()
