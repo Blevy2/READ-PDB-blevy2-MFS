@@ -422,7 +422,7 @@ hab <- readRDS("hab_GB_3species.RDS")
 #INTEGRATE WITH TEMP GRADIENT
 
 #constant temp gradient
-#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
 
 #increasing temp gradient
 moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
@@ -446,6 +446,14 @@ month_nm <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",
 
 
 #1) PLOTTING JUST TEMPERATURE OVER TIME
+
+
+
+
+##########################################################
+#OLD WAY USING IMAGE.PLOT
+##########################################################
+
 
 #plot increasing temp gradient over time similar to how 
 #plot_spatiotemp_hab_justtemp works, but without species-specific 
@@ -515,13 +523,96 @@ for(k in seq(12)){
   
   
 
+dev.off()
 
 
 
+
+
+
+
+##########################################################
+#NEW WAY USING GGPLOT
+##########################################################
+
+
+#plot increasing temp gradient over time similar to how 
+#plot_spatiotemp_hab_justtemp works, but without species-specific 
+#influences
+
+
+yearscut <- 2
+
+pdf(file=paste0('testfolder/Monthly_temp_plots','.pdf'))
+
+#figure out max/min temp to set color limits below
+zmax <- max(unlist(lapply(moveCov$cov.matrix,FUN=max, na.rm=T)))
+zmin <- min(unlist(lapply(moveCov$cov.matrix,FUN=min, na.rm=T)))
+
+
+surv_temp1 <- list()
+
+#plot same week on each page. GOOD FOR INCREASING TEMP SITUATION
+for(k in seq(12)){
+all_idx <- 1
+  
+  for(i in seq(52*yearscut+1,length(moveCov$cov.matrix),52)){
+    
+    month_shift <- 4*(k-1)
+    
+    
+    temp_rotate <- moveCov$cov.matrix[[i+month_shift]]
+    
+
+    temp_ <- reshape2::melt(temp_rotate, c("x", "y"), value.name = "Temperature") #temperature
+    
+    surv_temp1[[all_idx]] <-  ggplot() +
+      geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Temperature)) + 
+      scale_fill_gradientn(colours=c("yellow","red"),limits = range(zmin, zmax))+ #set the color pallet and color limits
+      theme_void()+ #remove x and y axis ticks and labels
+      #labs(x="lat", y="lon",title=paste('Week', (i+month_shift)%%52, 'Year', ceiling((i+month_shift)/52))) +
+      theme(legend.position="none" ) #remove legend
+    
+    
+    all_idx<- all_idx+1
+
+    
+    
+  }
+  
+      
+  do.call("grid.arrange", c(surv_temp1, ncol=4, top=paste(spp_names_short[s],  'Month', i)))
+}
+
+
+
+
+
+for(i in seq(52)){
+  
+  
+  
+  
+  temp_rotate <- moveCov$cov.matrix[[i]]
+  
+  
+  temp_ <- reshape2::melt(temp_rotate, c("x", "y"), value.name = "Temperature") #temperature
+  
+    p <-  ggplot() +
+    geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Temperature)) + 
+    scale_fill_gradientn(colours=c("yellow","red"),limits = range(zmin, zmax))+ #set the color pallet and color limits
+    theme_void()+ #remove x and y axis ticks and labels
+    labs(x="lat", y="lon",title=paste('Week', ((i+month_shift)%%52 + 1))) +
+    theme(plot.title = element_text(hjust = 0.5),legend.position="none" ) #remove legend
+  
+    print(p)
+  
+}
 
 
 
 dev.off()
+
 
 
 
@@ -556,6 +647,9 @@ tol_list <- list("spp1" = list("mu" = 9, "va" = 4),  #Yellowtail
 
 
 
+##########################################################
+#OLD WAY USING IMAGE.PLOT
+##########################################################
 
 #constant temp gradient
 #moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
@@ -681,10 +775,149 @@ dev.off()
 
 
 
+#############################################
+#NEW WAY USIN GGPLOT
+#############################################
+
+library(ggplot2)
+library(gridExtra)
+library(plotly)
+
+#constant temp gradient
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata_res2")
+
+#add temp tolerances order: had, cod, yellow
+moveCov[["spp_tol"]] <- list() #just in case
+moveCov[["spp_tol"]] <- tol_list
+
+
+library(MixFishSim)
+
+yearscut <- 2
+
+#function to rotate image before plotting because image.plot rotates it
+rotate <- function(x) t(apply(x, 2, rev))
+
+
+
+
+
+pdf(file=paste0('testfolder/Monthly_species_temp_plots_ConstTemp','.pdf'))
+
+
+surv_temp1 <- list()
+
+
+#obtain zlim bounds from maxtemp
+zmax <- c(.25,.25,.26)
+zmin <- c(0,0,0)
+
+#PLOT EACH SPECIES in groups
+for(s in seq_len(length(hab[["hab"]]))) {
+  
+  all_idx<- 1
+  
+  
+  for(i in seq(1,52)){
+    #par( mar = c(1, 1, 1, 1))
+    
+    move_cov_wk <- moveCov[["cov.matrix"]][[i]]
+    
+    move_cov_wk_spp <- matrix(nc = ncol(move_cov_wk),
+                              nr = nrow(move_cov_wk), 
+                              sapply(move_cov_wk, norm_fun, 
+                                     mu = moveCov[["spp_tol"]][[s]][["mu"]], 
+                                     va = moveCov[["spp_tol"]][[s]][["va"]]))
+ 
+    
+    temp_ <- reshape2::melt(move_cov_wk_spp, c("x", "y"), value.name = "Temperature") #temperature
+    
+    surv_temp1[[all_idx]] <-  ggplot() +
+      geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Temperature)) + 
+      scale_fill_gradientn(colours=c("yellow","red"),limits = range(0, zmax[[s]]))+ #set the color pallet and color limits
+      theme_void()+ #remove x and y axis ticks and labels
+      #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', i )) +
+      theme(plot.title = element_text(hjust = 0.5),legend.position="none" ) #remove legend
+    
+    
+    
+    
+    all_idx<- all_idx+1
+
+    
+  }
+  
+  
+  do.call("grid.arrange", c(surv_temp1, ncol=4, top=paste(spp_names_short[s],  'Month', i)))
+  # gridExtra::
+  
+}
+
+
+
+#PLOT EACH ON OWN PAGE
+for(s in seq_len(length(hab[["hab"]]))) {
+  
+  all_idx<- 1
+  
+  
+  
+  for(i in seq(1,52)){
+  
+    
+    move_cov_wk <- moveCov[["cov.matrix"]][[i]]
+    
+    move_cov_wk_spp <- matrix(nc = ncol(move_cov_wk),
+                              nr = nrow(move_cov_wk), 
+                              sapply(move_cov_wk, norm_fun, 
+                                     mu = moveCov[["spp_tol"]][[s]][["mu"]], 
+                                     va = moveCov[["spp_tol"]][[s]][["va"]]))
+
+    
+    
+    temp_ <- reshape2::melt(move_cov_wk_spp, c("x", "y"), value.name = "Temperature") #temperature
+ 
+   p <- ggplot() +
+      geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Temperature)) + 
+     scale_fill_gradientn(colours=c("yellow","red"),limits = range(0, zmax[[s]]))+ #set the color pallet and color limits
+      theme_void()+ #remove x and y axis ticks and labels
+      labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', i )) +
+      theme(plot.title = element_text(hjust = 0.5),legend.position="none" ) #remove legend
+     
+   print(p)
+    
+    
+  }
+  
+
+  
+}
+
+
+
+
+dev.off()
+
+
+
+
+
+
+
+
 
 ################################################################################
 #2B) PLOTTING SPECIES-SPECIFIC TEMPERATURE OVER TIME VARRYING TEMP
 #ie, applying each species temp preferences to temp gradient
+
+
+
+
+#############################################
+#OLD WAY USIN IMAGE.PLOT
+#############################################
 
 
 #load increasing temp gradient
@@ -761,6 +994,130 @@ for(s in seq_len(length(hab[["hab"]]))) {
 
 
 dev.off()
+
+
+
+
+
+
+
+
+#############################################
+#NEW WAY USIN GGPLOT
+#############################################
+
+
+#load increasing temp gradient
+#constant temp gradient
+#moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata")
+
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
+
+#add temp tolerances order: had, cod, yellow
+moveCov[["spp_tol"]] <- list() #just in case
+moveCov[["spp_tol"]] <- tol_list
+
+
+yearscut <- 2
+
+#trying same zlim as above, max values may need to be extended
+zmax <- c(.25,.25,.26)
+zmin <- c(0,0,0)
+
+pdf(file=paste0('testfolder/Monthly_species_temp_plots_IncrTemp','.pdf'))
+
+
+surv_temp1 <- list()
+
+#plot all on same page for comparison 
+
+for(s in seq_len(length(hab[["hab"]]))) {
+  
+  all_idx <-1
+  
+  for(k in seq(12)){
+    
+    
+  
+    for(i in seq(52*yearscut+1,length(moveCov$cov.matrix),52)){
+      
+      month_shift <- 4*(k-1)
+      
+      move_cov_wk <- moveCov[["cov.matrix"]][[i+month_shift]]
+      
+      move_cov_wk_spp <- matrix(nc = ncol(move_cov_wk),
+                                nr = nrow(move_cov_wk), 
+                                sapply(move_cov_wk, norm_fun, 
+                                       mu = moveCov[["spp_tol"]][[s]][["mu"]], 
+                                       va = moveCov[["spp_tol"]][[s]][["va"]]))
+      
+        temp_ <- reshape2::melt(move_cov_wk_spp, c("x", "y"), value.name = "Temperature") #temperature
+        
+        surv_temp1[[all_idx]] <- ggplot() +
+          geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Temperature)) + 
+          scale_fill_gradientn(colours=c("yellow","red"),limits = range(0, zmax[[s]]))+ #set the color pallet and color limits
+          theme_void()+ #remove x and y axis ticks and labels
+          #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', i )) +
+          theme(legend.position="none" ) #remove legend
+        
+         all_idx <- all_idx +1
+      
+    }
+    
+    
+  }
+  
+  
+  do.call("grid.arrange", c(surv_temp1, ncol=4, top=paste(spp_names_short[s],  'Month', i)))
+  
+}
+
+
+#plot each on own page for videos
+
+for(s in seq_len(length(hab[["hab"]]))) {
+  
+
+  
+  for(k in seq(12)){
+    
+    
+    
+    for(i in seq(52*yearscut+1,length(moveCov$cov.matrix),52)){
+      
+      month_shift <- 4*(k-1)
+      
+      move_cov_wk <- moveCov[["cov.matrix"]][[i+month_shift]]
+      
+      move_cov_wk_spp <- matrix(nc = ncol(move_cov_wk),
+                                nr = nrow(move_cov_wk), 
+                                sapply(move_cov_wk, norm_fun, 
+                                       mu = moveCov[["spp_tol"]][[s]][["mu"]], 
+                                       va = moveCov[["spp_tol"]][[s]][["va"]]))
+      
+      temp_ <- reshape2::melt(move_cov_wk_spp, c("x", "y"), value.name = "Temperature") #temperature
+      
+      p <- ggplot() +
+        geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Temperature)) + 
+        scale_fill_distiller(palette = "Spectral",limits = range(0, zmax[[s]]))+ #set the color pallet and color limits
+        theme_void()+ #remove x and y axis ticks and labels
+        labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', i%%52,'Year', ceiling((i+month_shift)/52)) ) +
+        theme(legend.position="none" ) #remove legend
+      
+      print(p)
+      
+    }
+    
+    
+  }
+  
+}
+
+
+
+
+dev.off()
+
 
 
 
@@ -1024,6 +1381,264 @@ dev.off()
 
 
 
+
+
+
+######################################################################################
+
+
+#4) PLOTTING ACTUAL SPECIES-SPECIFIC MODEL OUTPUT FROM A GIVEN SIMULATION WITH SURVEY SAMPLES ON TOP
+#ie, loading simulation output and copying above loops to plot them
+
+
+spp_names <- c("Yellowtail Flounder","Cod","Haddock")
+
+spp_names_short <- c("YT","Cod","Had")
+
+month_nm <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+
+#strata that each species occupies. Used to calculate stratified random mean of each
+strata_species <- list()
+strata_species[["YT"]] <-  c(13,14,15,16,17,18,19,20,21)
+strata_species[["Cod"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25)
+strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
+
+
+#load results from a given simulation
+scenario <- "IncPop_ConTemp"
+
+#choose which simulation iteration to use (chosen in different file)
+good_iter <- c(1,13,6) #ConPop_ConTemp
+good_iter <- c(1,1,3) #ConPop_IncTemp
+good_iter <- c(77,63,98) #IncPop_ConTemp
+#good_iter <- c(77,44,100) #IncPop_IncTemp
+#good_iter <- c(25,18,6) #DecPop_ConTemp
+#good_iter <- c(13,44,9) #DecPop_IncTemp
+
+
+#survey results without noise
+list_all_temp <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
+
+list_all <- list()
+list_all[["YT"]] <- list_all_temp[[good_iter[1]]]
+list_all[["Cod"]] <- list_all_temp[[good_iter[2]]]
+list_all[["Had"]] <- list_all_temp[[good_iter[3]]]
+
+#simulation results (LOAD JUST ONE OF THE FOLLOWING)
+memory.limit(45000) #this one for all results
+result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
+#load existing result_goodones, if it exists
+result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_goodones_",scenario,".RDS",sep=""))
+
+#load random survey locations used in this scenario
+surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
+
+
+
+#create matrix with survey values as points to add to plots later
+survey_points <- list()
+survey_points[["YT"]] <- vector("list",length(seq(3,22)))
+survey_points[["Cod"]] <- vector("list",length(seq(3,22)))
+survey_points[["Had"]] <- vector("list",length(seq(3,22)))
+
+
+for(s in spp_names_short){
+  for(yr in seq(3,22)){
+    survey_points[[s]][[yr]] <- list()
+    for(wk in c(13,37)){
+  #grab survey results from first week in each season 
+ #old way for image.plot
+#test <- matrix(NA, nrow = length(result[[good_iter[[1]]]]$pop_bios[[1]][[1]][,1]),ncol = length(result[[good_iter[[1]]]]$pop_bios[[1]][[1]][1,]))
+
+#new way for ggplot
+survey_points[[s]][[yr]][[wk]] <- data.frame()
+idx=1
+
+for(i in seq(length(list_all[[s]][,1]))){
+
+  if((as.numeric(list_all[[s]][i,"stratum"])%in%strata_species[[s]])&(as.numeric(list_all[[s]][i,"week"])==wk)&(as.numeric(list_all[[s]][i,"year"])==yr)){
+  
+    #old way using image.plot
+#  test[as.numeric(list_all[[s]][i,2]),as.numeric(list_all[[s]][i,3])] <- 1#list_all[[s]][i,7] #col = 7 is recording the year
+ 
+  survey_points[[s]][[yr]][[wk]][idx,"x"] <- as.numeric(list_all[[s]][i,"x"])
+  survey_points[[s]][[yr]][[wk]][idx,"y"] <- as.numeric(list_all[[s]][i,"y"])
+  survey_points[[s]][[yr]][[wk]][idx,"survey"] <- as.numeric(list_all[[s]][i,"stratum"])
+  idx=idx+1
+  }
+  }
+#old way
+#survey_points[[s]][[yr]][[wk]] <- test
+#new way
+
+}
+  }
+
+}
+
+yearscut <- 2
+
+n_spp <- 3  #for loop length
+
+#function to rotate image before plotting because image.plot rotates it
+rotate <- function(x) t(apply(x, 2, rev))
+
+#trying same zlim as above, max values may need to be extended
+#zmax <- c(.23,.22,.26)
+#zmin <- c(0,0,0)
+
+
+#for loop length
+moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
+
+
+library(ggplot2)
+library(gridExtra)
+library(plotly)
+
+# 
+# temp_ <- reshape2::melt(temp_rotate, c("x", "y"), value.name = "biomass")
+# temp_2 <- survey_points[[s]][[yr]][[wk]]
+# 
+# ggplot(temp_,aes(x=y,y=rev(x))) +
+#   geom_raster(aes(fill=biomass)) +
+#   geom_point(data=temp_2,aes(color = survey), shape = 19, size = 3, color="red") +
+#   scale_fill_distiller(palette = "Spectral") +
+#   labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52)))
+
+
+  #labs(x="letters", y="LETTERS", title="Matrix")
+
+#obtain zlim bounds from maxtemp
+# range(result[[good_iter[[s]]]]$pop_bios)
+# zmax <- c(.25,.25,.26)
+# zmin <- c(0,0,0)
+
+
+pdf(file=paste0('testfolder/Survey_Months_Plots_',scenario,'.pdf'))
+
+
+#record max population values to set below color limits. run below loop without plotting to get max values first
+pop_max <- matrix(nrow=40,ncol=3)
+color_min <- 0 
+color_max <- list()
+
+# #THESE FOR CONPOP_CONTEMP
+# color_max[["YT"]][[4]] <- 205  #spring survey pop max
+# color_max[["YT"]][[10]] <- 80 #fall survey 
+# color_max[["Cod"]][[4]] <- 170  #spring survey pop max
+# color_max[["Cod"]][[10]] <- 335 #fall survey 
+# color_max[["Had"]][[4]] <- 1525  #spring survey pop max
+# color_max[["Had"]][[10]] <-1273  #fall survey 
+  
+
+#THESE FOR CONPOP_INCTEMP
+# color_max[["YT"]][[4]] <- 125  #spring survey pop max
+# color_max[["YT"]][[10]] <- 200 #fall survey 
+# color_max[["Cod"]][[4]] <- 437  #spring survey pop max
+# color_max[["Cod"]][[10]] <- 3044 #fall survey 
+# color_max[["Had"]][[4]] <- 3945  #spring survey pop max
+# color_max[["Had"]][[10]] <-3775  #fall survey 
+
+#THESE FOR INCPOP_CONTEMP
+color_max[["YT"]][[4]] <- 405  #spring survey pop max
+color_max[["YT"]][[10]] <- 343 #fall survey 
+color_max[["Cod"]][[4]] <- 637  #spring survey pop max
+color_max[["Cod"]][[10]] <- 1550 #fall survey 
+color_max[["Had"]][[4]] <- 2645  #spring survey pop max
+color_max[["Had"]][[10]] <-1980  #fall survey 
+  
+
+   
+
+for(s in seq_len(n_spp)) {
+  
+      surv_temp1 <- list()
+      surv_temp2 <- list()
+      
+      all_idx<- 1
+      
+  #only plot survey months
+  for(k in c(4,10)){
+    
+    #uncomment below to have weeks 13 and 37 on own page (used this to create video)
+    #ifelse(((k==4)|(k==10)), par(mfrow = c(1,1), mar = c(1, 1, 1, 1)), par(mfrow = c(5,4), mar = c(1, 1, 1, 1)))
+    
+    #uncomment below to have all weeks in 5x4 grid on each page
+     #par(mfrow = c(5,4), mar = c(.5, .5, .5, .5))
+    
+    yr_idx<- 1
+
+    
+    for(i in seq(52*yearscut+1,length(moveCov$cov.matrix),52)){
+      
+ 
+      #col = grey(seq(1,0,l = 51)), 
+        
+        month_shift <- 4*(k-1) #puts us on end of previous month
+      
+        #FIRST WEEK in SURVEY MONTH
+        
+        #new way with ggplot
+        temp_rotate <- result[[good_iter[[s]]]]$pop_bios[[i+month_shift]][[s]]
+        
+        temp_ <- reshape2::melt(temp_rotate, c("x", "y"), value.name = "Biomass") #population biomass
+        temp_2 <- survey_points[[s]][[ceiling(i/52)]][[month_shift+1]] #survey locations
+        
+        pop_max[all_idx,s] <- max(temp_[,3],na.rm=T)
+     #    
+     surv_temp1[[yr_idx]] <- ggplot() +
+          geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Biomass)) + #plot biomass
+          geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="red") + #add survey points
+          scale_fill_distiller(palette = "Spectral",limits = range(0, color_max[[spp_names_short[[s]]]][[k]])) + #set the color pallet and color limits
+          theme_void()+ #remove x and y axis ticks and labels
+          #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
+         theme(legend.position="none" ) #remove legend
+          
+
+       
+      #print(p)
+      
+      #SECOND WEEK in SURVEY MONTH
+        
+      
+        all_idx<- all_idx+1
+        yr_idx<- yr_idx+1
+        #old way with image.plot
+      #   temp_rotate <- rotate(result[[good_iter[[s]]]]$pop_bios[[i+month_shift]][[s]])
+      #   fields::image.plot(temp_rotate, cex.axis = 1.5, cex.main = 2, axes = F, col = c("#4e83ed",rev(heat.colors(50))[5:50]) )
+      #   
+      #   fields::image.plot(rotate(survey_points[[s]][[yr]][[wk]]),add=T,legend.shrink=0)
+      # 
+      # #	  axis(1, at = seq(0, 1, by = 0.2), labels = seq(0, nrows, by = nrows/5))
+      # #	  axis(2, at = seq(0, 1, by = 0.2), labels = seq(0, ncols, by = ncols/5))
+      # text(0.5, 0.98, labels = paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52)), cex = 1)
+      # 
+      
+      
+    }
+    
+    do.call("grid.arrange", c(surv_temp1, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years')))
+    # gridExtra::grid.arrange(Obsmodel_plot[[1]],Obsmodel_plot[[2]],Obsmodel_plot[[3]],nrow=3)
+    # 
+    
+  }
+}
+
+
+dev.off()
+
+
+
+
+max(pop_max[1:20,1])
+max(pop_max[21:40,1])
+
+max(pop_max[1:20,2])
+max(pop_max[21:40,2])
+
+max(pop_max[1:20,3])
+max(pop_max[21:40,3])
 
 
 

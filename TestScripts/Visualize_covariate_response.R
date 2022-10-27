@@ -4,14 +4,14 @@
 #####################
 # Effects package
 #####################
-
+library(VAST)
 library(effects)  # Used to visualize covariate effects
 
-fittt <- fit_fall
+fittt <- fit_spring
 
 
 #CHANGE X1 OR X2 FORMULA IN FITTT IF IT INCLUDES AS.NUMERIC()
-fittt$X1_formula <- ~poly(Temp, degree = 2)
+fittt$X1_formula <- ~1
 fittt$X2_formula <- ~poly(Temp, degree = 2)
 
 

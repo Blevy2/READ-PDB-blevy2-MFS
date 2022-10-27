@@ -15,18 +15,20 @@ orig.dir <- getwd()
 
 ################################################################################
 #read in sample survey
-surv_random_sample <- readRDS(file="surv_random_sample.RDS")
-surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
+# surv_random_sample <- readRDS(file="surv_random_sample.RDS")
+# surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario <- "ConPop_ConTemp_7_29"
+scenario1 <- "ConPop_ConTemp"
 #survey results without noise
-list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
+list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
 exclude_strata <- FALSE
 
+with_noise <- TRUE
+
 covariates <- TRUE
 
-cov_used <- "CovSettings_A2"  #"Temp_LinearBasic" 
+cov_used <- "_WithCov"  #"Temp_LinearBasic" 
 
 #for Conpop_ConTemp (also used for IncTemp) run 1 shows decent constant value with single spike early on
 #for Incpop_ConTemp (also used for IncTemp) run 77 shows strong increase for yellowtail
@@ -35,6 +37,8 @@ cov_used <- "CovSettings_A2"  #"Temp_LinearBasic"
 surv_random_sample <- list_all[[1]]
 
 setwd(orig.dir)
+
+scenario <- paste("ForPaper/",scenario1,sep="")
 ################################################################################
 
 
@@ -94,15 +98,23 @@ Had_matrix <- as.matrix(Had_ras)
 #obtained via latitude = xFromCol(raster,col= )
 
 #load increasing or constant temp gradient based on scenario
-tmp <- substr(scenario,8,10)
+tmp <- substr(scenario1,8,10)
   
 if(tmp == "Con"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"stTemp_HaddockStrata_res2",sep=""))}
 if(tmp == "Inc"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"rTemp_HaddockStrata_res2",sep=""))}
+
+#temp tolerances
+moveCov[["spp_tol"]] <- list() #just in case
+moveCov[["spp_tol"]] <- list("YT" = list("mu" = 9, "va" = 4),  #Yellowtail
+                             "Cod" = list("mu" = 8.75, "va" = 4.25),  #Cod
+                             "Had" = list("mu" = 9, "va" = 4) )    #Haddock
+
 
 lat <- vector()
 lon <- vector()
 temperature <- vector()
 hab_cov <- list()
+movement_cov <- list()
 
 for(i in seq(length(surv_random_sample[,1]))){
   
@@ -117,11 +129,17 @@ for(i in seq(length(surv_random_sample[,1]))){
   yr = as.numeric(surv_random_sample[i,"year"]) 
  
   temperature[i] <- moveCov$cov.matrix[[52*(yr-1)+wk]][rw,cl]
-
+  
+  #PULLING MOVEMENT = HAB^2*TEMP_PREFERENCE VALUES
+ movement_cov[["YT"]][i] <- (hab$hab[["YT"]][rw,cl]^2)*MixFishSim::norm_fun(temperature[i],mu=moveCov$spp_tol$YT$mu,va=moveCov$spp_tol$YT$va)
+ movement_cov[["Cod"]][i] <- (hab$hab[["Cod"]][rw,cl]^2)*MixFishSim::norm_fun(temperature[i],mu=moveCov$spp_tol$Cod$mu,va=moveCov$spp_tol$Cod$va)    
+ movement_cov[["Had"]][i] <- (hab$hab[["Had"]][rw,cl]^2)*MixFishSim::norm_fun(temperature[i],mu=moveCov$spp_tol$Had$mu,va=moveCov$spp_tol$Had$va)
+ 
+ #PULLING HABITAT VALUES
   #This uses the normalized habitat values, which are extremely small 
   #and therefore may have been interfering with parameter estimation
   # hab_cov[["YT"]][i] <- hab$hab[["YT"]][rw,cl]
-  # hab_cov[["Cod"]][i] <- hab$hab[["Had"]][rw,cl]
+  # hab_cov[["Cod"]][i] <- hab$hab[["Cod"]][rw,cl]
   # hab_cov[["Had"]][i] <- hab$hab[["Had"]][rw,cl]
 
   #Instead try using non-normalize values
@@ -138,11 +156,11 @@ for(i in seq(length(surv_random_sample[,1]))){
 
 
 #add columns to survey table
-temp <- cbind.data.frame(surv_random_sample[,1:(length(surv_random_sample[1,])-1)],as.numeric(lat),lon,temperature, hab_cov[["YT"]], hab_cov[["Cod"]], hab_cov[["Had"]])
+temp <- cbind.data.frame(surv_random_sample[,1:(length(surv_random_sample[1,])-1)],as.numeric(lat),lon,temperature, hab_cov[["YT"]], hab_cov[["Cod"]], hab_cov[["Had"]], movement_cov[["YT"]], movement_cov[["Cod"]], movement_cov[["Had"]])
 
 x<-matrix(as.numeric(unlist(temp)),nrow = nrow(temp))
 surv_random_sample<-cbind.data.frame(x,surv_random_sample[,length(surv_random_sample[1,])])
-colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Lat","Lon","Temp","Hab_YT","Hab_Cod","Hab_Had","Season")
+colnames(surv_random_sample) <- c("station_no","x","y","stratum","day","tow","year","YTF","Cod","Had","week","Lat","Lon","Temp","Hab_YT","Hab_Cod","Hab_Had","MoveCov_YT","MoveCov_Cod","MoveCov_Had","Season")
 
 
 #get sizes of all cells in raster [km2]
@@ -160,59 +178,61 @@ mean(cell_size)
 
 
 
-
-library(spatstat.geom)
-#plot lat and lon coordinates to check that they look correct
-all_points <- spatstat.geom::ppp(x=lon,y=lat, marks = surv_random_sample[,"stratum"] , window=owin(c(-70.99, -65) ,c(40,43)))
-plot(all_points, use.marks=T) #here we see the stratas appear which makes me feel like it worked
-
-
-
-
-#load gb polygon which has area info in it
-#load stratas for clipping etc
-strata.dir <- "C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\" # strata shape files in this directory
-library(rgdal)
-# get the shapefiles
-strata.areas <- readOGR(paste(strata.dir,"Survey_strata", sep="")) #readShapePoly is deprecated; use rgdal::readOGR or sf::st_read 
-
-#define georges bank
-GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300")
-#pull out indices corresponding to GB strata
-GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
-#plot them
-#plot(strata.areas[GB_strata_idx,])
-#define GB strata as own object
-GB_strata <- strata.areas[GB_strata_idx,]
-
-
-#load random survey
-scenario <- "ConPop_ConTemp"
-#random survey locations
-surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
-
-#area info is in...
-st_area <- GB_strata$A2
-#corresponding to these strata...
-st_num <- GB_strata$STR2
-#number of cells in each strata...
-cell_str <- surv_random$cells_per_strata[!is.na(surv_random$cells_per_strata)]
-#area per cell...
-area_per_cell <- GB_strata$area_sqkm/cell_str
-
-
-
-
-#following from https://gis.stackexchange.com/questions/200420/calculate-area-for-each-polygon-in-r
-
-#check coordinate system
-crs(GB_strata)
-#add area value to GB_strata
-GB_strata$area_sqkm <- area(GB_strata)/1000000
-#number of cells in each strata...
-cell_str <- surv_random$cells_per_strata[!is.na(surv_random$cells_per_strata)]
-#area per cell...
-area_per_cell <- GB_strata$area_sqkm/cell_str
+# 
+# #OLD STUFF TRYING TO FIGURE OUT CELL SIZE
+# 
+# library(spatstat.geom)
+# #plot lat and lon coordinates to check that they look correct
+# all_points <- spatstat.geom::ppp(x=lon,y=lat, marks = surv_random_sample[,"stratum"] , window=owin(c(-70.99, -65) ,c(40,43)))
+# plot(all_points, use.marks=T) #here we see the stratas appear which makes me feel like it worked
+# 
+# 
+# 
+# 
+# #load gb polygon which has area info in it
+# #load stratas for clipping etc
+# strata.dir <- "C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\" # strata shape files in this directory
+# library(rgdal)
+# # get the shapefiles
+# strata.areas <- readOGR(paste(strata.dir,"Survey_strata", sep="")) #readShapePoly is deprecated; use rgdal::readOGR or sf::st_read 
+# 
+# #define georges bank
+# GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300")
+# #pull out indices corresponding to GB strata
+# GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+# #plot them
+# #plot(strata.areas[GB_strata_idx,])
+# #define GB strata as own object
+# GB_strata <- strata.areas[GB_strata_idx,]
+# 
+# 
+# #load random survey
+# scenario <- "ConPop_ConTemp"
+# #random survey locations
+# surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
+# 
+# #area info is in...
+# st_area <- GB_strata$A2
+# #corresponding to these strata...
+# st_num <- GB_strata$STR2
+# #number of cells in each strata...
+# cell_str <- surv_random$cells_per_strata[!is.na(surv_random$cells_per_strata)]
+# #area per cell...
+# area_per_cell <- GB_strata$area_sqkm/cell_str
+# 
+# 
+# 
+# 
+# #following from https://gis.stackexchange.com/questions/200420/calculate-area-for-each-polygon-in-r
+# 
+# #check coordinate system
+# crs(GB_strata)
+# #add area value to GB_strata
+# GB_strata$area_sqkm <- area(GB_strata)/1000000
+# #number of cells in each strata...
+# cell_str <- surv_random$cells_per_strata[!is.na(surv_random$cells_per_strata)]
+# #area per cell...
+# area_per_cell <- GB_strata$area_sqkm/cell_str
 
 
 
@@ -239,12 +259,37 @@ model_aic <- list()
   adios <- adios[(adios$stratum %in% strata_species),]
   adios <- adios[!(adios$stratum %in% exclude),]
   
+  
+  
+  ##################################################################################
+  # Add noise to sample data here, if desired
+  ##################################################################################
+  if(with_noise==TRUE){
+  
+  temp_noise <-  sapply(adios$YTF , function(x){rlnorm(1,mean=log(x),sdlog=.35)} ) 
+  
+  adios$YTF <- temp_noise
+  }
+  ##################################################################################
+  ##################################################################################
 
   
+  
+  
+  
+  
+  
+  
+
+  
+  ##################################################################################
   #covariates
   #create covariate data
-  covdata <- data.frame(cbind.data.frame(as.numeric(adios[,"Lat"]),as.numeric(adios[,"Lon"]),adios[,"x"],adios[,"y"],adios[,"week"],adios[,"year"],as.numeric(adios[,"Temp"]),as.numeric(adios[,"Hab_YT"]),adios[,"Season"]))
-  names(covdata) <- c("Lat","Lon","x","y","Week","Year","Temp","Habitat","Season")
+  ##################################################################################
+  
+
+  covdata <- data.frame(cbind.data.frame(as.numeric(adios[,"Lat"]),as.numeric(adios[,"Lon"]),adios[,"x"],adios[,"y"],adios[,"week"],adios[,"year"],as.numeric(adios[,"Temp"]),as.numeric(adios[,"Hab_YT"]),adios[,"MoveCov_YT"],adios[,"Season"]))
+  names(covdata) <- c("Lat","Lon","x","y","Week","Year","Temp","Habitat","MoveCov","Season")
   
   
   
@@ -283,28 +328,47 @@ model_aic <- list()
 
   
                 #lat, lon, year, temp, habitat
-  covdata <- temp_cov[,c(1,2,6,7,8,9)]
+  covdata <- temp_cov[, c("Lat","Lon","Year","Temp","Habitat","Season")]
   names(covdata) <- c("Lat","Lon","Year","Temp","Habitat","Season")
   
   
   
   #THIS CHUNK ATTEMPTS TO CREATE COVARITE DATA FOR JUST HABITAT
   #per the covariate wiki example, go through covariate table and copy each static habitat value for each of the years
+            #lat, lon, year, habitat
+  covdata <- covdata[,c(1,2,6,8)]
   covdata$Year <- NA
   
 #################################################################################  
 
   #HABITAT AND TEMP
   #INCLUDE LAT, LON, YEAR, TEMP, HABITAT (1:5)
-  covdata_fall <- covdata[covdata$Season=="FALL",c(1:5)]
-  covdata_spring <- covdata[covdata$Season=="SPRING",c(1:5)]
+  covdata_fall <- covdata[covdata$Season=="FALL",c("Lat","Lon","Year","Temp","Habitat")]
+  covdata_spring <- covdata[covdata$Season=="SPRING",c("Lat","Lon","Year","Temp","Habitat")]
   #View(covdata_fall)
+  
+  #MoveCov and Temp
+  #INCLUDE LAT, LONG, YEAR, TEMP, MOVECOV  
+  covdata_fall <- covdata[covdata$Season=="FALL",c("Lat","Lon","Year","Temp","MoveCov")]
+  covdata_spring <- covdata[covdata$Season=="SPRING",c("Lat","Lon","Year","Temp","MoveCov")]
+  #make the few NA values 0
+  covdata_fall$MoveCov[is.na(covdata_fall$MoveCov)] <- 0
+  covdata_spring$MoveCov[is.na(covdata_spring$MoveCov)] <- 0 
   
   #JUST TEMP
   #INCLUDE LAT, LON, YEAR, TEMP
   covdata_fall <- covdata[covdata$Season=="FALL",c(1,2,6,7)]
   covdata_spring <- covdata[covdata$Season=="SPRING",c(1,2,6,7)]
-#################################################################################
+  
+  #JUST MOVEMENT COVARIATE HAB^2*TEMP_TOLERANCE
+  #INCLUDE LAT, LON, YEAR, MOVECOV
+  covdata_fall <- covdata[covdata$Season=="FALL",c("Lat","Lon","Year","MoveCov")]
+  covdata_spring <- covdata[covdata$Season=="SPRING",c("Lat","Lon","Year","MoveCov")]
+  #make the few NA values 0
+  covdata_fall$MoveCov[is.na(covdata_fall$MoveCov)] <- 0
+  covdata_spring$MoveCov[is.na(covdata_spring$MoveCov)] <- 0 
+
+  #################################################################################
 
   
 
@@ -323,23 +387,25 @@ for(j in 1:6){
   if(j == 4) {obsmodel <- c(4, 1); run <- 4}
   if(j == 5) {obsmodel <- c(9, 0); run <- 5}
   if(j == 6) {obsmodel <- c(9, 1); run <- 6}
-  
+  if(j == 7) {obsmodel <- c(10, 2); run <- 7}
   
   #create directory for model specific output
   dir.create(paste(getwd(),"/",scenario,"/YT",sep=""))
   
-  ifelse(covariates==TRUE,{cov_dir <- paste("_with_",cov_used,sep="")},{cov_dir <- ""})
+  ifelse(with_noise==TRUE,{noise_dir <- "_WithNoise_"},{noise_dir <- "_NoNoise_"})
+  
+  ifelse(covariates==TRUE,{cov_dir <- paste(cov_used,sep="")},{cov_dir <- "_NoCovs_"})
   
   ifelse(exclude_strata==TRUE, 
-         {dir.create(paste(getwd(),"/",scenario,"/YT/ExcludeStrata",cov_dir,sep=""))
+         {dir.create(paste(getwd(),"/",scenario,"/YT/ExcludeStrata",cov_dir,noise_dir,sep=""))
            str_dir <- "ExcludeStrata"},
-         {dir.create(paste(getwd(),"/",scenario,"/YT/AllStrata",cov_dir,sep=""))
+         {dir.create(paste(getwd(),"/",scenario,"/YT/AllStrata",cov_dir,noise_dir,sep=""))
            str_dir <- "AllStrata"})
   
   
   
-  dir.create(paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,sep=""))
-  setwd((paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,sep="")))
+  dir.create(paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/obsmodel",j,sep=""))
+  setwd((paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,noise_dir,sep="")))
   
  
   
@@ -406,7 +472,8 @@ for(j in 1:6){
   # FC1[2,1] <-0
   # FC1[2,2] <-0
   
-  FC1 = c("Omega1" = 1, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 0) 
+  FC1 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
+  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 4)
   
   #FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0
   
@@ -417,6 +484,7 @@ for(j in 1:6){
                             strata.limits=example$strata.limits,
                             bias.correct=TRUE,
                             FieldConfig= FC1,
+                            RhoConfig = RhoConfig,
                             ObsModel = obsmodel,
                             knot_method = "samples")
   #' Specification of \code{FieldConfig} can be seen by calling \code{\link[FishStatsUtils]{make_settings}},
@@ -438,6 +506,10 @@ for(j in 1:6){
   
   #try domed-shaped response for temp and linear for habitat
     
+  # #MoveCov = hab^2*temp_tolerance
+  #  X1_formula = ~ poly(MoveCov, degree=2 )
+  #  X2_formula = ~ poly(MoveCov, degree=2 )
+  #   
   #Chris C idea for including 2 covariates
   X1_formula = ~ poly(Temp, degree=2 )
   X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
@@ -490,7 +562,8 @@ for(j in 1:6){
                                 "t_i"=as.numeric(spring[,'Year']), 
                                 "c_iz"=as.numeric(rep(0,nrow(spring))), 
                                 "b_i"=as.numeric(spring[,'Catch_KG']), 
-                                "a_i"=as.numeric(spring[,'AreaSwept_km2'])), 
+                                "a_i"=as.numeric(spring[,'AreaSwept_km2']),
+                                optimize_args=list("lower"=-Inf,"upper"=Inf)), 
                                 silent = TRUE)
 
   })
@@ -512,14 +585,14 @@ for(j in 1:6){
   
   #copy parameter files into iteration folder
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/spring/parameter_estimates.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/spring/parameter_estimates.RDATA",sep=""))
   
  
   #plot covariate respopne, if applicable 
@@ -647,7 +720,9 @@ for(j in 1:6){
   # FC2[2,1] <-0 
   # FC2[2,2] <-0 
   
-  FC2 = c("Omega1" = 1, "Epsilon1" = 0, "Omega2" = 1, "Epsilon2" = 0) 
+  
+  FC2 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
+  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =0)
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,
@@ -655,6 +730,7 @@ for(j in 1:6){
                             strata.limits=example$strata.limits,
                             bias.correct=TRUE,  
                             FieldConfig= FC2,
+                            RhoConfig=RhoConfig,
                             ObsModel = obsmodel,
                             knot_method = "samples")
   #ABOVE SETTINGS PRODUCE ERRORS. CHECK_FIT SUGGESTS ADDITIONAL FIELDCONFIG SETTINGS
@@ -678,10 +754,13 @@ for(j in 1:6){
   ifelse(covariates == "TRUE",{
     print("USING COVARIATES")
     
+    #MoveCov = hab^2*temp_tolerance
+    # X1_formula = ~ poly(MoveCov, degree=2 )
+    # X2_formula = ~ poly(MoveCov, degree=2 )
     
     #Chris C idea for including 2 covariates
-    X1_formula = ~ poly(Temp, degree=2 )
-    X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+    # X1_formula = ~ poly(Temp, degree=2 )
+    # X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
     # X1_formula = ~ 1
     # X2_formula = ~ poly(Habitat, degree=3 )
     
@@ -699,7 +778,8 @@ for(j in 1:6){
                               "a_i"=as.numeric(fall[,'AreaSwept_km2']),
                               X1_formula = X1_formula,
                               X2_formula = X2_formula,
-                              covariate_data = covdata_fall),
+                              covariate_data = covdata_fall,
+                              optimize_args=list("lower"=-Inf,"upper"=Inf)),
                               
                               silent = TRUE)
     
@@ -732,15 +812,15 @@ for(j in 1:6){
   
 
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/settings.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/settings.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
   
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.txt",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/parameter_estimates.txt",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/fall/parameter_estimates.txt",sep=""))
   
-  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/parameter_estimates.RDATA",sep="") 
-              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,"/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
+  file.rename(from= paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/parameter_estimates.RDATA",sep="") 
+              ,to =paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/fall/parameter_estimates.RDATA",sep=""))
   
   
   #plot covariate respopne, if applicable 
@@ -841,8 +921,10 @@ for(j in 1:6){
   
 }
 
-
-saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,"/model_aic.RDS",sep=""))
+#might need to go up another directory
+  setwd('..')
+  
+saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/model_aic.RDS",sep=""))
 
 
 
