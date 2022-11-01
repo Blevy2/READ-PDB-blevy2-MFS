@@ -18,7 +18,7 @@ orig.dir <- getwd()
 # surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 # surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario1 <- "ConPop_ConTemp"
+scenario1 <- "ConPop_IncTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
@@ -26,7 +26,7 @@ exclude_strata <- FALSE
 
 with_noise <- TRUE
 
-covariates <- TRUE
+covariates <- FALSE
 
 cov_used <- "_WithCov"  #"Temp_LinearBasic" 
 
@@ -265,7 +265,7 @@ model_aic <- list()
   # Add noise to sample data here, if desired
   ##################################################################################
   if(with_noise==TRUE){
-  
+  print("ADDING NOISE TO DATA")
   temp_noise <-  sapply(adios$YTF , function(x){rlnorm(1,mean=log(x),sdlog=.35)} ) 
   
   adios$YTF <- temp_noise
@@ -722,7 +722,7 @@ for(j in 1:6){
   
   
   FC2 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =0)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =4)
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,
