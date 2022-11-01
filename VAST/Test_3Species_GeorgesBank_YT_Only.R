@@ -22,9 +22,9 @@ scenario1 <- "ConPop_IncTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
-exclude_strata <- FALSE
+exclude_strata <- TRUE
 
-with_noise <- TRUE
+with_noise <- FALSE
 
 covariates <- FALSE
 
@@ -277,6 +277,11 @@ model_aic <- list()
 
   
     #save adios to have a record, for ex to create strat. mean later
+  ifelse(exclude_strata==TRUE, 
+         {dir.create(paste(getwd(),"/",scenario,"/YT/ExcludeStrata",cov_dir,noise_dir,sep=""))
+           str_dir <- "ExcludeStrata"},
+         {dir.create(paste(getwd(),"/",scenario,"/YT/AllStrata",cov_dir,noise_dir,sep=""))
+           str_dir <- "AllStrata"})
   
   ifelse(with_noise==TRUE,{noise_dir <- "_WithNoise_"},{noise_dir <- "_NoNoise_"})
   
