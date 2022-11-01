@@ -261,6 +261,7 @@ model_aic <- list()
   
   
   
+  
   ##################################################################################
   # Add noise to sample data here, if desired
   ##################################################################################
@@ -269,13 +270,19 @@ model_aic <- list()
   temp_noise <-  sapply(adios$YTF , function(x){rlnorm(1,mean=log(x),sdlog=.35)} ) 
   
   adios$YTF <- temp_noise
+
   }
   ##################################################################################
   ##################################################################################
 
   
+    #save adios to have a record, for ex to create strat. mean later
   
+  ifelse(with_noise==TRUE,{noise_dir <- "_WithNoise_"},{noise_dir <- "_NoNoise_"})
   
+  ifelse(covariates==TRUE,{cov_dir <- paste(cov_used,sep="")},{cov_dir <- "_NoCovs"})
+    
+  saveRDS(adios,file=paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/adios.RDS",sep=""))
   
   
   
@@ -391,10 +398,7 @@ for(j in 1:6){
   
   #create directory for model specific output
   dir.create(paste(getwd(),"/",scenario,"/YT",sep=""))
-  
-  ifelse(with_noise==TRUE,{noise_dir <- "_WithNoise_"},{noise_dir <- "_NoNoise_"})
-  
-  ifelse(covariates==TRUE,{cov_dir <- paste(cov_used,sep="")},{cov_dir <- "_NoCovs_"})
+
   
   ifelse(exclude_strata==TRUE, 
          {dir.create(paste(getwd(),"/",scenario,"/YT/ExcludeStrata",cov_dir,noise_dir,sep=""))
@@ -791,7 +795,8 @@ for(j in 1:6){
                               "t_i"=as.numeric(fall[,'Year']), 
                               "c_iz"=as.numeric(rep(0,nrow(fall))), 
                               "b_i"=as.numeric(fall[,'Catch_KG']), 
-                              "a_i"=as.numeric(fall[,'AreaSwept_km2'])), 
+                              "a_i"=as.numeric(fall[,'AreaSwept_km2']),
+                              optimize_args=list("lower"=-Inf,"upper"=Inf)), 
                     silent = TRUE)
  
   })
