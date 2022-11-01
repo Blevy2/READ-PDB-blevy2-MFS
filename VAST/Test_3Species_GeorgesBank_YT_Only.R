@@ -26,7 +26,7 @@ exclude_strata <- TRUE
 
 with_noise <- FALSE
 
-covariates <- FALSE
+covariates <- TRUE
 
 cov_used <- "_WithCov"  #"Temp_LinearBasic" 
 
@@ -274,7 +274,11 @@ model_aic <- list()
   }
   ##################################################################################
   ##################################################################################
-
+ 
+   ifelse(with_noise==TRUE,{noise_dir <- "_WithNoise_"},{noise_dir <- "_NoNoise_"})
+  
+  ifelse(covariates==TRUE,{cov_dir <- paste(cov_used,sep="")},{cov_dir <- "_NoCovs"})
+    
   
     #save adios to have a record, for ex to create strat. mean later
   ifelse(exclude_strata==TRUE, 
@@ -283,10 +287,7 @@ model_aic <- list()
          {dir.create(paste(getwd(),"/",scenario,"/YT/AllStrata",cov_dir,noise_dir,sep=""))
            str_dir <- "AllStrata"})
   
-  ifelse(with_noise==TRUE,{noise_dir <- "_WithNoise_"},{noise_dir <- "_NoNoise_"})
-  
-  ifelse(covariates==TRUE,{cov_dir <- paste(cov_used,sep="")},{cov_dir <- "_NoCovs"})
-    
+
   saveRDS(adios,file=paste(orig.dir,"/VAST/",scenario,"/YT/",str_dir,cov_dir,noise_dir,"/adios.RDS",sep=""))
   
   
