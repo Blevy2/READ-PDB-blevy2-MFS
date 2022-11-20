@@ -18,11 +18,11 @@ orig.dir <- getwd()
 # surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 # surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario1 <- "ConPop_IncTemp"
+scenario1 <- "DecPop_ConTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
-exclude_strata <- TRUE
+exclude_strata <- FALSE
 
 with_noise <- FALSE
 
@@ -34,7 +34,7 @@ cov_used <- "_WithCov"  #"Temp_LinearBasic"
 #for Incpop_ConTemp (also used for IncTemp) run 77 shows strong increase for yellowtail
 #for DecPop_ConTemp run 25 shows clear decrease with small values towards the end
 #for DecPop_IncTemp run 13 shows clear decrease with small values towards the end
-surv_random_sample <- list_all[[1]]
+surv_random_sample <- list_all[[25]]
 
 setwd(orig.dir)
 
