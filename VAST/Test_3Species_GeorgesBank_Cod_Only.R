@@ -19,13 +19,13 @@ surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
 
-scenario1 <- "DecPop_ConTemp"
+scenario1 <- "DecPop_IncTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
-exclude_strata <- TRUE
+exclude_strata <- FALSE
 
-with_noise <- TRUE
+with_noise <- FALSE
 
 covariates <- TRUE
 
@@ -38,7 +38,7 @@ cov_used <- "_WithCov"  #"Temp_LinearBasic"
 #for DecPop_ConTemp iteration 18 shows steady decline
 #for DecPop_IncTemp iteration 44 shows steady decline
 
-surv_random_sample <- list_all[[18]]
+surv_random_sample <- list_all[[44]]
 
 setwd(orig.dir)
 
