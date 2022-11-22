@@ -37,7 +37,7 @@ cov_used <- "_WithCov"  #"Temp_LinearBasic"
 #DecPop_ConTemp 6 is pretty good
 #DecPop_IncTemp 9 is pretty good
 
-surv_random_sample <- list_all[[6]]
+surv_random_sample <- list_all[[98]]
 
 
 setwd(orig.dir)
@@ -262,6 +262,10 @@ if(with_noise==TRUE){
 ##################################################################################
 ##################################################################################
 
+
+#create directory for model specific output
+dir.create(paste(getwd(),"/",scenario,"/Had",sep=""))
+
 ifelse(with_noise==TRUE,{noise_dir <- "_WithNoise_"},{noise_dir <- "_NoNoise_"})
 
 ifelse(covariates==TRUE,{cov_dir <- paste(cov_used,sep="")},{cov_dir <- "_NoCovs"})
@@ -393,11 +397,6 @@ for(j in 1:6){
   if(j == 7) {obsmodel <- c(10, 2); run <- 7}
   
   
-  
-  #create directory for model specific output
-  dir.create(paste(getwd(),"/",scenario,"/Had",sep=""))
-  
-  ifelse(covariates==TRUE,{cov_dir <- paste("_with_",cov_used,sep="")},{cov_dir <- ""})
   
   ifelse(exclude_strata==TRUE, 
          {dir.create(paste(getwd(),"/",scenario,"/Had/ExcludeStrata",cov_dir,noise_dir,sep=""))
