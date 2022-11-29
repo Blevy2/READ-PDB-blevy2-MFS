@@ -18,7 +18,7 @@ orig.dir <- getwd()
 # surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 # surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario1 <- "IncPop_ConTemp"
+scenario1 <- "IncPop_IncTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
@@ -26,7 +26,7 @@ exclude_strata <- FALSE
 
 with_noise <- FALSE
 
-covariates <- TRUE
+covariates <- FALSE
 
 cov_used <- "_WithCov"  #"Temp_LinearBasic" 
 
@@ -37,7 +37,7 @@ cov_used <- "_WithCov"  #"Temp_LinearBasic"
 #DecPop_ConTemp 6 is pretty good
 #DecPop_IncTemp 9 is pretty good
 
-surv_random_sample <- list_all[[98]]
+surv_random_sample <- list_all[[100]]
 
 
 setwd(orig.dir)
@@ -572,7 +572,7 @@ for(j in 1:6){
   plot(fit_spring)
   
   #copy parameter files into iteration folder
-  remove(fit_spring)
+#  remove(fit_spring)
   
   file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/settings.txt",sep="") 
               ,to =paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
@@ -799,7 +799,7 @@ for(j in 1:6){
   
   plot(fit_fall)
   
-  remove(fit_fall)
+ # remove(fit_fall)
   
   file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/settings.txt",sep="") 
               ,to =paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
@@ -915,7 +915,7 @@ for(j in 1:6){
 #might need to go up another directory
 setwd('..')
 
-saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Had/",str_dir,cov_dir,"/model_aic.RDS",sep=""))
+saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/model_aic.RDS",sep=""))
 
 
 
