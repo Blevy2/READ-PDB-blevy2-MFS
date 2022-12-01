@@ -1388,6 +1388,7 @@ dev.off()
 
 
 #4) PLOTTING ACTUAL SPECIES-SPECIFIC MODEL OUTPUT FROM A GIVEN SIMULATION WITH SURVEY SAMPLES ON TOP
+# ALSO PLOTTING SURVEY VALUES ON TOP OF COVARIATES AS WELL
 #ie, loading simulation output and copying above loops to plot them
 
 
@@ -1405,15 +1406,15 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 
 
 #load results from a given simulation
-scenario <- "IncPop_ConTemp"
+scenario <- "DecPop_IncTemp"
 
 #choose which simulation iteration to use (chosen in different file)
 good_iter <- c(1,13,6) #ConPop_ConTemp
 good_iter <- c(1,1,3) #ConPop_IncTemp
 good_iter <- c(77,63,98) #IncPop_ConTemp
-#good_iter <- c(77,44,100) #IncPop_IncTemp
-#good_iter <- c(25,18,6) #DecPop_ConTemp
-#good_iter <- c(13,44,9) #DecPop_IncTemp
+good_iter <- c(77,44,100) #IncPop_IncTemp
+good_iter <- c(25,18,6) #DecPop_ConTemp
+good_iter <- c(13,44,9) #DecPop_IncTemp
 
 
 #survey results without noise
@@ -1425,8 +1426,8 @@ list_all[["Cod"]] <- list_all_temp[[good_iter[2]]]
 list_all[["Had"]] <- list_all_temp[[good_iter[3]]]
 
 #simulation results (LOAD JUST ONE OF THE FOLLOWING)
-memory.limit(45000) #this one for all results
-result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
+#memory.limit(45000) #this one for all results
+#result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
 #load existing result_goodones, if it exists
 result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_goodones_",scenario,".RDS",sep=""))
 
@@ -1488,9 +1489,34 @@ rotate <- function(x) t(apply(x, 2, rev))
 #zmin <- c(0,0,0)
 
 
-#for loop length
-moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
+#for loop length and covariates
+tmp <- substr(scenario,8,10)
 
+if(tmp == "Con"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"stTemp_HaddockStrata_res2",sep=""))}
+if(tmp == "Inc"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"rTemp_HaddockStrata_res2",sep=""))}
+
+#temp tolerances
+moveCov[["spp_tol"]] <- list() #just in case
+moveCov[["spp_tol"]] <- list("YT" = list("mu" = 9, "va" = 4),  #Yellowtail
+                             "Cod" = list("mu" = 8.75, "va" = 4.25),  #Cod
+                             "Had" = list("mu" = 9, "va" = 4) )    #Haddock
+
+
+library(raster)
+#haddock contains all stratas used
+Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Had_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(Had_ras)
+#load others to extract covariate values
+#Yellowtail
+YT_ras <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/Yell_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(YT_ras)
+#Cod
+Cod_ras <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(Cod_ras)
+
+hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
+names(hab$hab) <- c("YT","Cod","Had")
+fields::image.plot(rotate(hab$hab$Had))
 
 library(ggplot2)
 library(gridExtra)
@@ -1553,8 +1579,9 @@ color_max[["Had"]][[10]] <-1980  #fall survey
 
 for(s in seq_len(n_spp)) {
   
-      surv_temp1 <- list()
-      surv_temp2 <- list()
+      surv_temp1 <- list() #FOR STORING PLOTS FOR SURVEYS POINTS OVER POPULATION VALUES
+      surv_temp2 <- list() #FOR STORING PLOTS FOR SURVEYS POINTS OVER HABITAT COVARIATES
+      surv_temp3 <- list()#FOR STORING PLOTS FOR SURVEYS POINTS OVER TEMPERATURE COVARIATE
       
       all_idx<- 1
       
@@ -1580,22 +1607,67 @@ for(s in seq_len(n_spp)) {
         #FIRST WEEK in SURVEY MONTH
         
         #new way with ggplot
+        #print((i+month_shift)%%52)  #PRINTS 13 THEN 37, THE WEEKS BEING SAMPLED
+      #    
+        
+        
+        #STORING PLOTS FOR SURVEYS POINTS OVER POPULATION VALUES   
         temp_rotate <- result[[good_iter[[s]]]]$pop_bios[[i+month_shift]][[s]]
         
         temp_ <- reshape2::melt(temp_rotate, c("x", "y"), value.name = "Biomass") #population biomass
         temp_2 <- survey_points[[s]][[ceiling(i/52)]][[month_shift+1]] #survey locations
         
         pop_max[all_idx,s] <- max(temp_[,3],na.rm=T)
-     #    
+        
+    
      surv_temp1[[yr_idx]] <- ggplot() +
           geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Biomass)) + #plot biomass
-          geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="red") + #add survey points
-          scale_fill_distiller(palette = "Spectral",limits = range(0, color_max[[spp_names_short[[s]]]][[k]])) + #set the color pallet and color limits
+          geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
+          scale_fill_distiller(palette = "Spectral",limits = range(0.000000000000000000000000000000000000000000000000000000001, color_max[[spp_names_short[[s]]]][[k]])) + #set the color pallet and color limits
           theme_void()+ #remove x and y axis ticks and labels
           #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
          theme(legend.position="none" ) #remove legend
+     
           
+     #STORING PLOTS FOR SURVEYS POINTS OVER HABITAT COVARIATES 
+     #set habitat
+     if(s==1){hab_ras = YT_ras}
+     if(s==2){hab_ras = Cod_ras}
+     if(s==3){hab_ras = Had_ras}
+     
+     temp_ras <- reshape2::melt(as.matrix(hab_ras), c("x", "y"), value.name = "Habitat") #population biomass
+    
+     surv_temp2[[yr_idx]] <- ggplot() +
+       geom_raster(data=temp_ras,aes(x=y,y=rev(x),fill=Habitat)) + #plot biomass
+       geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
+       scale_fill_distiller(palette = "Spectral") + #set the color pallet and color limits
+       theme_void()+ #remove x and y axis ticks and labels
+       #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
+       theme(legend.position="none" ) #remove legend
+     
+     
+     
+          
+     #STORING PLOTS FOR SURVEYS POINTS OVER TEMPERATURE COVARIATES
+     move_cov_wk <- moveCov[["cov.matrix"]][[i+month_shift]]
+     
+     # move_cov_wk_spp <- matrix(nc = ncol(move_cov_wk),
+     #                           nr = nrow(move_cov_wk), 
+     #                           sapply(move_cov_wk, norm_fun, 
+     #                                  mu = moveCov[["spp_tol"]][[s]][["mu"]], 
+     #                                  va = moveCov[["spp_tol"]][[s]][["va"]]))
+     
+     temp_temp <- reshape2::melt(move_cov_wk, c("x", "y"), value.name = "Temperature") #temperature
+     
 
+     surv_temp3[[yr_idx]] <- ggplot() +
+       geom_raster(data=temp_temp,aes(x=y,y=rev(x),fill=Temperature)) + #plot biomass
+       geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
+       scale_fill_distiller(palette = "Spectral") + #set the color pallet and color limits
+       theme_void()+ #remove x and y axis ticks and labels
+       #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
+       theme(legend.position="none" ) #remove legend
+     
        
       #print(p)
       
@@ -1618,7 +1690,10 @@ for(s in seq_len(n_spp)) {
       
     }
     
-    do.call("grid.arrange", c(surv_temp1, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years')))
+    do.call("grid.arrange", c(surv_temp1, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years Biomass')))
+    do.call("grid.arrange", c(surv_temp2, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years Habitat')))
+    do.call("grid.arrange", c(surv_temp3, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years Temperature')))
+    
     # gridExtra::grid.arrange(Obsmodel_plot[[1]],Obsmodel_plot[[2]],Obsmodel_plot[[3]],nrow=3)
     # 
     
