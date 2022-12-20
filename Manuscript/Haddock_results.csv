@@ -1,0 +1,17 @@
+Temp,Strata,Noise,season,VAST No Cov,VAST w/ Cov,Stratified Mean,,
+const,all,no ,spring,0.49,0.18,0.18,,
+const,all,yes,spring,0.73,0.43,0.21,,Haddock
+const,all,no ,fall,0.28,0.05,0.26,,Increasing Population
+const,all,yes,fall,0.41,0.06,0.27,,
+const,reduced,no ,spring,0.34,0.35,0.45,,
+const,reduced,yes,spring,0.3,0.33,0.46,,
+const,reduced,no ,fall,0.36,0.48,0.54,,
+const,reduced,yes,fall,0.33,0.46,0.52,,
+increasing,all,no ,spring,0.25,0.05,0.26,,
+increasing,all,yes,spring,0.3,0.06,0.31,,
+increasing,all,no ,fall,0.89,0.23,0.4,,
+increasing,all,yes,fall,1.04,0.35,0.42,,
+increasing,reduced,no ,spring,0.32,0.4,0.44,,
+increasing,reduced,yes,spring,0.38,0.37,0.37,,
+increasing,reduced,no ,fall,0.44,0.64,0.72,,
+increasing,reduced,yes,fall,0.42,0.62,0.7,,

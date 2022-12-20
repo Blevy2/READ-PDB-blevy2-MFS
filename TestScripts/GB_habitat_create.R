@@ -1406,8 +1406,9 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 
 
 #load results from a given simulation
-scenario <- "DecPop_IncTemp"
+scenario <- "IncPop_ConTemp"
 
+######################################################################################
 #choose which simulation iteration to use (chosen in different file)
 good_iter <- c(1,13,6) #ConPop_ConTemp
 good_iter <- c(1,1,3) #ConPop_IncTemp
@@ -1415,6 +1416,57 @@ good_iter <- c(77,63,98) #IncPop_ConTemp
 good_iter <- c(77,44,100) #IncPop_IncTemp
 good_iter <- c(25,18,6) #DecPop_ConTemp
 good_iter <- c(13,44,9) #DecPop_IncTemp
+######################################################################################
+
+######################################################################################
+# #THESE FOR CONPOP_CONTEMP
+color_max[["YT"]][[4]] <- 205  #spring survey pop max
+color_max[["YT"]][[10]] <- 80 #fall survey
+color_max[["Cod"]][[4]] <- 170  #spring survey pop max
+color_max[["Cod"]][[10]] <- 335 #fall survey
+color_max[["Had"]][[4]] <- 1525  #spring survey pop max
+color_max[["Had"]][[10]] <-1273  #fall survey
+
+#THESE FOR CONPOP_INCTEMP
+color_max[["YT"]][[4]] <- 125  #spring survey pop max
+color_max[["YT"]][[10]] <- 200 #fall survey
+color_max[["Cod"]][[4]] <- 437  #spring survey pop max
+color_max[["Cod"]][[10]] <- 3044 #fall survey
+color_max[["Had"]][[4]] <- 3945  #spring survey pop max
+color_max[["Had"]][[10]] <-3775  #fall survey
+
+#THESE FOR INCPOP_CONTEMP
+color_max[["YT"]][[4]] <- 405  #spring survey pop max
+color_max[["YT"]][[10]] <- 343 #fall survey 
+color_max[["Cod"]][[4]] <- 637  #spring survey pop max
+color_max[["Cod"]][[10]] <- 1550 #fall survey 
+color_max[["Had"]][[4]] <- 2645  #spring survey pop max
+color_max[["Had"]][[10]] <-1980  #fall survey 
+
+#THESE FOR INCPOP_INCTEMP
+color_max[["YT"]][[4]] <- 957  #spring survey pop max
+color_max[["YT"]][[10]] <- 1571 #fall survey 
+color_max[["Cod"]][[4]] <- 922  #spring survey pop max
+color_max[["Cod"]][[10]] <- 7398 #fall survey 
+color_max[["Had"]][[4]] <- 9662  #spring survey pop max
+color_max[["Had"]][[10]] <-9857  #fall survey 
+
+#THESE FOR DECPOP_CONTEMP
+color_max[["YT"]][[4]] <- 79  #spring survey pop max
+color_max[["YT"]][[10]] <- 70 #fall survey 
+color_max[["Cod"]][[4]] <- 62  #spring survey pop max
+color_max[["Cod"]][[10]] <- 149 #fall survey 
+color_max[["Had"]][[4]] <- 861  #spring survey pop max
+color_max[["Had"]][[10]] <-593  #fall survey 
+
+#THESE FOR DECPOP_INCTEMP
+color_max[["YT"]][[4]] <- 96  #spring survey pop max
+color_max[["YT"]][[10]] <- 86 #fall survey 
+color_max[["Cod"]][[4]] <- 86  #spring survey pop max
+color_max[["Cod"]][[10]] <- 486 #fall survey 
+color_max[["Had"]][[4]] <- 1016  #spring survey pop max
+color_max[["Had"]][[10]] <-1199  #fall survey 
+######################################################################################
 
 
 #survey results without noise
@@ -1491,9 +1543,15 @@ rotate <- function(x) t(apply(x, 2, rev))
 
 #for loop length and covariates
 tmp <- substr(scenario,8,10)
+temp_color_max <- vector()
 
-if(tmp == "Con"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"stTemp_HaddockStrata_res2",sep=""))}
-if(tmp == "Inc"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"rTemp_HaddockStrata_res2",sep=""))}
+if(tmp == "Con"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"stTemp_HaddockStrata_res2",sep=""))
+                temp_color_max[4] <- 10.1
+                temp_color_max[10] <- 18.9} #for plotting
+
+if(tmp == "Inc"){moveCov <- readRDS(paste("20 year moveCov matrices/GeorgesBank/GB_22yr_",tmp,"rTemp_HaddockStrata_res2",sep=""))
+                temp_color_max[4] <- 15.4
+                temp_color_max[10] <- 24.5} #for plotting
 
 #temp tolerances
 moveCov[["spp_tol"]] <- list() #just in case
@@ -1547,35 +1605,14 @@ pdf(file=paste0('testfolder/Survey_Months_Plots_',scenario,'.pdf'))
 #record max population values to set below color limits. run below loop without plotting to get max values first
 pop_max <- matrix(nrow=40,ncol=3)
 color_min <- 0 
-color_max <- list()
 
-# #THESE FOR CONPOP_CONTEMP
-# color_max[["YT"]][[4]] <- 205  #spring survey pop max
-# color_max[["YT"]][[10]] <- 80 #fall survey 
-# color_max[["Cod"]][[4]] <- 170  #spring survey pop max
-# color_max[["Cod"]][[10]] <- 335 #fall survey 
-# color_max[["Had"]][[4]] <- 1525  #spring survey pop max
-# color_max[["Had"]][[10]] <-1273  #fall survey 
-  
 
-#THESE FOR CONPOP_INCTEMP
-# color_max[["YT"]][[4]] <- 125  #spring survey pop max
-# color_max[["YT"]][[10]] <- 200 #fall survey 
-# color_max[["Cod"]][[4]] <- 437  #spring survey pop max
-# color_max[["Cod"]][[10]] <- 3044 #fall survey 
-# color_max[["Had"]][[4]] <- 3945  #spring survey pop max
-# color_max[["Had"]][[10]] <-3775  #fall survey 
+temp_max <- matrix(nrow=40,ncol=3)
+temp_color_min <- 0 
 
-#THESE FOR INCPOP_CONTEMP
-color_max[["YT"]][[4]] <- 405  #spring survey pop max
-color_max[["YT"]][[10]] <- 343 #fall survey 
-color_max[["Cod"]][[4]] <- 637  #spring survey pop max
-color_max[["Cod"]][[10]] <- 1550 #fall survey 
-color_max[["Had"]][[4]] <- 2645  #spring survey pop max
-color_max[["Had"]][[10]] <-1980  #fall survey 
-  
 
-   
+
+
 
 for(s in seq_len(n_spp)) {
   
@@ -1659,11 +1696,12 @@ for(s in seq_len(n_spp)) {
      
      temp_temp <- reshape2::melt(move_cov_wk, c("x", "y"), value.name = "Temperature") #temperature
      
+     temp_max[all_idx,s] <- max(temp_temp[,3],na.rm=T)
 
      surv_temp3[[yr_idx]] <- ggplot() +
        geom_raster(data=temp_temp,aes(x=y,y=rev(x),fill=Temperature)) + #plot biomass
        geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
-       scale_fill_distiller(palette = "Spectral") + #set the color pallet and color limits
+       scale_fill_distiller(palette = "Spectral",limits = range(0, temp_color_max[k])) + #set the color pallet and color limits
        theme_void()+ #remove x and y axis ticks and labels
        #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
        theme(legend.position="none" ) #remove legend
@@ -1689,11 +1727,11 @@ for(s in seq_len(n_spp)) {
       
       
     }
-    
+
     do.call("grid.arrange", c(surv_temp1, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years Biomass')))
     do.call("grid.arrange", c(surv_temp2, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years Habitat')))
     do.call("grid.arrange", c(surv_temp3, ncol=4, top=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'All 20 Years Temperature')))
-    
+
     # gridExtra::grid.arrange(Obsmodel_plot[[1]],Obsmodel_plot[[2]],Obsmodel_plot[[3]],nrow=3)
     # 
     
@@ -1706,8 +1744,8 @@ dev.off()
 
 
 
-max(pop_max[1:20,1])
-max(pop_max[21:40,1])
+max(pop_max[1:20,1])  #spring values
+max(pop_max[21:40,1]) #fall values
 
 max(pop_max[1:20,2])
 max(pop_max[21:40,2])
@@ -1715,7 +1753,8 @@ max(pop_max[21:40,2])
 max(pop_max[1:20,3])
 max(pop_max[21:40,3])
 
-
+max(temp_max[1:20,1])
+max(temp_max[21:40,1])
 
 
 
