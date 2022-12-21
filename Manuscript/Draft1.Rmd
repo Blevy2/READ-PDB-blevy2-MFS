@@ -84,18 +84,6 @@ keyword 1, keyword 2
 
 \newpage
 
-```{r}
-
-
-knitr::kable(YT_results, caption = "Yellowtail error results")
-
-knitr::kable(Cod_results, caption = "Cod error results")
-
-knitr::kable(Had_results, caption = "Haddock error results")
-```
-
-\newpage
-
 \section{Introduction}
 
 
@@ -161,13 +149,14 @@ The time step for our models is one week. MFS uses a modified two-stage Deriso-S
 
 
 
-<font size="5">*Temperature and Habitat Input*</font>
+<font size="5">*Movement*</font>
 
 The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to drive the probability of movement from cell $I$ to cell $J$ using the formulation
 
-\begin{align*}
+\begin{align}
 Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdot Tol_{J,p,wk})}{\sum^C_{c=1}e^{-\lambda \cdot d} \cdot (Hab^2_{c,p} \cdot Tol_{c,p,wk})},
-\end{align*}
+\label{moveP}
+\end{align}
 
 
  where 
@@ -182,12 +171,24 @@ Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdo
 
 Since we are modeling real species on the northeast continental shelf, we formulate the habitat and temperature components as follows.
 
-Each species is assumed to have normally distributed temperature preferences ($~N(\mu,\sigma)$). We assume Yellowtail's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. We obtain estimated temperature data for the region for 2012 from FVCOM **cite**. We chose 2012 because the data displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values. We transform the temperature data to create an oscillating  pattern that increases 5 degrees Celsius over the duration of the simulation. **show image of average temperature oscilations?**
+<font size="5">*Habitat Input*</font>
 
-Species-specific habitat preferences were derived by relating bottom trawl data to covariate predictors to create a niche model for each species. 
+Species-specific habitat preferences were derived using the *lrren* tool from the R package *envi* **cite** to create a niche model for each species. The *lrren* tool estimates an ecological niche using the relative risk function by relating presence/absence data to two covariate predictors. We used bottom trawl point data from 2009-2021 as our presence/absence input by using a value of 0 for any tow that failed to catch the given species and weighting a successful catch by the biomass of the given tow **cite trawl data?**. Depth and mean sediment size were used as our covariate predictors **cite**. Since the values in $Hab^2_{J,p}$ are required to be between 0 and 1, we transform the spatial estimates from *lrren* to fall between these bounds. See Figure ??? for a visual representation of this process being applied to Cod. Figure \@ref(fig:hab-plot) depicts habitat preferences $Hab^2_{J,p}$ for each species.
+
+```{r hab-plot, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Static habitat preferences for each species in our population models (Yellotwtail, Cod, Haddock)."}
+knitr::include_graphics(c("Images/Habitat_3species.png"))
+```
+
+<font size="5">*Temperature Input*</font>
+
+Each species is assumed to have normally distributed temperature preferences ($N(\mu,\sigma)$). We assume Yellowtail Flounder's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. Weekly estimated temperature data for the region for 2012 was obtained from FVCOM **cite**. We chose 2012 because the data displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values. This data was also transform to create an oscillating pattern that increases 5 degrees Celsius on average over the duration of the simulation.  **show images of temperature and/or and/or temp videos??? and/or average temperature oscillations?**
 
 
 --Describe difference between increasing and constant temperature scenarios (images?)
+
+In equation (1), $Hab^2_{J,p}$ is constant for the duration of the simulation, while $Tol_{c,p,wk}$ changes each week. Using a temperature gradient that repeats each year produces the same spatial preferences in a given week each year, which results in consistent spatial biomass patterns. Scenarios where the temperature increases over time creates spatial preferences that evolve as the water warms, which creates spatial biomass patterns that shift in a given week over the duration of the simulation.
+ 
+
 
 -- Describe each scenario that is considered
 
@@ -206,6 +207,19 @@ After each simulation is complete, we mimic the bottom trawl survey by conductin
 
 We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the  strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurrence (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model. 
 
+
+
+\section{Results}
+
+```{r}
+
+
+knitr::kable(YT_results, caption = "Yellowtail error results")
+
+knitr::kable(Cod_results, caption = "Cod error results")
+
+knitr::kable(Had_results, caption = "Haddock error results")
+```
 
 
 ## Discussion 

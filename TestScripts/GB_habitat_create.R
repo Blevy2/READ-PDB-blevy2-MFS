@@ -1762,3 +1762,111 @@ max(temp_max[21:40,1])
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+######################################################################################
+
+
+#5) PLOTTING HABITAT FOR PUBLICATION
+
+
+spp_names <- c("Yellowtail Flounder","Cod","Haddock")
+
+spp_names_short <- c("YT","Cod","Had")
+
+
+#function to rotate image before plotting because image.plot rotates it
+rotate <- function(x) t(apply(x, 2, rev))
+
+library(raster)
+#haddock contains all stratas used
+Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Had_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(Had_ras)
+#load others to extract covariate values
+#Yellowtail
+YT_ras <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/Yell_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(YT_ras)
+#Cod
+Cod_ras <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(Cod_ras)
+
+hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
+names(hab$hab) <- c("YT","Cod","Had")
+
+library(ggplot2)
+library(gridExtra)
+library(plotly)
+
+
+
+  surv_temp1 <- list() #FOR STORING PLOTS FOR SURVEYS POINTS OVER POPULATION VALUES
+  
+      
+
+for(s in seq(3)) {
+  
+      #STORING PLOTS FOR SURVEYS POINTS OVER HABITAT COVARIATES 
+      #set habitat
+      if(s==1){hab_ras = YT_ras}
+      if(s==2){hab_ras = Cod_ras}
+      if(s==3){hab_ras = Had_ras}
+      
+      temp_ras <- reshape2::melt(as.matrix(hab_ras), c("x", "y"), value.name = "Suitability") 
+      
+      surv_temp1[[s]] <- ggplot() +
+        geom_raster(data=temp_ras,aes(x=y,y=rev(x),fill=Suitability)) + #plot biomass
+        
+        scale_fill_distiller(palette = "Spectral")+  #set the color pallet and color limits
+        theme_void()+
+        theme(legend.direction="horizontal",legend.key.height = unit(1.25, 'cm'),legend.key.width = unit(5, 'cm'),legend.title = element_text(size=30),legend.text = element_text(size=15))#+ #remove x and y axis ticks and labels
+       # labs(title=spp_names[s]) 
+        #theme(legend.position="none" ) #remove legend
+      
+      
+}
+  #ADD SINGLE LEGEND TO 3 PANE PLOT
+  
+  #extract legend
+  #https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+  g_legend<-function(a.gplot){
+    tmp <- ggplot_gtable(ggplot_build(a.gplot))
+    leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+    legend <- tmp$grobs[[leg]]
+    return(legend)}
+  mylegend<-g_legend(surv_temp1[[1]]) 
+
+  grid.arrange(arrangeGrob(surv_temp1[[1]] + theme_void() + theme(legend.position="none") ,
+                           surv_temp1[[2]] + theme_void() + theme(legend.position="none"),
+                           surv_temp1[[3]] + theme_void() + theme(legend.position="none"),
+                           nrow=1),
+               mylegend, nrow=2,heights=c(10, 1))
+
+

@@ -147,6 +147,140 @@ keyword 1, keyword 2
 
 \newpage
 
+\section{Introduction}
+
+much of below is from \url{https://apps-nefsc.fisheries.noaa.gov/nefsc/ecosystem-ecology/}
+or
+\url{https://www.fisheries.noaa.gov/data-tools/fisheries-economics-united-states-data-and-visualizations}
+
+\begin{itemize}
+\tightlist
+\item
+  The eastern continental shelf is ecologically diverse and economically important
+\end{itemize}
+
+The Northeast United States continental shelf spans from the Outer Banks of North Carolina to the Gulf of Maine. The region covers over 250,000 km\(^2\) of ocean, extending over 200 km from shore in the largest areas in New England to just 30 km off shore in the southern regions. This ecologically diverse region contains approximately 18,000 vertebrate marine species. Commercial fisheries have been an important part of local economies for centuries. In 2019, New England fisheries produced \$22 billion in sales, which sustained over 200,000 jobs. Maintaining a healthy ecosystem is therefore vital to sustained ecological health and economic prosperity of the region. {[}@nefmc20{]}
+
+\begin{itemize}
+\tightlist
+\item
+  Bottom trawl survey is important for monitoring population trends
+\end{itemize}
+
+Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration's (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal biologists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 (cite survey paper). The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits \textbf{just listed a few uses of survey change/others?}.
+
+The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling during approximately the same 2-3 week time period in each season.
+
+\begin{itemize}
+\tightlist
+\item
+  Climate change is happening
+  Due to a combination of climate change and shifts in circulation, the Northeast United States continental shelf has experienced rapid warming in recent decades, resulting in a shift in spatial distributions of many species. Since stock assessment models rely on accurate descriptions of population dynamics and contemporary patterns of spatial abundance, there is concern that rapid undocumented changes in spatial distributions of species will bias future stock assessments. The implication of this is that the bottom trawl survey is actually sampling the population during a different life cycle stage than was originally assumed, which can lead to biased stock assessments. We are therefore interested in analyzing the impact of climate change on the accuracy of future stock assessment models as measured by NOAA's ongoing bottom-trawl survey along the East coast.
+\end{itemize}
+
+\textbf{use more info from initial proposal}
+
+\begin{itemize}
+\item
+  Fish are changing spatial distribution and have altered life stages (?) because of climate change
+  NYE paper
+\item
+  Population indexing methods may be becoming biased as a result
+\item
+  Briefly describe our study to test this
+\end{itemize}
+
+To test the ability of the bottom trawl survey to track population trends under shifting environmental conditions, we construct spatial models for fish where movement depend on temperature preferences. We can then consider the impact of climate change by simulating scenarios with repeating temperature patterns and those where temperature increases on average over time. In both cases we analyze the ability of stratified random sampling to track population trends.
+
+\section{Methods}
+
+\begin{itemize}
+\tightlist
+\item
+  Describe simulation study
+\end{itemize}
+
+We construct spatial models for Yellowtail Flounder, Atlantic Cod, and Haddock on George's Bank, where movement of each species combine static species-specific habitat preferences with dynamic temperature preferences. Model dynamics are driven by dynamic temperature gradients estimated from data to create simulated data sets for each population where the true biomass is known. Using temperature gradients that repeat each year creates data sets with predictable, repeating spatial patterns, whereas using a temperature gradient that increases on average throughout the simulation leads to spatial distributions that shift over time. We conducting stratified random sampling on our simulation output to mimic the bottom trawl survey and compare the ability of contemporary indexing methods to track population trends.
+
+\subsection{Population Model Formulation}
+
+-- Used MixFishSim. Describe edits made to package
+
+We use the R package \emph{MixFishSim} (MFS) to model our populations {[}@dolder2020highly{]}. MFS is a discrete spatiotemporal simulation tool where users can model multiple species under varying environmental conditions. The package uses a delay-difference population model with discrete processes for growth, death, and recruitment of the population. We formulate the following inputs for the MFS package to address our research question:
+
+\emph{Study Area}
+
+We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain Cod inhabit 13 strata, and yellowtail exist in 9 strata. Figure \ref{fig:strata-plot} shows the regions used in our models.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{Images/Strata} 
+
+}
+
+\caption{Strata inhabited by each species in our population models.}\label{fig:strata-plot}
+\end{figure}
+
+\emph{Population Dynamics and Recruitment}
+
+The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass of in each cell in our study area {[}@dolder2020highly{]}. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \ref{paramsALL} and \ref{tab:paramsSCENARIOS}. \textbf{missing spawning weeks, recruitment weeks, lambda}
+
+\emph{Movement}
+
+The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to drive the probability of movement from cell \(I\) to cell \(J\) using the formulation
+
+\begin{align}
+Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdot Tol_{J,p,wk})}{\sum^C_{c=1}e^{-\lambda \cdot d} \cdot (Hab^2_{c,p} \cdot Tol_{c,p,wk})},
+\label{moveP}
+\end{align}
+
+where
+
+\(e^{-\lambda \cdot d_{I,J}}\) accounts for distance between cells \(I\) and \(J\),
+
+\(Hab^2_{J,p}\) is the static habitat value for species \(p\) in cell \(J\), and
+
+\(Tol_{c,p,wk}\) is the value from normally distributed temperature tolerance for species \(p\) in cell \(c\) in week \(wk\).
+
+Since we are modeling real species on the northeast continental shelf, we formulate the habitat and temperature components as follows.
+
+\emph{Habitat Input}
+
+Species-specific habitat preferences were derived using the \emph{lrren} tool from the R package \emph{envi} \textbf{cite} to create a niche model for each species. The \emph{lrren} tool estimates an ecological niche using the relative risk function by relating presence/absence data to two covariate predictors. We used bottom trawl point data from 2009-2021 as our presence/absence input by using a value of 0 for any tow that failed to catch the given species and weighting a successful catch by the biomass of the given tow \textbf{cite trawl data?}. Depth and mean sediment size were used as our covariate predictors \textbf{cite}. Since the values in \(Hab^2_{J,p}\) are required to be between 0 and 1, we transform the spatial estimates from \emph{lrren} to fall between these bounds. See Figure ??? for a visual representation of this process being applied to Cod. Figure \ref{fig:hab-plot} depicts habitat preferences \(Hab^2_{J,p}\) for each species.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{Images/Habitat_3species} 
+
+}
+
+\caption{Static habitat preferences for each species in our population models (Yellotwtail, Cod, Haddock).}\label{fig:hab-plot}
+\end{figure}
+
+\emph{Temperature Input}
+
+Each species is assumed to have normally distributed temperature preferences (\(N(\mu,\sigma)\)). We assume Yellowtail Flounder's preferences are \(N(8.75,4.25)\), while Haddock and Cod have preferences \(N(9,4)\). We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. Weekly estimated temperature data for the region for 2012 was obtained from FVCOM \textbf{cite}. We chose 2012 because the data displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values. This data was also transform to create an oscillating pattern that increases 5 degrees Celsius on average over the duration of the simulation. \textbf{show images of temperature and/or and/or temp videos??? and/or average temperature oscillations?}
+
+--Describe difference between increasing and constant temperature scenarios (images?)
+
+In equation (1), \(Hab^2_{J,p}\) is constant for the duration of the simulation, while \(Tol_{c,p,wk}\) changes each week. Using a temperature gradient that repeats each year produces the same spatial preferences in a given week each year, which results in consistent spatial biomass patterns. Scenarios where the temperature increases over time creates spatial preferences that evolve as the water warms, which creates spatial biomass patterns that shift in a given week over the duration of the simulation.
+
+-- Describe each scenario that is considered
+
+We consider three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation.
+
+\emph{Simulating Bottom Trawl Survey and Population Indexing}
+
+-Describe post hoc sampling process and how data is used
+
+After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. We sample in the same weeks that the Spring and Fall surveys take place and the number of the samples taken in each strata reflect true values. Most strata contain enough cells to sample a unique location in each survey over the duration of the simulation. For smaller strata we must repeat some sample locations. We then use the biomass collected from our samples in contemporary population indexing methods to estimate population trends. Knowing the true population values in our simulations allows us to compare the error calculated from each estimation method.
+
+--Stratified mean vs VAST with and without covariates
+
+We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurrence (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model.
+
+\section{Results}
+
 \begin{table}
 
 \caption{\label{tab:unnamed-chunk-1}Yellowtail error results}
@@ -309,124 +443,6 @@ increasing & reduced & yes & fall & 0.42 & 0.62 & 0.70 & NA & \\
 \hline
 \end{tabular}
 \end{table}
-
-\newpage
-
-\section{Introduction}
-
-much of below is from \url{https://apps-nefsc.fisheries.noaa.gov/nefsc/ecosystem-ecology/}
-or
-\url{https://www.fisheries.noaa.gov/data-tools/fisheries-economics-united-states-data-and-visualizations}
-
-\begin{itemize}
-\tightlist
-\item
-  The eastern continental shelf is ecologically diverse and economically important
-\end{itemize}
-
-The Northeast United States continental shelf spans from the Outer Banks of North Carolina to the Gulf of Maine. The region covers over 250,000 km\(^2\) of ocean, extending over 200 km from shore in the largest areas in New England to just 30 km off shore in the southern regions. This ecologically diverse region contains approximately 18,000 vertebrate marine species. Commercial fisheries have been an important part of local economies for centuries. In 2019, New England fisheries produced \$22 billion in sales, which sustained over 200,000 jobs. Maintaining a healthy ecosystem is therefore vital to sustained ecological health and economic prosperity of the region. {[}@nefmc20{]}
-
-\begin{itemize}
-\tightlist
-\item
-  Bottom trawl survey is important for monitoring population trends
-\end{itemize}
-
-Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration's (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal biologists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 (cite survey paper). The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits \textbf{just listed a few uses of survey change/others?}.
-
-The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling during approximately the same 2-3 week time period in each season.
-
-\begin{itemize}
-\tightlist
-\item
-  Climate change is happening
-  Due to a combination of climate change and shifts in circulation, the Northeast United States continental shelf has experienced rapid warming in recent decades, resulting in a shift in spatial distributions of many species. Since stock assessment models rely on accurate descriptions of population dynamics and contemporary patterns of spatial abundance, there is concern that rapid undocumented changes in spatial distributions of species will bias future stock assessments. The implication of this is that the bottom trawl survey is actually sampling the population during a different life cycle stage than was originally assumed, which can lead to biased stock assessments. We are therefore interested in analyzing the impact of climate change on the accuracy of future stock assessment models as measured by NOAA's ongoing bottom-trawl survey along the East coast.
-\end{itemize}
-
-\textbf{use more info from initial proposal}
-
-\begin{itemize}
-\item
-  Fish are changing spatial distribution and have altered life stages (?) because of climate change
-  NYE paper
-\item
-  Population indexing methods may be becoming biased as a result
-\item
-  Briefly describe our study to test this
-\end{itemize}
-
-To test the ability of the bottom trawl survey to track population trends under shifting environmental conditions, we construct spatial models for fish where movement depend on temperature preferences. We can then consider the impact of climate change by simulating scenarios with repeating temperature patterns and those where temperature increases on average over time. In both cases we analyze the ability of stratified random sampling to track population trends.
-
-\section{Methods}
-
-\begin{itemize}
-\tightlist
-\item
-  Describe simulation study
-\end{itemize}
-
-We construct spatial models for Yellowtail Flounder, Atlantic Cod, and Haddock on George's Bank, where movement of each species combine static species-specific habitat preferences with dynamic temperature preferences. Model dynamics are driven by dynamic temperature gradients estimated from data to create simulated data sets for each population where the true biomass is known. Using temperature gradients that repeat each year creates data sets with predictable, repeating spatial patterns, whereas using a temperature gradient that increases on average throughout the simulation leads to spatial distributions that shift over time. We conducting stratified random sampling on our simulation output to mimic the bottom trawl survey and compare the ability of contemporary indexing methods to track population trends.
-
-\subsection{Population Model Formulation}
-
--- Used MixFishSim. Describe edits made to package
-
-We use the R package \emph{MixFishSim} (MFS) to model our populations {[}@dolder2020highly{]}. MFS is a discrete spatiotemporal simulation tool where users can model multiple species under varying environmental conditions. The package uses a delay-difference population model with discrete processes for growth, death, and recruitment of the population. We formulate the following inputs for the MFS package to address our research question:
-
-\emph{Study Area}
-
-We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain Cod inhabit 13 strata, and yellowtail exist in 9 strata. Figure \ref{fig:strata-plot} shows the regions used in our models.
-
-\begin{figure}
-
-{\centering \includegraphics[width=0.95\linewidth]{Images/Strata} 
-
-}
-
-\caption{Strata inhabited by each species in our population models.}\label{fig:strata-plot}
-\end{figure}
-
-\emph{Population Dynamics and Recruitment}
-
-The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass of in each cell in our study area {[}@dolder2020highly{]}. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \ref{paramsALL} and \ref{tab:paramsSCENARIOS}. \textbf{missing spawning weeks, recruitment weeks, lambda}
-
-\emph{Temperature and Habitat Input}
-
-The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to drive the probability of movement from cell \(I\) to cell \(J\) using the formulation
-
-\begin{align*}
-Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdot Tol_{J,p,wk})}{\sum^C_{c=1}e^{-\lambda \cdot d} \cdot (Hab^2_{c,p} \cdot Tol_{c,p,wk})},
-\end{align*}
-
-where
-
-\(e^{-\lambda \cdot d_{I,J}}\) accounts for distance between cells \(I\) and \(J\),
-
-\(Hab^2_{J,p}\) is the static habitat value for species \(p\) in cell \(J\), and
-
-\(Tol_{c,p,wk}\) is the value from normally distributed temperature tolerance for species \(p\) in cell \(c\) in week \(wk\).
-
-Since we are modeling real species on the northeast continental shelf, we formulate the habitat and temperature components as follows.
-
-Each species is assumed to have normally distributed temperature preferences (\(~N(\mu,\sigma)\)). We assume Yellowtail's preferences are \(N(8.75,4.25)\), while Haddock and Cod have preferences \(N(9,4)\). We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. We obtain estimated temperature data for the region for 2012 from FVCOM \textbf{cite}. We chose 2012 because the data displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values. We transform the temperature data to create an oscillating pattern that increases 5 degrees Celsius over the duration of the simulation. \textbf{show image of average temperature oscilations?}
-
-Species-specific habitat preferences were derived by relating bottom trawl data to covariate predictors to create a niche model for each species.
-
---Describe difference between increasing and constant temperature scenarios (images?)
-
--- Describe each scenario that is considered
-
-We consider three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation.
-
-\emph{Simulating Bottom Trawl Survey and Population Indexing}
-
--Describe post hoc sampling process and how data is used
-
-After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. We sample in the same weeks that the Spring and Fall surveys take place and the number of the samples taken in each strata reflect true values. Most strata contain enough cells to sample a unique location in each survey over the duration of the simulation. For smaller strata we must repeat some sample locations. We then use the biomass collected from our samples in contemporary population indexing methods to estimate population trends. Knowing the true population values in our simulations allows us to compare the error calculated from each estimation method.
-
---Stratified mean vs VAST with and without covariates
-
-We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurrence (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model.
 
 \hypertarget{discussion}{%
 \subsection{Discussion}\label{discussion}}
