@@ -44,46 +44,6 @@
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
 \usepackage[margin=1in]{geometry}
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
@@ -138,7 +98,7 @@
 \doublespacing
 \usepackage{lineno}
 \linenumbers
-\usepackage[belowskip=0pt,aboveskip=0pt]{caption}
+\usepackage[belowskip=0pt,aboveskip=0pt]{caption} \usepackage{array} \usepackage{caption} \usepackage{graphicx} \usepackage{siunitx} \usepackage{colortbl} \usepackage{multirow} \usepackage{hhline} \usepackage{calc} \usepackage{tabularx} \usepackage{tabulary} \usepackage{threeparttable} \usepackage{wrapfig}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -186,12 +146,6 @@ An Abstract
 keyword 1, keyword 2
 
 \newpage
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(YT\_results, }\AttributeTok{caption =} \StringTok{"Yellowtail error results"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{table}
 
@@ -270,12 +224,6 @@ increasing & w/ cov & reduced & yes & fall & 0.66 & 0.13 & 0.69 & 0.5 & 0.53 & 0
 \end{tabular}
 \end{table}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(Cod\_results, }\AttributeTok{caption =} \StringTok{"Cod error results"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{table}
 
 \caption{\label{tab:unnamed-chunk-1}Cod error results}
@@ -318,12 +266,6 @@ increasing & reduced & yes & fall & 0.62 & 0.32 & 0.53 & NA & \\
 \hline
 \end{tabular}
 \end{table}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(Had\_results, }\AttributeTok{caption =} \StringTok{"Haddock error results"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{table}
 
@@ -390,7 +332,7 @@ The Northeast United States continental shelf spans from the Outer Banks of Nort
   Bottom trawl survey is important for monitoring population trends
 \end{itemize}
 
-Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration's (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal biologists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 (cite survey paper). The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf \textbf{(include image from johnson\_sosebee?)}. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits \textbf{just listed a few uses of survey change/others?}.
+Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration's (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal biologists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 (cite survey paper). The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits \textbf{just listed a few uses of survey change/others?}.
 
 The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling during approximately the same 2-3 week time period in each season.
 
@@ -433,39 +375,58 @@ We use the R package \emph{MixFishSim} (MFS) to model our populations {[}@dolder
 
 \emph{Study Area}
 
-We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain Cod inhabit 13 strata, and yellowtail exist in 9 strata. \textbf{include figure?}
+We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain Cod inhabit 13 strata, and yellowtail exist in 9 strata. Figure \ref{fig:strata-plot} shows the regions used in our models.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{Images/Strata} 
+
+}
+
+\caption{Strata inhabited by each species in our population models.}\label{fig:strata-plot}
+\end{figure}
 
 \emph{Population Dynamics and Recruitment}
 
-The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass of in each cell in our study area {[}@dolder2020highly{]}. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period.
-
---Many parameter inputs were obtained from literature
-
-Each species is assumed to have normally distributed temperature preferences (\(~N(\mu,\sigma)\)). We assume Yellowtail's preferences are \(N(8.75,4.25)\), while Haddock and Cod have preferences \(N(9,4)\). We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. A full list of parameters used in our model can be seen below in Table ???.
-
-\textbf{go through each process in model and discuss edits/removals?}
+The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass of in each cell in our study area {[}@dolder2020highly{]}. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \ref{paramsALL} and \ref{tab:paramsSCENARIOS}. \textbf{missing spawning weeks, recruitment weeks, lambda}
 
 \emph{Temperature and Habitat Input}
 
-The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to simulate an entire fishery. Since we are modeling real species on the northeast continental shelf w
+The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to drive the probability of movement from cell \(I\) to cell \(J\) using the formulation
 
-We obtain estimated temperature data for the region for 2012 from FVCOM \textbf{cite}.
+\begin{align*}
+Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdot Tol_{J,p,wk})}{\sum^C_{c=1}e^{-\lambda \cdot d} \cdot (Hab^2_{c,p} \cdot Tol_{c,p,wk})},
+\end{align*}
+
+where
+
+\(e^{-\lambda \cdot d_{I,J}}\) accounts for distance between cells \(I\) and \(J\),
+
+\(Hab^2_{J,p}\) is the static habitat value for species \(p\) in cell \(J\), and
+
+\(Tol_{c,p,wk}\) is the value from normally distributed temperature tolerance for species \(p\) in cell \(c\) in week \(wk\).
+
+Since we are modeling real species on the northeast continental shelf, we formulate the habitat and temperature components as follows.
+
+Each species is assumed to have normally distributed temperature preferences (\(~N(\mu,\sigma)\)). We assume Yellowtail's preferences are \(N(8.75,4.25)\), while Haddock and Cod have preferences \(N(9,4)\). We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. We obtain estimated temperature data for the region for 2012 from FVCOM \textbf{cite}. We chose 2012 because the data displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values. We transform the temperature data to create an oscillating pattern that increases 5 degrees Celsius over the duration of the simulation. \textbf{show image of average temperature oscilations?}
+
+Species-specific habitat preferences were derived by relating bottom trawl data to covariate predictors to create a niche model for each species.
 
 --Describe difference between increasing and constant temperature scenarios (images?)
 
 -- Describe each scenario that is considered
 
-We consider three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees calcius over the duration of the 20 year simulation.
+We consider three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation.
 
 \emph{Simulating Bottom Trawl Survey and Population Indexing}
 
 -Describe post hoc sampling process and how data is used
 
-After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. The number of the samples taken in each strata reflect true values and we sample from the same weeks that the Spring and Fall surveys take place. Most strata contain enough cells to sample a unique location in each survey. For smaller strata we are forced to repeat locations. We then use the samples in contemporary population indexing methods to track population trends. Since we know the true population values in our simulations we can compare methods by comparing the error calculated from each estimate.
+After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. We sample in the same weeks that the Spring and Fall surveys take place and the number of the samples taken in each strata reflect true values. Most strata contain enough cells to sample a unique location in each survey over the duration of the simulation. For smaller strata we must repeat some sample locations. We then use the biomass collected from our samples in contemporary population indexing methods to estimate population trends. Knowing the true population values in our simulations allows us to compare the error calculated from each estimation method.
 
 --Stratified mean vs VAST with and without covariates
 
-We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurance (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model.
+We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurrence (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model.
 
 \hypertarget{discussion}{%
 \subsection{Discussion}\label{discussion}}
@@ -535,41 +496,56 @@ Table 1. Parameters used in all population models.
 \(M\) & Natural Mortality & wk\(^{-1}\) & 0.2064 & 0.2728 & 0.3340 & \\
 \(W_R\) & Weight of fully recruited fish & kg & 0.39 & 2.95 & 1.12 & \\
 \(W_{R-1}\) & Weight of pre-recruit fish & kg & 0.13 & 0.39 & 0.19 & \\
+\(\sigma^2\) & Variance in recruited fish & kg\(^2\) & 0.55 & 0.55 & 0.55 & \\
 \bottomrule
 \end{longtable}
 
-Table 2. Parameters used in models with relatively constant populations.
+\begin{verbatim}
+## Warning: `funs()` was deprecated in dplyr 0.8.0.
+## Please use a list of either functions or lambdas: 
+## 
+##   # Simple named list: 
+##   list(mean = mean, median = median)
+## 
+##   # Auto named with `tibble::lst()`: 
+##   tibble::lst(mean, median)
+## 
+##   # Using lambdas
+##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
+\end{verbatim}
 
-\begin{longtable}[]{@{}llllll@{}}
+\begin{table}
+
+\caption{\label{tab:paramsSCENARIOS}Parameters used in population models for each scenario.}
+\centering
+\fontsize{10}{12}\selectfont
+\begin{tabular}[t]{llllll}
 \toprule
-& Description & Yellowtail & Cod & Haddock & \\
+Parameter & Description & Unit & Yellowtail & Cod & Haddock\\
 \midrule
-\endhead
-\(M+F\) & Adjusted Mortality (Natural + Fishing) & wk\(^{-1}\) & 0.764 & 0.83 & 0.309 \\
+\addlinespace[0.3em]
+\multicolumn{1}{l}{\textbf{Constant Population}}\\
+\hspace{1em}M+F & Adjusted Mortality (Natural + Fishing) & 1/wk & 0.764 & 0.83 & 0.309\\
+\hspace{1em}P0 & Initial Biomass & kg & 3190 & 21500 & \vphantom{1} 180000\\
+\hspace{1em}a & Max recruitment rate & kg & 30400 & 27900 & 73600\\
+\hspace{1em}ß & Recruitment half saturation value & kg & 4300 & 10500 & 40500\\
+\addlinespace[0.3em]
+\multicolumn{1}{l}{\textbf{Decreasing Population}}\\
+\hspace{1em}M+F & Adjusted Mortality (Natural + Fishing) & 1/wk & 0.764 & 0.623 & 0.334\\
+\hspace{1em}P0 & Initial Biomass & kg & 50000 & 21500 & 180000\\
+\hspace{1em}a & Max recruitment rate & kg & 1.07e+12 & 3.89e+08 & 4.97e+08\\
+\hspace{1em}ß & Recruitment half saturation value & kg & 2.3e+12 & 9.8e+08 & 2.08e+09\\
+\addlinespace[0.3em]
+\multicolumn{1}{l}{\textbf{Increasing Population}}\\
+\hspace{1em}M+F & Adjusted Mortality (Natural + Fishing) & 1/wk & 0.564 & 0.372 & 0.134\\
+\hspace{1em}P0 & Initial Biomass & kg & 3190 & 21500 & 180000\\
+\hspace{1em}a & Max recruitment rate & kg & 40000 & 45000 & 1e+05\\
+\hspace{1em}ß & Recruitment half saturation value & kg & 43000 & 62800 & 405000\\
 \bottomrule
-\end{longtable}
-
-Table 3. Parameters used in models with increasing populations.
-
-\begin{longtable}[]{@{}llllll@{}}
-\toprule
-& Description & Yellowtail & Cod & Haddock & Source \\
-\midrule
-\endhead
-\(M+F\) & Adjusted Mortality (Natural + Fishing) & wk\(^{-1}\) & 0.564 & 0.372 & 0.134 \\
-\bottomrule
-\end{longtable}
-
-Table 4. Parameters used in models with decreasing populations.
-
-\begin{longtable}[]{@{}llllll@{}}
-\toprule
-& Description & Yellowtail & Cod & Haddock & Source \\
-\midrule
-\endhead
-\(M+F\) & Adjusted Mortality (Natural + Fishing) & wk\(^{-1}\) & 0.764 & 0.623 & 0.334 \\
-\bottomrule
-\end{longtable}
+\end{tabular}
+\end{table}
 
 Table 1. Maturity-, weight-, and selectivity-at-age of the simulated fish population.
 

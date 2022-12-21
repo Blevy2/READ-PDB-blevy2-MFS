@@ -8,6 +8,7 @@ output:
     fig_caption: yes
     keep_tex: yes
   bibliography: IBMWG.bib
+  
   word_document: default
   html_document: default
   pdf_document:
@@ -19,13 +20,27 @@ header-includes:
 - \usepackage{lineno}
 - \linenumbers
 - \usepackage[belowskip=0pt,aboveskip=0pt]{caption}
+ \usepackage{array}
+ \usepackage{caption}
+ \usepackage{graphicx}
+ \usepackage{siunitx}
+ \usepackage{colortbl}
+ \usepackage{multirow}
+ \usepackage{hhline}
+ \usepackage{calc}
+ \usepackage{tabularx}
+ \usepackage{tabulary}
+ \usepackage{threeparttable}
+ \usepackage{wrapfig}
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 if(!require(kableExtra)) {  
   install.packages("kableExtra")
   require(kableExtra)}
+
+
 
 #read in results tables
 YT_results<-read.csv("Yellowtail_results.csv")
@@ -70,6 +85,8 @@ keyword 1, keyword 2
 \newpage
 
 ```{r}
+
+
 knitr::kable(YT_results, caption = "Yellowtail error results")
 
 knitr::kable(Cod_results, caption = "Cod error results")
@@ -95,7 +112,7 @@ The Northeast United States continental shelf spans from the Outer Banks of Nort
 
 - Bottom trawl survey is important for monitoring population trends
 
-Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration’s (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal biologists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 (cite survey paper). The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf **(include image from johnson_sosebee?)**. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits **just listed a few uses of survey change/others?**.  
+Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration’s (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal biologists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 (cite survey paper). The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits **just listed a few uses of survey change/others?**.  
 
 The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and  projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling during approximately the same 2-3 week time period in each season.  
 
@@ -132,31 +149,49 @@ We use the R package *MixFishSim* (MFS) to model our populations [@dolder2020hig
 
 <font size="5">*Study Area*</font>
 
-We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain Cod inhabit 13 strata, and yellowtail exist in 9 strata. **include figure?**
+We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain Cod inhabit 13 strata, and yellowtail exist in 9 strata. Figure \@ref(fig:strata-plot) shows the regions used in our models.
+
+```{r strata-plot, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Strata inhabited by each species in our population models."}
+knitr::include_graphics(c("Images/Strata.png"))
+```
 
 <font size="5">*Population Dynamics and Recruitment*</font>
 
-The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass of in each cell in our study area [@dolder2020highly]. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. 
+The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass of in each cell in our study area [@dolder2020highly]. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \@ref(paramsALL) and \@ref(tab:paramsSCENARIOS). **missing spawning weeks, recruitment weeks, lambda**
 
---Many parameter inputs were obtained from literature
-
-Each species is assumed to have normally distributed temperature preferences ($~N(\mu,\sigma)$). We assume Yellowtail's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. A full list of parameters used in our model can be seen below in Table ???.
-
-
-**go through each process in model and discuss edits/removals?**
 
 
 <font size="5">*Temperature and Habitat Input*</font>
 
-The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to simulate an entire fishery. Since we are modeling real species on the northeast continental shelf w
+The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to drive the probability of movement from cell $I$ to cell $J$ using the formulation
 
-We obtain estimated temperature data for the region for 2012 from FVCOM **cite**. 
+\begin{align*}
+Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdot Tol_{J,p,wk})}{\sum^C_{c=1}e^{-\lambda \cdot d} \cdot (Hab^2_{c,p} \cdot Tol_{c,p,wk})},
+\end{align*}
+
+
+ where 
+ 
+
+   $e^{-\lambda \cdot d_{I,J}}$ accounts for distance between cells $I$ and $J$,
+     
+  $Hab^2_{J,p}$ is the static habitat value for species $p$ in cell $J$, and
+    
+   $Tol_{c,p,wk}$ is the value from normally distributed temperature tolerance for species $p$ in cell $c$ in week $wk$.
+
+
+Since we are modeling real species on the northeast continental shelf, we formulate the habitat and temperature components as follows.
+
+Each species is assumed to have normally distributed temperature preferences ($~N(\mu,\sigma)$). We assume Yellowtail's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. We obtain estimated temperature data for the region for 2012 from FVCOM **cite**. We chose 2012 because the data displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values. We transform the temperature data to create an oscillating  pattern that increases 5 degrees Celsius over the duration of the simulation. **show image of average temperature oscilations?**
+
+Species-specific habitat preferences were derived by relating bottom trawl data to covariate predictors to create a niche model for each species. 
+
 
 --Describe difference between increasing and constant temperature scenarios (images?)
 
 -- Describe each scenario that is considered
 
-We consider three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees calcius over the duration of the 20 year simulation. 
+We consider three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation. 
 
 
 <font size="5">*Simulating Bottom Trawl Survey and Population Indexing*</font>
@@ -164,12 +199,12 @@ We consider three population parameter scenarios for each of our three species- 
 
 -Describe post hoc sampling process and how data is used
 
-After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. The number of the samples taken in each strata reflect true values and we sample from the same weeks that the Spring and Fall surveys take place. Most strata contain enough cells to sample a unique location in each survey. For smaller strata we are forced to repeat locations. We then use the samples in contemporary population indexing methods to track population trends. Since we know the true population values in our simulations we can compare methods by comparing the error calculated from each estimate.
+After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. We sample in the same weeks that the Spring and Fall surveys take place and the number of the samples taken in each strata reflect true values. Most strata contain enough cells to sample a unique location in each survey over the duration of the simulation. For smaller strata we must repeat some sample locations. We then use the biomass collected from our samples in contemporary population indexing methods to estimate population trends. Knowing the true population values in our simulations allows us to compare the error calculated from each estimation method.
 
 
 --Stratified mean vs VAST with and without covariates
 
-We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the  strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurance (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model. 
+We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the  strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurrence (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model. 
 
 
 
@@ -201,7 +236,7 @@ An interesting finding of this study is the linear versus diffuse patterns betwe
 
 One of the reasons for the difference in performance between the catch and natural mortality retrospective sources was how the reference points were calculated. In all cases, the initial conditions, including the natural mortality rate, were used to compute the reference points. This decision was made based on the fact that the increase in natural mortality was assumed to be unknown in the simulations. If the increase in natural mortality was known, the age-structured assessments would have accounted for it, different reference points might have been computed [@legault2016increaseM] and there may not have been a retrospective pattern at all [@legault2020rose], and no need to consider alternative DLMs. The reference points for the increased $M$ scenarios would have been different if they were computed using the values from the final year of the base period, but the overall conclusions regarding the different DLMs would not change as this just results in a rescaling of the axis. These results are not shown to reduce confusion regarding the simulations.
 
-Closed-loop simulation is a common tool for examining performance of catch advice from various stock assessment approaches in a feedback setting. It is often used as part of a full management strategy evaluation when working with stakeholders to develop management regulations that make trade offs between near term and long term catches, risk to the fish population, and mixed-fleet allocations [@carruthers2016simpleMPs; @goethel2019mse; @harlyan2019hcr]. We did not conduct a full management strategy evaluation with stakeholder input [@goethel2019stakeholder], but see that as a fruitful next step that could build on the conclusions from our closed-loop work. Using a generic groundfish life-history and monitoring standard performance metrics related to stock status and catch stability, we were able to cull the herd of potential DLMs and we would not carry the consistent poor performers forward for further study.  The wide range of expertise reflected in the authorship was by design so that the simulation specifications and performance metrics were broadly useful. Before undertaking a full management strategy evaluation and engaging regional stakeholders, we would want to select a specific stock and jointly identify specific management regulations to be tested [@deroba2019dream]. Results of this work have been presented to both local fishery management councils, with generally positive feedback about the utility of the conclusions for identifying appropriate model approaches when an SCAA is rejected. Our work was similar to all other closed-loop simulations in that it was designed to address a specific situation, including much recent work comparing the performance of data-limited and data rich assessment approaches [e.g., @fulton2016datarich; @sagarese2019dlm; @bouch2020datapoor; @li2022dlm]. 
+Closed-loop simulation is a common tool for examining performance of catch advice from various stock assessment approaches in a feedback setting. It is often used as part of a full management strategy evaluation when working with stakeholders to develop management regulations that make trade offs between near term and long term catches, risk to the fish population, and mixed-fleet allocations [@carruthers2016simpleMPs; @goethel2019mse; @harlyan2019hcr]. We did not conduct a full management strategy evaluation with stakeholder input [@goethel2019stakeholder], but see that as a fruitful next step that could build on the conclusions from our closed-loop work. Using a generic groundfish life-history and monitoring standard performance metrics related to stock status and catch stability, we were able to cull the herd of potential DLMs and we would not carry the consistent poor performers forward for further study.  The wide range of expertise reflected in the authorship was by design so that the simulation specifications and performance metrics were broadly useful. Before undertaking a full management strategy evaluation and engaging regional stakeholders, we would want to select a specific stock and jointly identify specific management regulations to be tested [@deroba2019dream]. Results of this work have been presented to both local fishery management councils, with generally positive feedback about the utility of the conclusions for identifying appropriate model approaches when an SCAA is rejected. Our work was similar to all other closed-loop simulations in that it was designed to address a specific situation, including much recent work comparing the performance of data-limited and data rich assessment approaches [e.g., @fulton2016datarich; @sagarese2019dlm; @bouch2020datapoor; @li2022dlm].
 
 This study is a first attempt to identify suitable methods for setting catch advice when stock assessment models are rejected due to large, positive retrospective patterns. Although no single method performed best across scenarios, a number of generally suitable and unsuitable methods were identified under specific conditions. The results of this work can help scientists and managers select a subset of possible options for consideration to set catch advice when assessment models are rejected. The approach developed here can, and should be expanded to consider other cases not explored here, as performance of individual methods are very likely case-dependent. 
 
@@ -214,6 +249,8 @@ All data and code used in this work are available at https://github.com/cmlegaul
 ## References
 
 <div id="refs"></div>
+
+
 
 \pagebreak
 
@@ -230,55 +267,153 @@ tabl <- "
 | $M$ | Natural Mortality| wk$^{-1}$  | 0.2064 | 0.2728 | 0.3340 | |
 | $W_R$ |Weight of fully recruited fish| kg | 0.39 | 2.95 | 1.12 | |
 | $W_{R-1}$ | Weight of pre-recruit fish| kg | 0.13 | 0.39 | 0.19 | |
+| $\\sigma^2$ | Variance in recruited fish | kg$^2$ | 0.55 | 0.55 | 0.55 ||
 "
 cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 ```
 
 
-Table 2. Parameters used in models with relatively constant populations.
-```{r paramsCON, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-|		|	Description | Yellowtail | Cod | Haddock 
-|:---	|:------- |:--- |:-- |:-- |:--
-| $M+F$ | Adjusted Mortality (Natural + Fishing)| wk$^{-1}$  | 0.764 | 0.83 | 0.309 | 
+<!-- Table 2. Parameters used in models with relatively constant populations. -->
+<!-- ```{r paramsCON, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'} -->
+<!-- tabl <- " -->
+<!-- |		|	Description | Yellowtail | Cod | Haddock  -->
+<!-- |:---	|:------- |:--- |:-- |:-- |:-- -->
+<!-- | $M+F$ | Adjusted Mortality (Natural + Fishing)| wk$^{-1}$  | 0.764 | 0.83 | 0.309 |  -->
 
-"
-cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+<!-- " -->
+<!-- cat(tabl) # output the table in a format good for HTML/PDF/docx conversion -->
+<!-- ``` -->
+
+<!-- Table 3. Parameters used in models with increasing populations. -->
+<!-- ```{r paramsINC, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'} -->
+<!-- tabl <- " -->
+<!-- |		|	Description | Yellowtail | Cod | Haddock | Source -->
+<!-- |:---	|:------- |:--- |:-- |:-- |:-- -->
+<!-- | $M+F$ | Adjusted Mortality (Natural + Fishing)| wk$^{-1}$  | 0.564 | 0.372 |  0.134 |  -->
+
+<!-- " -->
+<!-- cat(tabl) # output the table in a format good for HTML/PDF/docx conversion -->
+<!-- ``` -->
+
+
+<!-- Table 4. Parameters used in models with decreasing populations. -->
+<!-- ```{r paramsDEC, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'} -->
+<!-- tabl <- " -->
+<!-- |		|	Description | Yellowtail | Cod | Haddock | Source -->
+<!-- |:---	|:------- |:--- |:-- |:-- |:-- -->
+<!-- | $M+F$ | Adjusted Mortality (Natural + Fishing)| wk$^{-1}$  | 0.764 | 0.623 | 0.334 |  -->
+
+<!-- " -->
+<!-- cat(tabl) # output the table in a format good for HTML/PDF/docx conversion -->
+<!-- ``` -->
+
+
+<!-- DOESNT WORK!!
+<!-- Table 2. Parameters used in population models for each scenario. -->
+<!-- ```{r paramsSCENARIOS, echo=FALSE, message=TRUE, warnings=TRUE, results='asis'} -->
+<!-- library(huxtable) -->
+
+<!-- ht <- tribble_hux( -->
+<!--   ~ "Section/topic", ~ "Item no", ~ "Checklist item", ~ "Reported on Page No", -->
+<!--   "Title"          , ""         , ""                , "", -->
+<!--   "Title"          , "1"        , "Identify..."     , "",  -->
+<!--   "Abstract"       , ""         , ""                , "", -->
+<!--   "Structured summary", "2"     , "Provide..."      , "" -->
+<!--   # et cetera... -->
+<!-- )  -->
+
+
+<!-- # using the pipe from 4.1.0... -->
+
+<!-- ht |>  -->
+<!--   set_header_rows(c(2, 4), TRUE)                |> -->
+<!--   merge_across(c(2, 4), everywhere)             |> -->
+<!--   style_header_rows(bold = TRUE)                |> -->
+<!--   set_all_borders(brdr(0.4, "solid", "grey70")) |> -->
+<!--   set_background_color("grey97")                |> -->
+<!--   set_background_color(1, 1:3, "grey90")        |> -->
+<!--   set_col_width(c(0.2, 0.05, 0.55, 0.2))        |> -->
+<!--   set_font("cmss")                               -->
+<!-- ``` -->
+
+
+<!-- ```{r,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'} -->
+<!-- library("knitr") -->
+<!-- library("kableExtra") -->
+<!-- library("dplyr") -->
+<!-- library("readr") -->
+<!-- library("tidyr") -->
+<!-- library("forcats") -->
+
+<!-- #orig_ui_deaths = read_csv("https://www.opendata.nhs.scot/dataset/b0135993-3d8a-4f3b-afcf-e01f4d52137c/resource/89807e07-fc5f-4b5e-a077-e4cf59491139/download/ui_deaths_2020.csv") -->
+
+<!-- summary_tab <- orig_ui_deaths %>% -->
+<!--   # Apply filters in same was as in plots so looking at one year, whole of Scotland, and exlucing "All" entries -->
+<!--   filter(Year == "2018", HBR == "S92000003", AgeGroup != "All" & Sex != "All", InjuryType != "Accidental exposure" & InjuryType != "All") %>% -->
+<!-- # Group the table according to injury type, age, and sex -->
+<!--   group_by(InjuryType, AgeGroup, Sex) %>% -->
+<!-- # Create a summary of total number of deaths for neater appearance to the table and demonstration of the figures -->
+<!--   summarise(total_deaths = sum(NumberofDeaths)) %>% -->
+<!-- # Change the orientation of the table so that age groups become the variable headings -->
+<!--   pivot_wider(names_from = AgeGroup, values_from = total_deaths) %>% -->
+<!--   mutate(Sex = factor(Sex)) %>% -->
+<!--   arrange(Sex) %>% -->
+<!--   select(Sex, everything()) -->
+
+<!-- # Create table to present the data] -->
+<!-- Fig_2 <- kable(summary_tab[, -1],  -->
+<!--   caption = "Deaths from unintentional injuries in Scotland", -->
+<!--     format = "latex", booktabs = TRUE) %>% -->
+<!--   kable_styling(font_size = 10) %>% -->
+<!--   pack_rows(tab_kable, colnum = 1, -->
+<!--     index = table(fct_inorder(summary_tab$Sex), useNA = "no")) -->
+<!-- ``` -->
+<!-- ```{r, results='asis'} -->
+<!-- Fig_2 -->
+<!-- ``` -->
+
+
+
+```{r paramsSCENARIOS,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("forcats")
+
+
+
+param_table = read_csv("Parameters.csv")
+
+summary_tab <- param_table %>% 
+  dplyr::mutate_if(is.numeric, funs(as.character(signif(., 3))))%>%
+  
+ mutate_if(grepl('alpha',.), ~replace(., grepl('alpha', .), paste("\U03B1"))) %>% #should be replacing alpha with the symbol
+  mutate_if(grepl('beta',.), ~replace(., grepl('beta', .), paste("\U03B2"))) %>% #should be replacing beta with the symbol
+    mutate_if(grepl('wk',.), ~replace(., grepl('wk', .), "1/wk")) %>% #should be replacing beta with the symbol
+  
+# Group the table according to Parameter, Scenario
+  group_by(Parameter, Scenario)%>%
+# Change the orientation of the table so that Species become the variable headings
+  pivot_wider(names_from = Species,  values_from = Value) %>%
+  mutate(Scenario = factor(Scenario)) %>%
+  arrange(Scenario) %>%
+  select(Scenario, everything())
+
+
+
+# Create table to present the data]
+Fig_3 <- kable(summary_tab[, -1], 
+  caption = "Parameters used in population models for each scenario.",
+    format = "latex", booktabs = TRUE) %>%
+  kable_styling(font_size = 10) %>%
+  pack_rows(tab_kable, colnum = 1,
+    index = table(fct_inorder(summary_tab$Scenario), useNA = "no"))
 ```
-
-Table 3. Parameters used in models with increasing populations.
-```{r paramsINC, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-|		|	Description | Yellowtail | Cod | Haddock | Source
-|:---	|:------- |:--- |:-- |:-- |:--
-| $M+F$ | Adjusted Mortality (Natural + Fishing)| wk$^{-1}$  | 0.564 | 0.372 |  0.134 | 
-
-"
-cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+```{r, results='asis'}
+Fig_3
 ```
-
-
-Table 4. Parameters used in models with decreasing populations.
-```{r paramsDEC, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-|		|	Description | Yellowtail | Cod | Haddock | Source
-|:---	|:------- |:--- |:-- |:-- |:--
-| $M+F$ | Adjusted Mortality (Natural + Fishing)| wk$^{-1}$  | 0.764 | 0.623 | 0.334 | 
-
-"
-cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
-```
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -152,7 +152,7 @@ GB_strata_idx <- match(GB_Had_strata_num,strata.areas@data[["STRATUMA"]])
 #plot(strata.areas[GB_strata_idx,])
 #define GB strata as own object
 GB_had_strata <- strata.areas[GB_strata_idx,]
-plot(GB_had_strata)
+plot(GB_had_strata,main='Haddock Strata')
 
 #CREATE COD STRATA
 #define georges bank
@@ -163,7 +163,7 @@ GB_strata_idx <- match(GB_Cod_strata_num,strata.areas@data[["STRATUMA"]])
 #plot(strata.areas[GB_strata_idx,])
 #define GB strata as own object
 GB_cod_strata <- strata.areas[GB_strata_idx,]
-plot(GB_cod_strata)
+plot(GB_cod_strata,main='Atlantic Cod Strata')
 
 #CREATE YELLOWTAIL STRATA
 #define georges bank
@@ -174,8 +174,7 @@ GB_strata_idx <- match(GB_Yel_strata_num,strata.areas@data[["STRATUMA"]])
 #plot(strata.areas[GB_strata_idx,])
 #define GB strata as own object
 GB_yell_strata <- strata.areas[GB_strata_idx,]
-plot(GB_yell_strata)
-
+plot(GB_yell_strata,main='Yellowtail Flounder Strata')
 
 
 #ADD "STRATA" list to hab which is used to determine how many total strata there are in Bens_init_survey
