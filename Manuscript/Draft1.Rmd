@@ -13,7 +13,6 @@ output:
   html_document: default
   pdf_document:
     toc: no
-fontsize: 12pt
 header-includes:
 - \usepackage{setspace}
 - \doublespacing
@@ -125,19 +124,19 @@ To test the ability of the bottom trawl survey to track population trends under 
 
 - Describe simulation study
 
-We construct spatial models for Yellowtail Flounder, Atlantic Cod, and Haddock on George's Bank, where movement of each species combine static species-specific habitat preferences with dynamic temperature preferences. Model dynamics are driven by dynamic temperature gradients estimated from data to create simulated data sets for each population where the true biomass is known. Using temperature gradients that repeat each year creates data sets with predictable, repeating spatial patterns, whereas using a temperature gradient that increases on average throughout the simulation leads to spatial distributions that shift over time. We conducting stratified random sampling on our simulation output to mimic the bottom trawl survey and compare the ability of contemporary indexing methods to track population trends. 
+We construct spatial models for Yellowtail Flounder, Atlantic Cod, and Haddock on George's Bank, where movement of each species combine static species-specific habitat preferences with temperature preferences. Model dynamics are driven by a time series of temperature gradients that were estimated from data to create simulated data sets for each population where the true biomass is known. Using temperature gradients that repeat each year creates data sets with predictable, repeating spatial patterns, whereas using a temperature gradient that increases on average throughout the simulation leads to spatial distributions that shift over time. We conducting stratified random sampling on our simulation output to mimic the bottom trawl survey and compare the ability of contemporary indexing methods to track population trends. 
 
 \subsection{Population Model Formulation}
 
 
 -- Used MixFishSim. Describe edits made to package
 
-We use the R package *MixFishSim* (MFS) to model our populations [@dolder2020highly]. MFS is a discrete spatiotemporal simulation tool where users can model multiple species under varying environmental conditions. The package uses a delay-difference population model with discrete processes for growth, death, and recruitment of the population. We formulate the following inputs for the MFS package to address our research question:
+We use the R package *MixFishSim* (MFS) to model our populations [@dolder2020highly]. MFS is a discrete spatiotemporal simulation tool where users can model multiple species under varying environmental conditions. The package uses a delay-difference population model with discrete processes for growth, death, and recruitment of the population. We formulate the following inputs for the MFS package to address our research question.
 
 
 <font size="5">*Study Area*</font>
 
-We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain Cod inhabit 13 strata, and yellowtail exist in 9 strata. Figure \@ref(fig:strata-plot) shows the regions used in our models.
+We obtained a shapefile for the 15 strata that comprise George's Bank to use as our modeling environment. We discritized the region into a raster with 88 rows and 144 columns. Haddock inhabit all 15 strata in the domain, Cod inhabit 13 strata, and Yellowtail exist in 9 strata. Figure \@ref(fig:strata-plot) shows the regions used in our models.
 
 ```{r strata-plot, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Strata inhabited by each species in our population models."}
 knitr::include_graphics(c("Images/Strata.png"))
@@ -145,7 +144,7 @@ knitr::include_graphics(c("Images/Strata.png"))
 
 <font size="5">*Population Dynamics and Recruitment*</font>
 
-The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass of in each cell in our study area [@dolder2020highly]. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \@ref(paramsALL) and \@ref(tab:paramsSCENARIOS). **missing spawning weeks, recruitment weeks, lambda**
+The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass in each cell in our study area [@dolder2020highly]. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation **cite**. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \@ref(paramsALL) and \@ref(tab:paramsSCENARIOS). 
 
 
 
@@ -154,7 +153,7 @@ The time step for our models is one week. MFS uses a modified two-stage Deriso-S
 The package was designed to generate theoretical habitat preferences using Gaussian Random Fields that combine with hypothetical temperature gradients to drive the probability of movement from cell $I$ to cell $J$ using the formulation
 
 \begin{align}
-Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdot Tol_{J,p,wk})}{\sum^C_{c=1}e^{-\lambda \cdot d} \cdot (Hab^2_{c,p} \cdot Tol_{c,p,wk})},
+Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,s} \cdot Tol_{J,s,wk})}{\sum^C_{c=1}e^{-\lambda \cdot d} \cdot (Hab^2_{c,s} \cdot Tol_{c,s,wk})},
 \label{moveP}
 \end{align}
 
@@ -164,16 +163,16 @@ Pr(C_{wk+1}=J|C_{wk}=I) = \frac{e^{-\lambda \cdot d_{I,J}}\cdot(Hab^2_{J,p} \cdo
 
    $e^{-\lambda \cdot d_{I,J}}$ accounts for distance between cells $I$ and $J$,
      
-  $Hab^2_{J,p}$ is the static habitat value for species $p$ in cell $J$, and
+  $Hab^2_{J,s}$ is the static habitat value for species $s$ in cell $J$, and
     
-   $Tol_{c,p,wk}$ is the value from normally distributed temperature tolerance for species $p$ in cell $c$ in week $wk$.
+   $Tol_{c,s,wk}$ is the value from normally distributed temperature tolerance for species $s$ in cell $c$ in week $wk$.
 
 
 Since we are modeling real species on the northeast continental shelf, we formulate the habitat and temperature components as follows.
 
 <font size="5">*Habitat Input*</font>
 
-Species-specific habitat preferences were derived using the *lrren* tool from the R package *envi* **cite** to create a niche model for each species. The *lrren* tool estimates an ecological niche using the relative risk function by relating presence/absence data to two covariate predictors. We used bottom trawl point data from 2009-2021 as our presence/absence input by using a value of 0 for any tow that failed to catch the given species and weighting a successful catch by the biomass of the given tow **cite trawl data?**. Depth and mean sediment size were used as our covariate predictors **cite**. Since the values in $Hab^2_{J,p}$ are required to be between 0 and 1, we transform the spatial estimates from *lrren* to fall between these bounds. See Figure ??? for a visual representation of this process being applied to Cod. Figure \@ref(fig:hab-plot) depicts habitat preferences $Hab^2_{J,p}$ for each species.
+Species-specific habitat preferences were derived using the *lrren* tool from the R package *envi* **cite** to create a niche model for each species. The *lrren* tool estimates an ecological niche using the relative risk function by relating presence/absence data to two covariate predictors. We used bottom trawl point data from 2009-2021 as our presence/absence input by using a value of 0 for any tow that failed to catch the given species and weighting a successful catch by the biomass of the given tow **cite trawl data?**. Depth and mean sediment size were used as our covariate predictors **cite**. Since the values in $Hab^2_{J,s}$ are required to be between 0 and 1, we transform the spatial estimates from *lrren* to fall between these bounds. See Figure ??? for a visual representation of this process being applied to Cod. Figure \@ref(fig:hab-plot) depicts habitat preferences $Hab^2_{J,s}$ for each species.
 
 ```{r hab-plot, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Static habitat preferences for each species in our population models (Yellotwtail, Cod, Haddock)."}
 knitr::include_graphics(c("Images/Habitat_3species.png"))
@@ -186,13 +185,13 @@ Each species is assumed to have normally distributed temperature preferences ($N
 
 --Describe difference between increasing and constant temperature scenarios (images?)
 
-In equation (1), $Hab^2_{J,p}$ is constant for the duration of the simulation, while $Tol_{c,p,wk}$ changes each week. Using a temperature gradient that repeats each year produces the same spatial preferences in a given week each year, which results in consistent spatial biomass patterns. Scenarios where the temperature increases over time creates spatial preferences that evolve as the water warms, which creates spatial biomass patterns that shift in a given week over the duration of the simulation.
+In equation (1), $Hab^2_{J,s}$ is constant for the duration of the simulation, while $Tol_{c,s,wk}$ changes each week. Using a temperature gradient that repeats each year produces the same spatial preferences in a given week each year, which results in consistent spatial biomass patterns. Scenarios where the temperature increases over time creates spatial preferences that evolve as the water warms, which creates spatial biomass patterns that shift in a given week over the duration of the simulation.
  
 
 
 -- Describe each scenario that is considered
 
-We consider three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation. 
+We consider 20 year simulations under three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation. We therefore simulate a total of 6 scenarios. **show line plot of population for each?**
 
 
 <font size="5">*Simulating Bottom Trawl Survey and Population Indexing*</font>
@@ -205,11 +204,45 @@ After each simulation is complete, we mimic the bottom trawl survey by conductin
 
 --Stratified mean vs VAST with and without covariates
 
-We compare the stratified mean estimate of abundance to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the  strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurrence (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model. 
+We compare the yearly estimated of abundance obtained from the stratified mean to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a typical survey-based approach that scales individual samples to the  strata-level by considering the area of each strata, before scaling to the region-level based on the relative size of each strata. VAST is a spatio-temporal statistical framework that models both abundance (biomass) and probability of occurrence (presence/absence). If desired, VAST also allows users to include covariate data to better inform the model. Covariates can be static (eg. habitat preferences) or dynamics (eg. temperature). The stratified mean calculations are straightforward and quick, while VAST models require numerous user inputs and take on the order of hours to complete.
 
+
+We follow the advice given in **cite Thorson 2019 Guidance...** to build VAST models to estimate biomass on George's Bank using stratified mean samples from our model output. In addition to exploring different link functions and assumed distributions, our VAST model-building process included testing the impact of including spatial and/or spatio-temporal variation in our models, considering varying number of knots in our mesh, and testing different forms of temporal correlation. We also carried out the same process both including covariates in our model as well as running models without covariate information. We considered covaraites in the form of dyamic temperature values and/or static habitat values from our population model. When using covariates we ultimately decided to provide the most information to the model by including both covariates for both linear predictors. Since we know the true population values in our models we calculate the absolute error of each VAST estimate to compare between potential settings. Through this process, and in consultation with the VAST package creator, we determined setting that allowed VAST models to converge for all of our scenarios while also providing the lowest absolute error values. Settings for our VAST models can be seen in Table ???.
+
+Our goal is to determine indexing approaches and settings that are robust to future environmental conditions and resulting spatial biomass patterns. An underlying assumption in all indexing methods that individual random samples combine to accurately represent true abudance by a) sampling all strata in which the population exists and b) low enough noise level in the samples to allow for a discernable pattern. This assumption can be questioned given enough noise in the sampling process **cite?** and/or shifting spatial preferences driven by climate change causing a population to move into a previously uninhabited strata. To simulate the impact of noise, indexing estimates after adding noise to our samples versus those using the true sampling values. To evaluate the effect of populations moving into new habitat, we compare indexing estimates using samples from all strata versus those that only include a subset of the full spatial domain for each species.
+
+When combining population trends for each species, differing temperature scenarios, and sampling possibilities (noise, strata, covariates) there are a number of scenario combinations to consider. The columnbs in Table COMBOS show the possible choices that define each scenario.
+
+
+
+<div align="center">Table COMBOS Each index estimate chooses one condition from each of the following columns. There are $3*3*2*2*2*2=144$ VAST model combinations and $3*3*2*2*2=72$ stratified mean estimates.</div>
+
+```{r scenarios, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("forcats")
+
+
+tabl <- "
+|	Species	|	Population Trend | Temperature Scenario | Strata Included | Noise in Data | Covariates (VAST only) 
+|:--	|:-- |:-- |:-- |:-- |:--- 
+|Yellowtail | Increasing | Repeating | All strata | No Noise| No Covariates
+|Cod | Constant | Increasing 5$^{\\circ}$| Subset | Yes Noise| Temp + Habitat
+|Haddock | Decreasing | | | |
+"
+cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+
+
+```
 
 
 \section{Results}
+
+
+
 
 ```{r}
 
@@ -272,19 +305,74 @@ All data and code used in this work are available at https://github.com/cmlegaul
 </font>
 
 \pagebreak
-Table 1. Parameters used in all population models.
+
+<div align="center">Table 1. Parameters used in all population models.</div>
+
 ```{r paramsALL, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("forcats")
+
+
 tabl <- "
-|		|	Description | Unit |Yellowtail | Cod | Haddock | Source
+|	Parameter	|	Description | Unit |Yellowtail | Cod | Haddock | Source
 |:---	|:------- |:-- |:--- |:-- |:-- |:--
 | $\\rho$ | Ford's growth coefficient | wk$^{-1}$  | 4.48 | 4.43 | 4.49 | |
 | $M$ | Natural Mortality| wk$^{-1}$  | 0.2064 | 0.2728 | 0.3340 | |
 | $W_R$ |Weight of fully recruited fish| kg | 0.39 | 2.95 | 1.12 | |
 | $W_{R-1}$ | Weight of pre-recruit fish| kg | 0.13 | 0.39 | 0.19 | |
 | $\\sigma^2$ | Variance in recruited fish | kg$^2$ | 0.55 | 0.55 | 0.55 ||
+| $\\lambda$ | Decay rate for movement | - | 0.7 | 0.7 | 0.7 ||
+| $Spwn_s$ | Spawning weeks for species $s$ | wk | 9-12 | 8-13 | 11-14 ||
+| $Rec_s$ | Recruitment weeks for species $s$ | wk | 9-12 | 8-13 | 11-14 ||
 "
 cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+
+
 ```
+
+
+```{r paramsALL2,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("forcats")
+
+
+
+param_table1 = read_csv("Parameters1.csv")
+
+summary_tab1 <- param_table1 %>% 
+ # dplyr::mutate_if(is.numeric, list(~as.character(signif(., 3))))%>%
+  
+  mutate_if(grepl('rrr',.), ~replace(., grepl('rrr', .), paste("\U03C1")))#should be replacing r with the rho symbol
+ # mutate_if(grepl('W1',.), ~replace(., grepl('W1', .), "WW")) #should be replacing beta with the symbol
+ #    mutate_if(grepl('wk',.), ~replace(., grepl('wk', .), "1/wk")) %>% #should be replacing beta with the symbol
+ #  
+
+# Change the orientation of the table so that Species become the variable headings
+
+
+
+# Create table to present the data]
+Fig_1 <- kable(summary_tab1, 
+  caption = "Parameters used in all population models.",
+    format = "latex", booktabs = TRUE) %>%
+  kable_styling(font_size = 10)
+ 
+```
+
+
+ ```{r, results='asis'}
+ 
+ Fig_1
+ 
+ ```
 
 
 <!-- Table 2. Parameters used in models with relatively constant populations. -->
@@ -401,7 +489,7 @@ library("forcats")
 param_table = read_csv("Parameters.csv")
 
 summary_tab <- param_table %>% 
-  dplyr::mutate_if(is.numeric, funs(as.character(signif(., 3))))%>%
+  dplyr::mutate_if(is.numeric, list(~as.character(signif(., 3))))%>%
   
  mutate_if(grepl('alpha',.), ~replace(., grepl('alpha', .), paste("\U03B1"))) %>% #should be replacing alpha with the symbol
   mutate_if(grepl('beta',.), ~replace(., grepl('beta', .), paste("\U03B2"))) %>% #should be replacing beta with the symbol
@@ -433,116 +521,54 @@ Fig_3
 
 
 
+<div align="center">Table XX. Parameters used in all VAST models.</div>
+
+```{r VASTsettings, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 
 
-
-
-
-
-
-Table 1. Maturity-, weight-, and selectivity-at-age of the simulated fish population.
-<!---markdown style table. f*cking escape characters-->
-```{r lifehisttabl, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 tabl <- "
-|	Age	|	Maturity | Weight (kg) | Fishery Selectivity (before change if  applicable) | Fishery Selectivity (after change if applicable)
-|:---	|:------ |:------ |:------ |:------
-|	1	|	0.04 | 0.15 | 0.07 | 0.02
-|	2	|	0.25 | 0.5 | 0.17 | 0.05
-|	3	|	0.60 | 0.9 | 0.36 | 0.12
-| 4 | 0.77 | 1.4 | 0.61 | 0.27
-| 5 | 0.85 | 2.0 | 0.81 | 0.50
-| 6 | 0.92 | 2.6 | 0.92 | 0.74
-| 7 | 1.00 | 3.2 | 0.97 | 0.89
-| 8 | 1.00 | 4.1 | 0.99 | 0.96
-| 9 | 1.00 | 5.9 | 1.00 | 0.99
-| 10+ | 1.00 | 9.0 | 1.00 | 1.00
+|	Parameter	|	Description | Input/Value
+|:-	|:------- |:----
+| *ObsModel* | Link function and assumed distribution | c(10,2)
+|FieldCOnfig | Specified spatial and/or spatio-temporal variation in predictors| c(Omega1=0, Epsilon1=0, Omega2=1, Epsilon2=1)
+| RhoConfig | Specifying whether intercepts or spatio-temporal variation is structured among time intervals | c(Beta1=3, Beta2=3, Epsilon1=0, Epsilon2=4)
+| X1_formula | Right-sided formula affecting the 1st linear predictor  | X1_formula = ~ poly(Temp, degree=2 )
+| X2_formula | Right-sided formula affecting the 2nd linear predictor | X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
+
+
 "
 cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
-```
-
-\pagebreak
-Table 2. Naming convention and details of the data-limited methods evaluated.
-```{r methodtable, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-|	Method	|	Details
-|:---	|:------ 
-|	Ismooth	|	$C_{targ,y+1:y+2} =\\overline{C}_{3,y}(e^{\\lambda})$ <br> where $\\overline{C}_{3,y}$ is the most recent three year average; <br> $\\overline{C}_{3,y} = \\frac{1}{3}\\sum_{t=1}^{t=3}C_{y-t}$ <br> and $\\lambda$ is the slope of a log linear regression of a LOESS-smoothed average index of abundance (spring and fall) with span = 0.3: <br> $\\hat{I}_y=loess(\\hat{I}_y)$ and $LN(\\widehat{I_y}) = b + \\lambda y$
-| Islope	|	$C_{targ,y+1:y+2} = 0.8\\overline{C}_{5,y}(1+0.4e^{\\lambda})$ where $\\overline{C}_{5,y}$ is the most recent five-year average catch through year $y-1$: <br> $\\overline{C}_{5,y} = \\frac{1}{5}\\sum_{t=1}^{t=5}C_{y-t}$ <br> and $\\lambda$ is the slope of a log-linear regression of the most recent five years of the averaged index.
-|	Itarget	|	$C_{targ,y+1:y+2}=\\left[0.5C_{ref}\\left(\\frac{\\overline{I}_{5,y}-I_{thresh}}{I_{target}-I_{thresh}}\\right)\\right]$ $\\overline{I}_{5,y} \\geq I_{thresh}$ <br> $C_{targ,y+1:y+2}=\\left[0.5C_{ref}\\left(\\frac{\\overline{I}_{5,y}}{I_{thresh}}\\right)^{2}\\right]$ $\\overline{I}_{5,y} <  I_{thresh}$; <br>  $C_{ref}$ is the average catch over the reference period (years 26 through 50): <br> $C_{ref} = \\frac{1}{25}\\sum_{y=26}^{y=50}C_y$; <br>  $I_{target}$ is 1.5 times the average index over the reference period: <br> $I_{target} = \\frac{1}{25}\\sum_{y=26}^{y=50}\\overline{I}_y$; <br> $I_{thresh}$ = 0.8 $I_{target}$, and is the most recent five year average of the combined spring and fall index: <br> $\\overline{I}_{5,y} = \\frac{1}{5}\\sum_{t=1}^{t=5}\\overline{I}_{y-t+1}$
-| Skate | $C_{targ,y+1:y+2}= F_{rel} \\overline{I}_{3,y}$ where <br> $F_{rel} =median \\left(\\frac{\\overline{C}_{3,\\textbf{Y}}}{\\overline{I}_{3,\\textbf{Y}}} \\right)$ <br> is the median relative fishing mortality rate calculated using a 3 year moving average of the catch and average survey index across all available years ($\\textbf{Y}$): <br> $\\overline{C}_{3,y} = \\frac{1}{3} \\sum_{t=1}^{t=3} C_{y-t}$ and <br> $\\overline{I}_{3,y} = \\frac{1}{3} \\sum_{t=1}^{t=3} I_{y-t+1}$
-| An Index Method (AIM) | AIM first calculates the annual relative $F$: $F_{rel,y}=\\frac{C_y}{\\frac{1}{3}\\sum_{t=1}^{t=3}\\overline{I}_{y-t+1}}$ <br> and the annual replacement ratio: $\\Psi_y = \\frac{\\overline{I}_y}{\\frac{1}{5}\\sum_{t=1}^{t=5}\\overline{I}_{y-t}}$. <br> These values are used in a regression: $LN(\\Psi_y)= b + \\lambda LN(F_{rel,y})$ to determine $F_{rel,*}$, which is the value of $F_{rel,y}$ where the predicted $\\Psi=1$ or <br> $LN(\\Psi)=0$. $F_{rel,*}$ is called either the “stable” or “replacement” $F$, and is used to calculate the target catch: $C_{targ,y+1:y+2} = \\overline{I}_yF_{rel,*}$.
-| Dynamic Linear Model (DynLin) | @Langan2021DLM.
-| Expanded survey  biomass method 1 $F_{40\\%}$ (ES-FSPR) | $C_{targ,y+1:y+2}=B_{\\bar{I},y}\\mu_{targ}$ <br> where $B_{\\bar{I}}$ is the average of estimated fully-selected biomass from each survey: <br> $B_{\\bar{I},y}=\\frac{1}{2}\\left(\\frac{I_{spr,y}}{q_{spr}} +\\frac{I_{fall,y-1}}{q_{fall}}\\right)$ <br> and target exploitation fraction, $\\mu_{targ}$ is calculated as: <br> $\\mu_{targ}=\\frac{F_{targ}}{Z_{targ}}\\left(1-e^{-Z_{targ}}\\right)$; <br> $F_{targ}=F_{40\\%}$ and <br> $Z_{targ}=F_{targ}+M$
-| Expanded survey biomass method 2 $F=$ AIM replacement (ES-Fstable) | Same as the above expanded survey method, but with $\\mu_{targ}$ equal to the stable exploitation fraction $F_{rel,*}$ calculated using the AIM approach (see above).
-| Expanded survey biomass method 3 $F=M$ (ES-FM) | Same as the above expanded survey methods, but with the target exploitation rate set to the assumed $M$: $F_{targ}=M$.
-| Expanded survey biomass method 4 $F=$ recent average (ES-Frecent) | Same as the above expanded survey methods, but with the target exploitation fraction set to the most recent three year average exploitation fraction: <br> ${\\mu_{targ}}=\\frac{\\sum_{y-2}^{y}\\mu_y}{3}$ <br> $\\mu_{y}=\\frac{C_{y-1}}{B_{\\bar{I},y}}$
-| Catch curve Method 1 $F_{40\\%}$ (CC-FSPR) | $C_{targ,y+1:y+2}= \\frac{F_{targ}}{Z_{avg,y}}B_{cc,y}\\left(1-e^{-Z_{avg,y}}\\right)$ <br>  where $B_{cc}$ is the estimated biomass: <br> $B_{cc,y} = \\frac{C_{y-1}}{\\frac{F_{avg,y}}{Z_{avg,y}}{\\left(1-e^{-Z_{avg,y}}\\right)}}$ with <br> $Z_{avg,y} = \\frac{Z_{spring, y}+Z_{fall,y-1}}{2}$; <br> $F_{avg,y-1} = Z_{avg,y-1} - M$ and, <br> $F_{targ}=F_{40\\%}$. Survey catch at age used in catch curve to estimate $Z$.
-| Catch curve Method 2 $M$ (CC-FM) | Same as catch curve method 1 above, but with $F_{targ}=M$.
-| Ensemble | Median of catch advice provided by AIM, CC-FSPR, ES-Frecent, ES-FSPR, Islope, Itarget, Ismooth, and Skate methods.
-"
-cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
-```
-
-\pagebreak
-Table 3. Summary of the scenarios evaluated within the study design.
-```{r schemetable, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-        
-|	Factors | Variants
-|:------ |:------
-|	retrospective source | catch or <br> natural mortality
-|	fishing history | $F_{MSY}$ in second half of base period or <br> overfishing throughout base period (2.5x$F_{MSY}$)
-|	fishery selectivity blocks | constant selectivity or <br> selectivity changes in second half of base period
-| catch advice multiplier | applied as is from DLM (1) or <br> reduced from DLM (0.75)
-"
-#Table: (\#tab:schemtable) Coding scheme.
-cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
-```
-
-\pagebreak
-
-## List of Figures
-
-```{r figcaps, echo=FALSE}
-figcap1 <- "Inner quartiles and medians for all performance measures across all scenarios and runs for each method. Vertical lines are shown at a value of 1 for the performance measures that are relative to the MSY reference points (A,B,C)."
-figcap2 <- "Relationship between long-term average spawning biomass and average catch (relative to MSY levels) for each method. Each point represents the median for a given scenario, separated by the source of the retrospective pattern (catch or M)."
-figcap3 <- "Median performance measures for each method, separated by the source of the retrospective error (catch = black, M = gray) and the exploitation history in the base period (always overfishing at $2.5 x F_{MSY}$ (circle), or $F$ reduced to $F_{MSY}$ during base period (triangle)). Vertical lines are shown at a value of 1 for the performance measures that are relative to the MSY reference points (A,B,C)."
-figcap4 <- "Median $F / F_{MSY}$ for each method, with results separated by the exploitation history in the base period (always overfishing at $2.5 x F_{MSY}$ (circle), or $F$ reduced to $F_{MSY}$ during base period (triangle)) showing A) short- (gray) versus long-term (black) values, and B) with (black) or without (gray) a buffer applied when setting the catch (catch multiplier = 0.75 or 1)."
-figcap5 <- "Relationship between long-term average catch and spawning stock biomass relative to their reference points by method. Each point represents the average for years 21-40 in the feedback period for a single iteration of a scenario. The scenario shown is where catch was the source of the retrospective pattern with $F$ reduced to $F_{MSY}$ in the second half of the base period, there was a single selectivity block, and where no buffer was applied to the catch advice (catch multiplier = 1)."
-  
-```
-
-Figure 1. `r figcap1`
-
-Figure 2. `r figcap2`
-
-Figure 3. `r figcap3`
-
-Figure 4. `r figcap4`
-
-Figure 5. `r figcap5`
 
 
-```{r PMsallscenarios, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap1}
-#knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_1.pdf"))
 ```
 
 
-```{r SSmsyvsCMSY, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap2}
-#knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_2.pdf"))
-```
 
 
-```{r PMsbyretroF, echo=FALSE, message=FALSE, warnings=FALSE, out.width='6in', fig.cap=figcap3}
-#knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_3.pdf"))
-```
 
 
-```{r FFmsybyscenario, echo=FALSE, message=FALSE, warnings=FALSE, out.width='6in', fig.cap=figcap4}
-#knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_4.pdf"))
-```
 
 
-```{r linearvsdiffuse, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap5}
-#knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_5.pdf"))
-```
+<!-- ```{r PMsallscenarios, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap1} -->
+<!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_1.pdf")) -->
+<!-- ``` -->
+
+
+<!-- ```{r SSmsyvsCMSY, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap2} -->
+<!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_2.pdf")) -->
+<!-- ``` -->
+
+
+<!-- ```{r PMsbyretroF, echo=FALSE, message=FALSE, warnings=FALSE, out.width='6in', fig.cap=figcap3} -->
+<!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_3.pdf")) -->
+<!-- ``` -->
+
+
+<!-- ```{r FFmsybyscenario, echo=FALSE, message=FALSE, warnings=FALSE, out.width='6in', fig.cap=figcap4} -->
+<!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_4.pdf")) -->
+<!-- ``` -->
+
+
+<!-- ```{r linearvsdiffuse, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap5} -->
+<!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_5.pdf")) -->
+<!-- ``` -->
