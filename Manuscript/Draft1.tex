@@ -330,7 +330,13 @@ Haddock & Decreasing & & & & & \\
 
 \section{Results}
 
-The goal of our project was to analyze how well different contemporary population indexing methods can track population trends under a host of conditions, as depicted in Table COMBOS. Historically, Atlantic Cod has seen significant decline over the last XXX years while Haddock has increased in abundance in recent year \textbf{cite}. For this reason we compare indexing estimates using stratified random samples from decreasing population scenarios for Cod and increasing population scenarios for Haddock. We consider all possible scenario combinations for Yellowtail Flounder to provide a more comprehensive analysis of population indexing methods.
+The goal of our project was to analyze how well different contemporary population indexing methods can track population trends under a host of conditions, as depicted in Table COMBOS. Historically, Atlantic Cod has seen significant decline over the last XXX years while Haddock has increased in abundance in recent year \textbf{cite}. For this reason we compare indexing estimates using stratified random samples from decreasing population scenarios for Cod and increasing population scenarios for Haddock. We consider all possible scenario combinations for Yellowtail Flounder to provide a comprehensive analysis of population indexing methods.
+
+In the Cod results, when using reduced strata adding covariates produces worst VAST results (though still better than stratified mean). VAST without covariates much worse than stratified mean in fall with increasing temperture and all strata, but adding covariates corrects this.
+
+For Haddock, VAST has a particularly hard time in spring regulalry producing larger errors than the stratified mean with added covariates only improving to the level of the stratifie dmean. VAST shows imrpoved results in fall relative to the stratified mean with added covaraites producing extremely low errors in some cases.
+
+In considering the Yellowtail Flounder results in Table XXX, we can see VAST estimates generally provide lower errors relative to those derived from the stratified mean, with models that include covariate information typically providing the lowest errors. However, there are several instances in which VAST failed to provide improved abundance estimates during the fall season without covariate information, producing the largest errors seen in the Table. These errors are corrected by including covariate information allowing for an improved VAST estimate that are significantly lower than their stratified mean counterparts.
 
 \begin{table}
 
@@ -495,13 +501,9 @@ increasing & reduced & yes & fall & 0.42 & 0.62 & 0.70 & NA & \\
 \end{tabular}
 \end{table}
 
-\hypertarget{discussion}{%
-\subsection{Discussion}\label{discussion}}
+\section{Discussion}
 
-\hypertarget{acknowledgements}{%
-\subsection{Acknowledgements}\label{acknowledgements}}
-
-We thank the Index-Based Methods and Control Rules Research Track review panel of Paul Rago (chair), Yong Chen, Robin Cook, and Paul Medley for feedback on preliminary results, three anonymous reviewers and the associate editor for reviewing an earlier version of this work. The scientific results and conclusions, as well as any views or opinions expressed herein, are those of the authors and do not necessarily reflect those of NOAA or the Department of Commerce.
+\section{Acknowledgements}
 
 \hypertarget{data-and-code-availability}{%
 \subsection{Data and Code Availability}\label{data-and-code-availability}}
