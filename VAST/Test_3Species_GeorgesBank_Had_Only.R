@@ -18,13 +18,13 @@ orig.dir <- getwd()
 # surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 # surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario1 <- "IncPop_IncTemp"
+scenario1 <- "IncPop_ConTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
 exclude_strata <- FALSE
 
-with_noise <- FALSE
+with_noise <- TRUE
 
 covariates <- FALSE
 
@@ -37,7 +37,7 @@ cov_used <- "_WithCov"  #"Temp_LinearBasic"
 #DecPop_ConTemp 6 is pretty good
 #DecPop_IncTemp 9 is pretty good
 
-surv_random_sample <- list_all[[100]]
+surv_random_sample <- list_all[[98]]
 
 
 setwd(orig.dir)
@@ -451,7 +451,7 @@ for(j in 1:6){
   
   
   FC1 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 4)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 2) #was 4 for most runs
   
   #FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0
   
@@ -709,7 +709,7 @@ for(j in 1:6){
   #FC2 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
   
   FC2 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =4)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =2) #used to be 4
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,

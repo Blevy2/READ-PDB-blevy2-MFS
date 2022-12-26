@@ -248,11 +248,13 @@ cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 
 \section{Results}
 
-The goal of our project was to analyze how well different contemporary population indexing methods can track population trends under a host of conditions, as depicted in Table COMBOS. Historically, Atlantic Cod has seen significant decline over the last XXX years while Haddock has increased in abundance in recent year **cite**. For this reason we compare indexing estimates using stratified random samples from decreasing population scenarios for Cod and increasing population scenarios for Haddock. We consider all possible scenario combinations for Yellowtail Flounder to provide a comprehensive analysis of population indexing methods.
+The goal of our project was to analyze how well contemporary population indexing methods can track population trends under a host of conditions, as depicted in Table COMBOS. Historically, Atlantic Cod has seen significant decline over the last XXX years while Haddock has increased in abundance in recent year **cite**. For this reason we compare indexing estimates using stratified random samples from decreasing population scenarios for Cod (see Table ???) and increasing population scenarios for Haddock (see Table ???). To provide a comprehensive analysis of population indexing methods we consider all possible scenario combinations for Yellowtail Flounder (see Table ???).
 
-In the Cod results, when using reduced strata adding covariates produces worst VAST results (though still better than stratified mean). VAST without covariates much worse than stratified mean in fall with increasing temperture and all strata, but adding covariates corrects this.  
+General themes that exist in Tables X, Y and Z are that VAST estimates provide lower errors relative to those derived from the stratified mean, with VAST models that include covariate information providing the lowest overall errors. We also see individual cases where the stratified mean produced the lowest absolut error and instances where including covarites in VAST models actually increase the absolute error. When we reduce the number of strata that are included in indexing calculations to simulation species shifting into new territory, we typically see an increase in absolute error, though there are some scenarios where the impact is minimal. 
 
-For Haddock, VAST has a particularly hard time in spring regulalry producing larger errors than the stratified mean with added covariates only improving to the level of the stratifie dmean. VAST shows imrpoved results in fall relative to the stratified mean with added covaraites producing extremely low errors in some cases.
+In the Cod results, when using reduced strata adding covariates produces worst VAST results (though still better than stratified mean). VAST without covariates much worse than stratified mean in fall with increasing temperature and all strata, but adding covariates corrects this.  
+
+For Haddock, VAST has a particularly hard time in spring regularly producing larger errors than the stratified mean with added covariates only improving to the level of the stratified mean. VAST shows improved results in fall relative to the stratified mean with added covaraites producing extremely low errors in some cases.
 
 In considering the Yellowtail Flounder results in Table XXX, we can see VAST estimates generally provide lower errors relative to those derived from the stratified mean, with models that include covariate information typically providing the lowest errors. However, there are several instances in which VAST failed to provide improved abundance estimates during the fall season without covariate information, producing the largest errors seen in the Table. These errors are corrected by including covariate information allowing for an improved VAST estimate that are significantly lower than their stratified mean counterparts. 
 
@@ -548,16 +550,17 @@ summary_tab <- result_table %>%
 
   
 # Group the table according to Parameter, Scenario
-  group_by(Season, Scenario)%>%
-# Change the orientation of the table so that Species become the variable headings
-  mutate(Scenario = factor(Scenario)) %>%
-  arrange(Scenario) %>%
-  select(Scenario, everything())
+  group_by(Scenario,Strata)
 
 
 
 # Create table to present the data]
-Fig_5 <- kable(summary_tab) 
+Fig_5 <- kable(summary_tab) %>%
+  kable_styling(font_size = 10)  %>%
+  pack_rows(tab_kable, colnum = c(1,4),
+    index = table(fct_inorder(summary_tab$Strata), useNA = "no")) %>%
+  pack_rows(tab_kable, colnum = 1,
+    index = table(fct_inorder(summary_tab$Scenario), useNA = "no")) 
 
 ```
 ```{r, results='asis'}
