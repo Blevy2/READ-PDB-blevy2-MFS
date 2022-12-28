@@ -7,6 +7,7 @@ output:
     number_sections: no
     fig_caption: yes
     keep_tex: yes
+  citation_package: biblatex
   bibliography: IBMWG.bib
   
   word_document: default
@@ -281,6 +282,7 @@ knitr::kable(Had_results, caption = "Haddock error results")
 All data and code used in this work are available at https://github.com/cmlegault/IBMWG.
 
 ## References
+
 
 <div id="refs"></div>
 
