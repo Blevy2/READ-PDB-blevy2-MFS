@@ -1,17 +1,17 @@
-Temp,Strata,Noise,season,VAST No Cov,VAST w/ Cov,Stratified Mean,,
-const,all,no ,spring,0.11,0.12,0.36,,
-const,all,yes,spring,0.12,0.15,0.35,,Cod
-const,all,no ,fall,0.19,0.05,0.49,,Decreasing Population
-const,all,yes,fall,0.3,0.23,0.41,,
-const,reduced,no ,spring,0.17,0.24,0.41,,
-const,reduced,yes,spring,0.2,0.23,0.46,,
-const,reduced,no ,fall,0.21,0.33,0.6,,
-const,reduced,yes,fall,0.18,0.31,0.58,,
-increasing,all,no ,spring,0.12,0.15,0.25,,
-increasing,all,yes,spring,0.19,0.19,0.27,,
-increasing,all,no ,fall,0.76,0.13,0.45,,
-increasing,all,yes,fall,0.89,0.33,0.44,,
-increasing,reduced,no ,spring,0.14,0.22,0.32,,
-increasing,reduced,yes,spring,0.15,0.21,0.29,,
-increasing,reduced,no ,fall,0.6,0.31,0.54,,
-increasing,reduced,yes,fall,0.62,0.32,0.53,,
+Temp,Strata,Noise,season,VAST No Cov,VAST w/ Cov,Stratified Mean
+constant,all,no ,spring,0.11,0.12,0.36
+constant,all,yes,spring,0.12,0.15,0.35
+constant,all,no ,fall,0.19,0.05,0.49
+constant,all,yes,fall,0.3,0.23,0.41
+constant,reduced,no ,spring,0.17,0.24,0.41
+constant,reduced,yes,spring,0.2,0.23,0.46
+constant,reduced,no ,fall,0.21,0.33,0.6
+constant,reduced,yes,fall,0.18,0.31,0.58
+increasing,all,no ,spring,0.12,0.15,0.25
+increasing,all,yes,spring,0.19,0.19,0.27
+increasing,all,no ,fall,0.76,0.13,0.45
+increasing,all,yes,fall,0.89,0.33,0.44
+increasing,reduced,no ,spring,0.14,0.22,0.32
+increasing,reduced,yes,spring,0.15,0.21,0.29
+increasing,reduced,no ,fall,0.6,0.31,0.54
+increasing,reduced,yes,fall,0.62,0.32,0.53

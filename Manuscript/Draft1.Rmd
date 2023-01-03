@@ -107,6 +107,7 @@ The survey takes place twice each year- once in the spring and again in the fall
 
 
 - Climate change is happening
+
  Due to a combination of climate change and shifts in circulation, the Northeast United States continental shelf has experienced rapid warming in recent decades, resulting in a shift in spatial distributions of many species. Since stock assessment models rely on accurate descriptions of population dynamics and contemporary patterns of spatial abundance, there is concern that rapid undocumented changes in spatial distributions of species will bias future stock assessments. The implication of this is that the bottom trawl survey is actually sampling the population during a different life cycle stage than was originally assumed, which can lead to biased stock assessments. We are therefore interested in analyzing the impact of climate change on the accuracy of future stock assessment models as measured by NOAA’s ongoing bottom-trawl survey along the East coast.
 
 - say something about our study species? Past abundance history, biological characteristics, others? Maybe better suited in below section
@@ -569,6 +570,38 @@ Fig_5 <- kable(summary_tab) %>%
 Fig_5
 ```
 
+
+```{r CodERROR,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("forcats")
+
+
+
+param_table1 = read_csv("Cod_results.csv")
+
+summary_tab1 <- param_table1 %>% 
+# Group the table according to Parameter, Scenario
+  group_by(Temp)%>%
+  mutate(Temp = factor(Temp)) %>%
+  arrange(Temp) %>%
+  select(Temp, everything())
+
+# Create table to present the data]
+Fig_3a <-  kable(summary_tab1[, -1], 
+  caption = "Cod error results.",
+    format = "latex", booktabs = TRUE) %>%
+  kable_styling(font_size = 10) %>%
+  pack_rows(tab_kable(), colnum = 1,
+    index = table(fct_inorder(summary_tab1$Temp), useNA = "no"))
+```
+
+```{r, results='asis'}
+Fig_3a
+```
 
 <!-- ```{r PMsallscenarios, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap1} -->
 <!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_1.pdf")) -->

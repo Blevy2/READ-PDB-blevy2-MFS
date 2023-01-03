@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  28 DEC 2022 15:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  3 JAN 2023 09:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -667,61 +667,56 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 <Images/Strata.png, id=85, 644.4075pt x 224.63925pt>
 File: Images/Strata.png Graphic file (type png)
 <use Images/Strata.png>
-Package pdftex.def Info: Images/Strata.png  used on input line 217.
+Package pdftex.def Info: Images/Strata.png  used on input line 223.
 (pdftex.def)             Requested size: 446.28374pt x 155.57367pt.
 
-LaTeX Warning: Reference `paramsALL' on page 5 undefined on input line 226.
+LaTeX Warning: Reference `paramsALL' on page 5 undefined on input line 232.
 
-[5 <./Images/Strata.PNG>]
-<Images/hab_snip.png, id=98, 925.95938pt x 498.36188pt>
+[5 <./Images/Strata.PNG>] [6]
+<Images/hab_snip.png, id=110, 925.95938pt x 498.36188pt>
 File: Images/hab_snip.png Graphic file (type png)
 <use Images/hab_snip.png>
-Package pdftex.def Info: Images/hab_snip.png  used on input line 253.
+Package pdftex.def Info: Images/hab_snip.png  used on input line 259.
 (pdftex.def)             Requested size: 446.26396pt x 240.18434pt.
-<Images/Habitat_3species.png, id=99, 1285.05093pt x 415.5525pt>
+<Images/Habitat_3species.png, id=111, 1285.05093pt x 415.5525pt>
 File: Images/Habitat_3species.png Graphic file (type png)
 <use Images/Habitat_3species.png>
-Package pdftex.def Info: Images/Habitat_3species.png  used on input line 262.
+Package pdftex.def Info: Images/Habitat_3species.png  used on input line 268.
 (pdftex.def)             Requested size: 446.2647pt x 144.31055pt.
-[6] [7 <./Images/hab_snip.PNG> <./Images/Habitat_3species.png (PNG copy)>] [8] [9]
-Overfull \hbox (7.9507pt too wide) in alignment at lines 306--324
+[7 <./Images/hab_snip.PNG> <./Images/Habitat_3species.png (PNG copy)>] [8] [9]
+Overfull \hbox (7.9507pt too wide) in alignment at lines 312--330
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (7.9507pt too wide) in alignment at lines 324--329
+Overfull \hbox (7.9507pt too wide) in alignment at lines 330--335
  [] [] [] [] [] [] [] 
  []
 
 [10]
-Overfull \hbox (326.52138pt too wide) in paragraph at lines 347--418
+Overfull \hbox (326.52138pt too wide) in paragraph at lines 353--424
  [][] 
  []
 
 
-Overfull \hbox (72.38907pt too wide) in paragraph at lines 424--461
- [][] 
- []
-
-
-Overfull \hbox (69.47205pt too wide) in paragraph at lines 467--504
+Overfull \hbox (69.47205pt too wide) in paragraph at lines 473--510
  [][] 
  []
 
 [11] [12] [13] [14]
-Overfull \hbox (36.30684pt too wide) in paragraph at lines 574--598
+Overfull \hbox (36.30684pt too wide) in paragraph at lines 580--604
  [][] 
  []
 
 [15]
-Overfull \hbox (105.92778pt too wide) in paragraph at lines 627--835
+Overfull \hbox (105.92778pt too wide) in paragraph at lines 633--841
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 615.76936pt on input line 835.
+LaTeX Warning: Float too large for page by 615.76936pt on input line 841.
 
-[16] [17] (./Draft1.aux)
+[16] [17] [18] (./Draft1.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -732,18 +727,18 @@ Package rerunfilecheck Info: File `Draft1.out' has not changed.
 (rerunfilecheck)             Checksum: 935ECFF00962E93298A7DDE85146B5E8;1831.
  ) 
 Here is how much of TeX's memory you used:
- 17125 strings out of 478053
- 320728 string characters out of 5838651
- 1933787 words of memory out of 5000000
- 36925 multiletter control sequences out of 15000+600000
+ 17128 strings out of 478053
+ 320765 string characters out of 5838651
+ 1939787 words of memory out of 5000000
+ 36926 multiletter control sequences out of 15000+600000
  555999 words of font info for 60 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  72i,10n,77p,1479b,1011s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi5.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb>
-Output written on Draft1.pdf (17 pages, 734314 bytes).
+Output written on Draft1.pdf (18 pages, 735539 bytes).
 PDF statistics:
- 252 PDF objects out of 1000 (max. 8388607)
- 199 compressed objects within 2 object streams
- 50 named destinations out of 1000 (max. 500000)
+ 258 PDF objects out of 1000 (max. 8388607)
+ 203 compressed objects within 3 object streams
+ 52 named destinations out of 1000 (max. 500000)
  112 words of extra memory for PDF output out of 10000 (max. 10000000)
 

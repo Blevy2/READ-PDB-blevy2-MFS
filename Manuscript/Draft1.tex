@@ -171,9 +171,15 @@ Fish stocks in this highly productive and economically important region are mana
 The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling during approximately the same 2-3 week time period in each season.
 
 \begin{itemize}
+\tightlist
 \item
   Climate change is happening
-  Due to a combination of climate change and shifts in circulation, the Northeast United States continental shelf has experienced rapid warming in recent decades, resulting in a shift in spatial distributions of many species. Since stock assessment models rely on accurate descriptions of population dynamics and contemporary patterns of spatial abundance, there is concern that rapid undocumented changes in spatial distributions of species will bias future stock assessments. The implication of this is that the bottom trawl survey is actually sampling the population during a different life cycle stage than was originally assumed, which can lead to biased stock assessments. We are therefore interested in analyzing the impact of climate change on the accuracy of future stock assessment models as measured by NOAA's ongoing bottom-trawl survey along the East coast.
+\end{itemize}
+
+Due to a combination of climate change and shifts in circulation, the Northeast United States continental shelf has experienced rapid warming in recent decades, resulting in a shift in spatial distributions of many species. Since stock assessment models rely on accurate descriptions of population dynamics and contemporary patterns of spatial abundance, there is concern that rapid undocumented changes in spatial distributions of species will bias future stock assessments. The implication of this is that the bottom trawl survey is actually sampling the population during a different life cycle stage than was originally assumed, which can lead to biased stock assessments. We are therefore interested in analyzing the impact of climate change on the accuracy of future stock assessment models as measured by NOAA's ongoing bottom-trawl survey along the East coast.
+
+\begin{itemize}
+\tightlist
 \item
   say something about our study species? Past abundance history, biological characteristics, others? Maybe better suited in below section
 \end{itemize}
@@ -421,41 +427,41 @@ increasing & w/ cov & reduced & yes & fall & 0.66 & 0.13 & 0.69 & 0.5 & 0.53 & 0
 
 \caption{\label{tab:unnamed-chunk-1}Cod error results}
 \centering
-\begin{tabular}[t]{l|l|l|l|r|r|r|l|l}
+\begin{tabular}[t]{l|l|l|l|r|r|r}
 \hline
-Temp & Strata & Noise & season & VAST.No.Cov & VAST.w..Cov & Stratified.Mean & X & X.1\\
+Temp & Strata & Noise & season & VAST.No.Cov & VAST.w..Cov & Stratified.Mean\\
 \hline
-const & all & no & spring & 0.11 & 0.12 & 0.36 & NA & \\
+constant & all & no & spring & 0.11 & 0.12 & 0.36\\
 \hline
-const & all & yes & spring & 0.12 & 0.15 & 0.35 & NA & Cod\\
+constant & all & yes & spring & 0.12 & 0.15 & 0.35\\
 \hline
-const & all & no & fall & 0.19 & 0.05 & 0.49 & NA & Decreasing Population\\
+constant & all & no & fall & 0.19 & 0.05 & 0.49\\
 \hline
-const & all & yes & fall & 0.30 & 0.23 & 0.41 & NA & \\
+constant & all & yes & fall & 0.30 & 0.23 & 0.41\\
 \hline
-const & reduced & no & spring & 0.17 & 0.24 & 0.41 & NA & \\
+constant & reduced & no & spring & 0.17 & 0.24 & 0.41\\
 \hline
-const & reduced & yes & spring & 0.20 & 0.23 & 0.46 & NA & \\
+constant & reduced & yes & spring & 0.20 & 0.23 & 0.46\\
 \hline
-const & reduced & no & fall & 0.21 & 0.33 & 0.60 & NA & \\
+constant & reduced & no & fall & 0.21 & 0.33 & 0.60\\
 \hline
-const & reduced & yes & fall & 0.18 & 0.31 & 0.58 & NA & \\
+constant & reduced & yes & fall & 0.18 & 0.31 & 0.58\\
 \hline
-increasing & all & no & spring & 0.12 & 0.15 & 0.25 & NA & \\
+increasing & all & no & spring & 0.12 & 0.15 & 0.25\\
 \hline
-increasing & all & yes & spring & 0.19 & 0.19 & 0.27 & NA & \\
+increasing & all & yes & spring & 0.19 & 0.19 & 0.27\\
 \hline
-increasing & all & no & fall & 0.76 & 0.13 & 0.45 & NA & \\
+increasing & all & no & fall & 0.76 & 0.13 & 0.45\\
 \hline
-increasing & all & yes & fall & 0.89 & 0.33 & 0.44 & NA & \\
+increasing & all & yes & fall & 0.89 & 0.33 & 0.44\\
 \hline
-increasing & reduced & no & spring & 0.14 & 0.22 & 0.32 & NA & \\
+increasing & reduced & no & spring & 0.14 & 0.22 & 0.32\\
 \hline
-increasing & reduced & yes & spring & 0.15 & 0.21 & 0.29 & NA & \\
+increasing & reduced & yes & spring & 0.15 & 0.21 & 0.29\\
 \hline
-increasing & reduced & no & fall & 0.60 & 0.31 & 0.54 & NA & \\
+increasing & reduced & no & fall & 0.60 & 0.31 & 0.54\\
 \hline
-increasing & reduced & yes & fall & 0.62 & 0.32 & 0.53 & NA & \\
+increasing & reduced & yes & fall & 0.62 & 0.32 & 0.53\\
 \hline
 \end{tabular}
 \end{table}
@@ -832,6 +838,39 @@ Temp & Covariate & Strata & Noise & Season & Scenario & Stratified Mean & VAST E
 \hline
 \end{tabular}
 \endgroup{}
+\end{table}
+
+\begin{table}
+
+\caption{\label{tab:CodERROR}Cod error results.}
+\centering
+\fontsize{10}{12}\selectfont
+\begin{tabular}[t]{lllrrr}
+\toprule
+Strata & Noise & season & VAST No Cov & VAST w/ Cov & Stratified Mean\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{1}{l}{\textbf{constant}}\\
+\hspace{1em}all & no & spring & 0.11 & 0.12 & 0.36\\
+\hspace{1em}all & yes & spring & 0.12 & 0.15 & 0.35\\
+\hspace{1em}all & no & fall & 0.19 & 0.05 & 0.49\\
+\hspace{1em}all & yes & fall & 0.30 & 0.23 & 0.41\\
+\hspace{1em}reduced & no & spring & 0.17 & 0.24 & 0.41\\
+\hspace{1em}reduced & yes & spring & 0.20 & 0.23 & 0.46\\
+\hspace{1em}reduced & no & fall & 0.21 & 0.33 & 0.60\\
+\hspace{1em}reduced & yes & fall & 0.18 & 0.31 & 0.58\\
+\addlinespace[0.3em]
+\multicolumn{1}{l}{\textbf{increasing}}\\
+\hspace{1em}all & no & spring & 0.12 & 0.15 & 0.25\\
+\hspace{1em}all & yes & spring & 0.19 & 0.19 & 0.27\\
+\hspace{1em}all & no & fall & 0.76 & 0.13 & 0.45\\
+\hspace{1em}all & yes & fall & 0.89 & 0.33 & 0.44\\
+\hspace{1em}reduced & no & spring & 0.14 & 0.22 & 0.32\\
+\hspace{1em}reduced & yes & spring & 0.15 & 0.21 & 0.29\\
+\hspace{1em}reduced & no & fall & 0.60 & 0.31 & 0.54\\
+\hspace{1em}reduced & yes & fall & 0.62 & 0.32 & 0.53\\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \end{document}
