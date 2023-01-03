@@ -1,0 +1,98 @@
+
+---
+csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
+output:
+  bookdown::pdf_document2:
+    toc: no
+    number_sections: no
+    fig_caption: yes
+    keep_tex: yes
+  pdf_document:
+    toc: no
+  word_document: default
+  html_document: default
+bibliography: test.bib
+fontsize: 12pt
+header-includes:
+- \usepackage{setspace}
+- \doublespacing
+- \usepackage{lineno}
+- \linenumbers
+- \usepackage[belowskip=0pt,aboveskip=0pt]{caption}  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+if(!require(kableExtra)) {  
+  install.packages("kableExtra")
+  require(kableExtra)}
+
+
+
+#read in results tables
+YT_results<-read.csv("Yellowtail_results.csv")
+Cod_results<-read.csv("Cod_results.csv")
+Had_results<-read.csv("Haddock_results.csv")
+```
+
+
+\newpage
+
+# Estimating Population Trends with Stratified Random Sampling Under the Pressures of Climate Change
+
+  
+Benjamin A. Levy^1^, Christopher M. Legault^2^, Timothy J. Miller^2^, Elizabeth N. Brooks^2^
+
+
+
+^1^Ben's Institution, USA  
+^2^National Marine Fisheries Service, Northeast Fisheries Science Center, Woods Hole, MA, USA  
+  
+
+Corresponding author: Ben Levy (benjamin.levy@noaa.gov)
+
+Competing interests: The authors declare there are no competing interests.
+
+<!-- Table1 <- YT_results -->
+
+<!-- write.table( -->
+<!--    format(f, digits=2), "", -->
+<!--    sep="|", row.names=F, col.names=F, quote=F, eol="|\n") -->
+
+\newpage
+
+## Abstract
+
+An Abstract
+
+## Keywords
+
+keyword 1, keyword 2
+
+\newpage
+
+\section{Introduction}
+
+
+
+\section{Methods}
+
+
+-- Used MixFishSim. Describe edits made to package
+
+We use the R package *MixFishSim* (MFS) to model our populations [@dolder2020highly]. MFS is a discrete spatiotemporal simulation tool where users can model multiple species under varying environmental conditions. The package uses a delay-difference population model with discrete processes for growth, death, and recruitment of the population. We formulate the following inputs for the MFS package to address our research question.
+
+
+
+## References
+
+
+<div id="refs"></div>
+
+
+
+\pagebreak
+
+## Tables
+</font>
+
