@@ -7,13 +7,12 @@ output:
     number_sections: no
     fig_caption: yes
     keep_tex: yes
-  citation_package: biblatex
-  bibliography: IBMWG.bib
-  
-  word_document: default
-  html_document: default
   pdf_document:
     toc: no
+  word_document: default
+  html_document: default
+bibliography: IBMWG.bib
+fontsize: 12pt
 header-includes:
 - \usepackage{setspace}
 - \doublespacing
@@ -179,7 +178,7 @@ The following sections describe how we formulated the habitat and temperature co
 Species-specific habitat preferences were derived using the *lrren* tool from the R package *envi* [@envi] to create a niche model for each species. The *lrren* tool estimates an ecological niche using the relative risk function by relating presence/absence data to two covariate predictors. We used bottom trawl point data in from 2009-2021 as our presence/absence input by using a value of 0 for any tow that failed to catch the given species and weighting a successful catch by the biomass of the given tow **cite trawl data?**. We combined data from both the fall and spring surveys to obscure the influence of temperature so that the niche model would instead infer habitat preferences. Depth and mean sediment size were used as our covariate predictors. Estimated depth for the region was obtained from FVCOM [@chen2006unstructured]. The mean sediment size raster was interpolated in ArcMap using the natural neighbor interpolation method **cite arcmap or more?** using point data collected by the United States Geologic Survey (USGS) [@mcmullen2005usgs]. Since the values in $Hab^2_{J,s}$ are required to be between 0 and 1, we transform the spatial estimates from *lrren* to fall between these bounds. See Figure \@ref(fig:hab-plot1) for a visual representation of this process being applied to Cod. Figure \@ref(fig:hab-plot) depicts habitat preferences $Hab^2_{J,s}$ for each species.
 
 ```{r hab-plot1, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Visual representation of niche model for Cod."}
-knitr::include_graphics(c("Images/hab_snip.png"))
+knitr::include_graphics(c("Images/hab_snip3.png"))
 ```
 
 
