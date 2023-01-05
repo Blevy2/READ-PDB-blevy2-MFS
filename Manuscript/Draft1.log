@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  3 JAN 2023 09:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  4 JAN 2023 20:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -7,8 +7,8 @@ entering extended mode
 LaTeX2e <2022-11-01> patch level 1
 L3 programming layer <2022-12-17> (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
-(c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size10.clo
-File: size10.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
+(c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
 )
 \c@part=\count185
 \c@section=\count186
@@ -409,7 +409,7 @@ Package caption Info: longtable package is loaded.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/caption/ltcaption.sty
 Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
 )) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/siunitx/siunitx.sty
-Package: siunitx 2022-12-05 v3.1.11 A comprehensive (SI) units package
+Package: siunitx 2023-01-03 v3.2.0 A comprehensive (SI) units package
 \l__siunitx_angle_tmp_dim=\dimen196
 \l__siunitx_angle_marker_box=\box62
 \l__siunitx_angle_unit_box=\box63
@@ -418,30 +418,33 @@ Package: siunitx 2022-12-05 v3.1.11 A comprehensive (SI) units package
 \l__siunitx_number_min_decimal_int=\count310
 \l__siunitx_number_min_integer_int=\count311
 \l__siunitx_number_round_precision_int=\count312
-\l__siunitx_number_group_first_int=\count313
-\l__siunitx_number_group_size_int=\count314
-\l__siunitx_number_group_minimum_int=\count315
+\l__siunitx_number_lower_threshold_int=\count313
+\l__siunitx_number_upper_threshold_int=\count314
+\l__siunitx_number_group_first_int=\count315
+\l__siunitx_number_group_size_int=\count316
+\l__siunitx_number_group_minimum_int=\count317
 \l__siunitx_table_tmp_box=\box64
 \l__siunitx_table_tmp_dim=\dimen197
 \l__siunitx_table_column_width_dim=\dimen198
 \l__siunitx_table_integer_box=\box65
 \l__siunitx_table_decimal_box=\box66
-\l__siunitx_table_before_box=\box67
-\l__siunitx_table_after_box=\box68
+\l__siunitx_table_uncert_box=\box67
+\l__siunitx_table_before_box=\box68
+\l__siunitx_table_after_box=\box69
 \l__siunitx_table_before_dim=\dimen199
 \l__siunitx_table_carry_dim=\dimen256
-\l__siunitx_unit_tmp_int=\count316
-\l__siunitx_unit_position_int=\count317
-\l__siunitx_unit_total_int=\count318
+\l__siunitx_unit_tmp_int=\count318
+\l__siunitx_unit_position_int=\count319
+\l__siunitx_unit_total_int=\count320
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/colortbl/colortbl.sty
 Package: colortbl 2022/06/20 v1.0f Color table columns (DPC)
 \everycr=\toks28
 \minrowclearance=\skip66
-\rownum=\count319
+\rownum=\count321
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
 \multirow@colwidth=\skip67
-\multirow@cntb=\count320
+\multirow@cntb=\count322
 \multirow@dima=\skip68
 \bigstrutjot=\dimen257
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tools/hhline.sty
@@ -453,32 +456,32 @@ Package: tabularx 2020/01/15 v2.11c `tabularx' package (DPC)
 \TX@old@col=\dimen260
 \TX@target=\dimen261
 \TX@delta=\dimen262
-\TX@cols=\count321
+\TX@cols=\count323
 \TX@ftn=\toks29
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tabulary/tabulary.sty
 Package: tabulary 2014/06/11 v0.10 tabulary package (DPC)
-\TY@count=\count322
+\TY@count=\count324
 \TY@linewidth=\dimen263
 \tymin=\dimen264
 \tymax=\dimen265
 \TY@tablewidth=\dimen266
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/threeparttable/threeparttable.sty
 Package: threeparttable 2003/06/13  v 3.0
-\@tempboxb=\box69
+\@tempboxb=\box70
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/wrapfig/wrapfig.sty
 \wrapoverhang=\dimen267
 \WF@size=\dimen268
-\c@WF@wrappedlines=\count323
-\WF@box=\box70
+\c@WF@wrappedlines=\count325
+\WF@box=\box71
 \WF@everypar=\toks30
 Package: wrapfig 2003/01/31  v 3.6
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count324
+\c@float@type=\count326
 \float@exts=\toks31
-\float@box=\box71
+\float@box=\box72
 \@float@everytoks=\toks32
-\@floatcapt=\box72
+\@floatcapt=\box73
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape.sty
 Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape-nometadata.sty
@@ -491,17 +494,17 @@ Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
 Package: tabu 2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-fixed)
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/varwidth/varwidth.sty
 Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
-\@vwid@box=\box73
-\sift@deathcycles=\count325
+\@vwid@box=\box74
+\sift@deathcycles=\count327
 \@vwid@loff=\dimen269
 \@vwid@roff=\dimen270
 )
-\c@taburow=\count326
-\tabu@nbcols=\count327
-\tabu@cnt=\count328
-\tabu@Xcol=\count329
-\tabu@alloc=\count330
-\tabu@nested=\count331
+\c@taburow=\count328
+\tabu@nbcols=\count329
+\tabu@cnt=\count330
+\tabu@Xcol=\count331
+\tabu@alloc=\count332
+\tabu@nested=\count333
 \tabu@target=\dimen271
 \tabu@spreadtarget=\dimen272
 \tabu@naturalX=\dimen273
@@ -513,10 +516,10 @@ Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \tabustrutrule=\dimen279
 \tabu@thebody=\toks33
 \tabu@footnotes=\toks34
-\tabu@box=\box74
-\tabu@arstrutbox=\box75
-\tabu@hleads=\box76
-\tabu@vleads=\box77
+\tabu@box=\box75
+\tabu@arstrutbox=\box76
+\tabu@hleads=\box77
+\tabu@vleads=\box78
 \tabu@cellskip=\skip69
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/threeparttablex/threeparttablex.sty
 Package: threeparttablex 2013/07/23 v0.3 by daleif
@@ -527,25 +530,25 @@ Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 ))
 \TPTL@width=\skip70
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/ulem/ulem.sty
-\UL@box=\box78
-\UL@hyphenbox=\box79
+\UL@box=\box79
+\UL@hyphenbox=\box80
 \UL@skip=\skip71
 \UL@hook=\toks35
 \UL@height=\dimen280
-\UL@pe=\count332
+\UL@pe=\count334
 \UL@pixel=\dimen281
-\ULC@box=\box80
+\ULC@box=\box81
 Package: ulem 2019/11/18
 \ULdepth=\dimen282
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/makecell/makecell.sty
 Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
 \rotheadsize=\dimen283
-\c@nlinenum=\count333
+\c@nlinenum=\count335
 \TeXr@lab=\toks36
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2022-10-26 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count334
-\l__pdf_internal_box=\box81
+\l__color_backend_stack_int=\count336
+\l__pdf_internal_box=\box82
 ) (./Draft1.aux
 
 LaTeX Warning: Label `tab:unnamed-chunk-1' multiply defined.
@@ -556,32 +559,31 @@ LaTeX Warning: Label `tab:unnamed-chunk-1' multiply defined.
 )
 \openout1 = `Draft1.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 119.
-LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 120.
+LaTeX Font Info:    ... okay on input line 120.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring OFF on input line 119.
-(./Draft1.out) (./Draft1.out)
+Package hyperref Info: Link coloring OFF on input line 120.
 \@outlinefile=\write3
 \openout3 = `Draft1.out'.
 
@@ -604,12 +606,12 @@ Package hyperref Info: Link coloring OFF on input line 119.
 * \topmargin=-37.0pt
 * \headheight=12.0pt
 * \headsep=25.0pt
-* \topskip=10.0pt
+* \topskip=12.0pt
 * \footskip=30.0pt
-* \marginparwidth=65.0pt
-* \marginparsep=11.0pt
+* \marginparwidth=44.0pt
+* \marginparsep=10.0pt
 * \columnsep=10.0pt
-* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
@@ -624,121 +626,162 @@ Package caption Info: float package is loaded.
 Package caption Info: threeparttable package is loaded.
 Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 124.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 125.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 126.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 127.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 126.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 127.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 126.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 127.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 126.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 127.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 126.
+(Font)              <12> on input line 127.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 126.
+(Font)              <8> on input line 127.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 126.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 126.
+(Font)              <6> on input line 127.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 127.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 126.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 127.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 158.
+Underfull \hbox (badness 2635) in paragraph at lines 154--157
+\T1/lmr/m/n/12 much of be-low is from []$https : / / apps -[] nefsc . ^^\sheries . noaa . gov / nefsc / ecosystem -[] ecology/$[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--157
+\T1/lmr/m/n/12 or []$https : / / www . ^^\sheries . noaa . gov / data -[] tools / ^^\sheries -[] economics -[] united -[] states -[] data -[] and -[]
+ []
+
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 161.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [3] [4]
-<Images/Strata.png, id=85, 644.4075pt x 224.63925pt>
+) [3] [4] [5]
+<Images/Strata.png, id=48, 644.4075pt x 224.63925pt>
 File: Images/Strata.png Graphic file (type png)
 <use Images/Strata.png>
-Package pdftex.def Info: Images/Strata.png  used on input line 223.
+Package pdftex.def Info: Images/Strata.png  used on input line 226.
 (pdftex.def)             Requested size: 446.28374pt x 155.57367pt.
 
-LaTeX Warning: Reference `paramsALL' on page 5 undefined on input line 232.
+LaTeX Warning: Reference `paramsALL' on page 6 undefined on input line 235.
 
-[5 <./Images/Strata.PNG>] [6]
-<Images/hab_snip.png, id=110, 925.95938pt x 498.36188pt>
-File: Images/hab_snip.png Graphic file (type png)
-<use Images/hab_snip.png>
-Package pdftex.def Info: Images/hab_snip.png  used on input line 259.
-(pdftex.def)             Requested size: 446.26396pt x 240.18434pt.
-<Images/Habitat_3species.png, id=111, 1285.05093pt x 415.5525pt>
+
+LaTeX Warning: Reference `tab:paramsSCENARIOS' on page 6 undefined on input line 235.
+
+[6 <./Images/Strata.PNG>] [7]
+<Images/hab_snip3.png, id=73, 930.47626pt x 435.12563pt>
+File: Images/hab_snip3.png Graphic file (type png)
+<use Images/hab_snip3.png>
+Package pdftex.def Info: Images/hab_snip3.png  used on input line 262.
+(pdftex.def)             Requested size: 446.25438pt x 208.68529pt.
+<Images/Habitat_3species.png, id=74, 1285.05093pt x 415.5525pt>
 File: Images/Habitat_3species.png Graphic file (type png)
 <use Images/Habitat_3species.png>
-Package pdftex.def Info: Images/Habitat_3species.png  used on input line 268.
+Package pdftex.def Info: Images/Habitat_3species.png  used on input line 271.
 (pdftex.def)             Requested size: 446.2647pt x 144.31055pt.
-[7 <./Images/hab_snip.PNG> <./Images/Habitat_3species.png (PNG copy)>] [8] [9]
-Overfull \hbox (7.9507pt too wide) in alignment at lines 312--330
+[8] [9 <./Images/hab_snip3.PNG> <./Images/Habitat_3species.png (PNG copy)>] [10] [11] [12]
+Overfull \hbox (10.24467pt too wide) in paragraph at lines 322--323
+[]\T1/lmr/m/n/12 Temperature 
+ []
+
+
+Overfull \hbox (7.9507pt too wide) in alignment at lines 315--333
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (7.9507pt too wide) in alignment at lines 330--335
+Overfull \hbox (7.9507pt too wide) in alignment at lines 333--338
  [] [] [] [] [] [] [] 
  []
 
-[10]
-Overfull \hbox (326.52138pt too wide) in paragraph at lines 353--424
+[13] [14]
+Overfull \hbox (441.85887pt too wide) in paragraph at lines 358--429
  [][] 
  []
 
 
-Overfull \hbox (69.47205pt too wide) in paragraph at lines 473--510
+Overfull \hbox (144.20148pt too wide) in paragraph at lines 478--515
  [][] 
  []
 
-[11] [12] [13] [14]
-Overfull \hbox (36.30684pt too wide) in paragraph at lines 580--604
- [][] 
- []
-
-[15]
-Overfull \hbox (105.92778pt too wide) in paragraph at lines 633--841
- [][] 
+[15] [16] [17] [18] [19]
+Overfull \hbox (7.39761pt too wide) in alignment at lines 569--573
+ [] [] [] [] [] [] [] 
  []
 
 
-LaTeX Warning: Float too large for page by 615.76936pt on input line 841.
+Overfull \hbox (7.39761pt too wide) in alignment at lines 573--583
+ [] [] [] [] [] [] [] 
+ []
 
-[16] [17] [18] (./Draft1.aux)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 590.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 590.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 590.
 
-LaTeX Warning: There were undefined references.
+Overfull \hbox (36.30684pt too wide) in paragraph at lines 612--636
+ [][] 
+ []
 
 
-LaTeX Warning: There were multiply-defined labels.
+Overfull \hbox (4.55157pt too wide) in paragraph at lines 655--655
+[]|\T1/lmr/m/n/12 FieldCOnfig|  
+ []
 
-Package rerunfilecheck Info: File `Draft1.out' has not changed.
-(rerunfilecheck)             Checksum: 935ECFF00962E93298A7DDE85146B5E8;1831.
- ) 
+
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 657--657
+[]|\T1/lmr/m/n/12 X1_formula|  
+ []
+
+
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 658--658
+[]|\T1/lmr/m/n/12 X2_formula|  
+ []
+
+[20]
+Overfull \hbox (105.92778pt too wide) in paragraph at lines 665--873
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 615.76936pt on input line 873.
+
+
+! LaTeX Error: Too deeply nested.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.914 \begin{quote}
+                    
 Here is how much of TeX's memory you used:
- 17128 strings out of 478053
- 320765 string characters out of 5838651
- 1939787 words of memory out of 5000000
- 36926 multiletter control sequences out of 15000+600000
- 555999 words of font info for 60 fonts, out of 8000000 for 9000
+ 17180 strings out of 478053
+ 322379 string characters out of 5838651
+ 1907787 words of memory out of 5000000
+ 36968 multiletter control sequences out of 15000+600000
+ 574362 words of font info for 78 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 72i,10n,77p,1479b,1011s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi5.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb>
-Output written on Draft1.pdf (18 pages, 735539 bytes).
-PDF statistics:
- 258 PDF objects out of 1000 (max. 8388607)
- 203 compressed objects within 3 object streams
- 52 named destinations out of 1000 (max. 500000)
- 112 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 72i,10n,77p,1616b,1028s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
+!  ==> Fatal error occurred, no output PDF file produced!
