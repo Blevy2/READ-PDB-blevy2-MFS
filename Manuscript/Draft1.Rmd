@@ -633,4 +633,4 @@ Fig_3a
 <!-- ```{r linearvsdiffuse, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap5} -->
 <!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_5.pdf")) -->
 <!-- ``` -->
->>>>>>> fac774b6b2cab2991e9875992ad8ca7eb3de1326
+

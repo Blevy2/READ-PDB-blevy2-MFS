@@ -1869,4 +1869,316 @@ for(s in seq(3)) {
                            nrow=1),
                mylegend, nrow=2,heights=c(10, 1))
 
+  
+  
+  
+  #plot just one habitat
+  
+  ggplot() +
+    geom_raster(data=temp_ras,aes(x=y,y=rev(x),fill=Suitability)) + #plot biomass
+    
+    scale_fill_distiller(palette = "Spectral")+  #set the color pallet and color limits
+    theme_void()+
+    theme(legend.position = "none")
+    # ggtitle("Cod Habitat")+  
+    # theme(plot.title = element_text(hjust = 0.5,size=50),legend.position="none" )
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  ######################################################################################
+  
+  
+  #6) PLOTTING POPULATION SCENARIOS USED FOR PUBLICATION
+  
+  #LOAD ALL SCENARIOS USED
+  
+  
+  ######################################################################################
+  
+  #I AM COPYING FROM CALC_SRS_INDEX_SURVEY_BENS, which was adapted from Liz's code to create below
+  library(tibble)
+  library(ggplot2)
+  library(plyr)
+  library(dplyr)
+  library(tidyr)
+  library(readr)
+  library(here)
+  
+  
+  
+  orig.dir <- getwd()
+  
+  n_spp <- 3
+  
+  years_sim <- 22
+  
+  years_cut <- 2
+  
+  spp_names_short <- c("YT","Cod","Had")
+  
+  #choose which simulation iteration to use (chosen in different file)
+  good_iter <- list()
+  good_iter[["ConPop"]][["ConTemp"]] <- c(1) #yellowtail only c(1,13,6) #ConPop_ConTemp
+  good_iter[["ConPop"]][["IncTemp"]] <- c(1) #yellowtail only c(1,1,3) #ConPop_IncTemp
+  good_iter[["IncPop"]][["ConTemp"]] <- c(77,98) #YT and Had c(77,63,98) #IncPop_ConTemp
+  good_iter[["IncPop"]][["IncTemp"]] <- c(77,100) #YT and Had c(77,44,100) #IncPop_IncTemp
+  good_iter[["DecPop"]][["ConTemp"]] <- c(25,18) #YT and Cod c(25,18,6) #DecPop_ConTemp
+  good_iter[["DecPop"]][["IncTemp"]] <- c(13,44) #YT and Cod c(13,44,9) #DecPop_IncTemp
+  
+  
+  list_all_temp <- list()
+  result1 <- list()
+  
+  #load existing results found in result_goodones
+  for(PopScen in c("ConPop","IncPop","DecPop")){
+    for(TempScen in c("ConTemp","IncTemp")){
+      
+      scenario1 <- paste(PopScen,"_",TempScen,sep="")
+      
+      result1[[PopScen]][[TempScen]] <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\result_goodones_",scenario1,".RDS",sep=""))
+      list_all_temp[[PopScen]][[TempScen]] <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
+      
+      
+      
+    }
+  }
+  
+  
+  list_all <- list()
+  result <- list()
+  
+  list_all[["YT"]][["ConPop_ConTemp"]] <- list_all_temp[["ConPop"]][["ConTemp"]][[1]]
+  list_all[["YT"]][["ConPop_IncTemp"]] <- list_all_temp[["ConPop"]][["IncTemp"]][[1]]
+  
+  list_all[["YT"]][["IncPop_ConTemp"]] <- list_all_temp[["IncPop"]][["ConTemp"]][[77]]
+  list_all[["YT"]][["IncPop_IncTemp"]] <- list_all_temp[["IncPop"]][["IncTemp"]][[77]]
+  
+  list_all[["YT"]][["DecPop_ConTemp"]] <- list_all_temp[["DecPop"]][["ConTemp"]][[25]]
+  list_all[["YT"]][["DecPop_IncTemp"]] <- list_all_temp[["DecPop"]][["IncTemp"]][[13]]
+
+  list_all[["Cod"]][["DecPop_ConTemp"]] <- list_all_temp[["DecPop"]][["ConTemp"]][[18]]
+  list_all[["Cod"]][["DecPop_IncTemp"]] <- list_all_temp[["DecPop"]][["IncTemp"]][[44]]
+  
+  list_all[["Had"]][["IncPop_ConTemp"]] <- list_all_temp[["IncPop"]][["ConTemp"]][[98]]
+  list_all[["Had"]][["IncPop_IncTemp"]] <- list_all_temp[["IncPop"]][["IncTemp"]][[100]]
+  
+  
+  
+  
+  result[["YT"]][["ConPop_ConTemp"]] <- result1[["ConPop"]][["ConTemp"]][[1]]
+  result[["YT"]][["ConPop_IncTemp"]] <- result1[["ConPop"]][["IncTemp"]][[1]]
+  
+  result[["YT"]][["IncPop_ConTemp"]] <- result1[["IncPop"]][["ConTemp"]][[77]]
+  result[["YT"]][["IncPop_IncTemp"]] <- result1[["IncPop"]][["IncTemp"]][[77]]
+  
+  result[["YT"]][["DecPop_ConTemp"]] <- result1[["DecPop"]][["ConTemp"]][[25]]
+  result[["YT"]][["DecPop_IncTemp"]] <- result1[["DecPop"]][["IncTemp"]][[13]]
+  
+  result[["Cod"]][["DecPop_ConTemp"]] <- result1[["DecPop"]][["ConTemp"]][[18]]
+  result[["Cod"]][["DecPop_IncTemp"]] <- result1[["DecPop"]][["IncTemp"]][[44]]
+  
+  result[["Had"]][["IncPop_ConTemp"]] <- result1[["IncPop"]][["ConTemp"]][[98]]
+  result[["Had"]][["IncPop_IncTemp"]] <- result1[["IncPop"]][["IncTemp"]][[100]]
+  
+  
+  for(s in spp_names_short){
+    for(scenario in names(list_all[[s]])){
+    
+      temp <- matrix(data=0,nrow=length(list_all[[s]][[scenario]][,1]),ncol=n_spp) 
+    #  lat <- vector()
+     # lon <- vector()
+      
+      for(samp in seq(length(list_all[[s]][[scenario]][,1]))){
+    
+        #ADDING TRUE POPULATION
+        x = as.numeric(list_all[[s]][[scenario]][samp,2]) #x in second column
+        y = as.numeric(list_all[[s]][[scenario]][samp,3]) #y in third column
+        wk = as.numeric(list_all[[s]][[scenario]][samp,11]) #week in 11th column
+        yr = as.numeric(list_all[[s]][[scenario]][samp,7]) #year in 7th column
+        
+        temp[samp,1] <- sum(result[[s]][[scenario]]$pop_bios[[(wk+(52*(yr-1)))]][["spp1"]],na.rm=T) #YT is spp1
+        temp[samp,2] <- sum(result[[s]][[scenario]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]],na.rm=T) #Cod is spp2
+        temp[samp,3] <- sum(result[[s]][[scenario]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]],na.rm=T) #Had is spp3
+        
+        #ADDING LAT LON LOCATIONS
+      #  rw <- as.numeric(list_all[[s]][[scenario]][samp,"x"])  #x in col 2
+       # cl <- as.numeric(list_all[[s]][[scenario]][samp,"y"]) #y in col 3
+        
+       # lon[samp] <- NA #xFromCol(hab_ras, col = cl)
+       # lat[samp] <- NA #yFromRow(hab_ras, row = rw)
+        
+        
+      }
+      
+      colnames(temp) <- c("YT","Cod","Had") 
+      list_all[[s]][[scenario]] <- cbind(list_all[[s]][[scenario]],temp)
+      colnames(list_all[[s]][[scenario]]) <- c("station_no","x","y","stratum","day","tow","year","YT_samp","Cod_samp","Had_samp","week","Season","YT_pop","Cod_pop","Had_pop")
+    }
+    
+      
+    }
+  
+
+  
+  
+  #FIND MEAN VALUE BY SEASON USING ABOVE INFORMATION. USE MEAN OF TWO SURVEY WEEKS FOR EACH SEASON
+  season_wks <- list(c(13,14),c(37,38))
+  pop_by_season <- list()
+  
+  
+  for(s in spp_names_short){
+    for(scenario in names(list_all[[s]])){
+      
+
+
+      temp <- data.frame()
+      idx <- 1
+      for(yr in seq(3,22)){
+        
+        for(season in seq(2)){
+          
+          
+          
+          temp[idx,1] <- yr
+          temp[idx,2] <- season
+          
+          #use values in given year for weeks in specified season. only use single strata because entire population summarized in each strata in above loop
+          temp[idx,3] <- mean(as.numeric(list_all[[s]][[scenario]][((as.numeric(list_all[[s]][[scenario]][,"year"]==yr)) & (as.numeric(list_all[[s]][[scenario]][,"week"]) %in% season_wks[[season]]) & (as.numeric(list_all[[s]][[scenario]][,"stratum"]==29)) ),paste(s,"_pop",sep="")]))
+          
+          temp[idx,4] <- substr(scenario,1,3) #population scenario (inc vs dec vs con)
+          
+          idx <- idx + 1    
+        }  
+        
+      }
+      colnames(temp) <- c("year","season","biomass","scenario")
+      pop_by_season[[s]][[scenario]] <- temp
+    }
+    
+  }
+  
+  
+  
+  
+  spp_names <- c("Yellowtail Flounder","Cod","Haddock")
+  
+  
+  PopPlot <- list()
+  
+
+  
+  #plot each population scenario used in paper
+    
+    #YT first
+  
+  s_idx = 1
+    for(s in c("YT")){
+
+    for(scenario in c("ConTemp","IncTemp")){
+      
+  
+    
+      PopPlot[[s]][[scenario]] <- ggplot() +
+        
+        #this way plots data by season
+        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("ConPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Constant Pop."),size=3) +
+        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("ConPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Constant Pop."),size=1) +
+        
+        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Pop."),size=3) +
+        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Pop."),size=1) +
+        
+        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Pop."),size=3) +
+        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Pop."),size=1) +
+        
+        labs(x="year",y="Total Spring Biomass", title = "Yellowtail Flounder") +
+        
+        theme(axis.text=element_text(size=12),
+              axis.title=element_text(size=12),
+              title=element_text(size=8))
+      
+      
+    }
+    s_idx = s_idx + 1
+  }
+  
+  
+    
+    
+    #Cod second
+  s_idx = 1
+    for(s in c("Cod")){
+      
+      for(scenario in c("ConTemp","IncTemp")){
+        
+        
+        
+        PopPlot[[s]][[scenario]] <- ggplot() +
+          
+          geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=3) +
+          geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=1) +
+          
+          labs(x="year",y="Total Spring Biomass", title = "Atlantic Cod") +
+          
+          theme(axis.text=element_text(size=12),
+                axis.title=element_text(size=12),
+                title=element_text(size=8))
+        
+        
+      }
+      s_idx = s_idx + 1
+    }
+    
+    
+    
+    #Then Had
+  s_idx = 1
+    for(s in c("Had")){
+      
+      for(scenario in c("ConTemp","IncTemp")){
+        
+        
+        
+        PopPlot[[s]][[scenario]] <- ggplot() +
+          
+          geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=3) +
+          geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=1) +
+          
+          labs(x="year",y="Total Spring Biomass", title = "Haddock") +
+          
+          theme(axis.text=element_text(size=12),
+                axis.title=element_text(size=12),
+                title=element_text(size=8))
+        
+        
+      }
+      s_idx = s_idx + 1
+    }
+    
+    
+    
+    
+gridExtra::grid.arrange(PopPlot[["YT"]][["ConTemp"]],PopPlot[["YT"]][["IncTemp"]],ncol=2)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
