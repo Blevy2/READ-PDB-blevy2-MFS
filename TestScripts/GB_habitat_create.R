@@ -1905,7 +1905,6 @@ for(s in seq(3)) {
   
   ######################################################################################
   
-  #I AM COPYING FROM CALC_SRS_INDEX_SURVEY_BENS, which was adapted from Liz's code to create below
   library(tibble)
   library(ggplot2)
   library(plyr)
@@ -2086,25 +2085,28 @@ for(s in seq(3)) {
 
     for(scenario in c("ConTemp","IncTemp")){
       
-  
-    
+  ifelse(scenario == "ConTemp",ss <- "Constant Temperature",ss <- "Increasing Temperature")
+
       PopPlot[[s]][[scenario]] <- ggplot() +
         
         #this way plots data by season
-        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("ConPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Constant Pop."),size=3) +
-        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("ConPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Constant Pop."),size=1) +
+        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("ConPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Constant Population"),size=3) +
+        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("ConPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Constant Population"),size=1) +
         
-        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Pop."),size=3) +
-        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Pop."),size=1) +
+        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Population"),size=3) +
+        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Population"),size=1) +
         
-        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Pop."),size=3) +
-        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Pop."),size=1) +
+        geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Population"),size=3) +
+        geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Population"),size=1) +
         
-        labs(x="year",y="Total Spring Biomass", title = "Yellowtail Flounder") +
+        labs(x=NULL,y=NULL, title = "Yellowtail Flounder") + #
+        
+        theme(legend.position="bottom")  +
         
         theme(axis.text=element_text(size=12),
               axis.title=element_text(size=12),
-              title=element_text(size=8))
+              title=element_text(size=8),
+              plot.title = element_text(hjust = 0.5))
       
       
     }
@@ -2120,18 +2122,22 @@ for(s in seq(3)) {
       
       for(scenario in c("ConTemp","IncTemp")){
         
+        ifelse(scenario == "ConTemp",ss <- "Constant Temperature",ss <- "Increasing Temperature")
         
         
         PopPlot[[s]][[scenario]] <- ggplot() +
           
-          geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=3) +
-          geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=1) +
+          geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Population"),size=3) +
+          geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("DecPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Decreasing Population"),size=1) +
           
-          labs(x="year",y="Total Spring Biomass", title = "Atlantic Cod") +
+          labs(x=NULL,y=NULL, title = "Atlantic Cod")+ #x="year",y="Total Spring Biomass",
+          
+          scale_color_manual(values=c('#00BA38')) + #make same color as yellowtail plot
           
           theme(axis.text=element_text(size=12),
                 axis.title=element_text(size=12),
-                title=element_text(size=8))
+                title=element_text(size=8),
+                plot.title = element_text(hjust = 0.5))
         
         
       }
@@ -2146,28 +2152,195 @@ for(s in seq(3)) {
       
       for(scenario in c("ConTemp","IncTemp")){
         
-        
+        ifelse(scenario == "ConTemp",ss <- "Constant Temperature",ss <- "Increasing Temperature")
         
         PopPlot[[s]][[scenario]] <- ggplot() +
           
-          geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=3) +
-          geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season),size=1) +
+          geom_point(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Population"),size=3) +
+          geom_line(data =  subset(as.data.frame(pop_by_season[[s]][[paste("IncPop_",scenario,sep="")]]),season==1), aes(x=as.numeric(year),y=as.numeric(biomass), group = season, color = "Increasing Population"),size=1) +
           
-          labs(x="year",y="Total Spring Biomass", title = "Haddock") +
+          labs(x=NULL,y=NULL, title = "Haddock")+ #x="year",y="Total Spring Biomass",
+          
+          scale_color_manual(values=c('#619CFF')) + #make same color as yellowtail plot
+        
           
           theme(axis.text=element_text(size=12),
                 axis.title=element_text(size=12),
-                title=element_text(size=8))
+                title=element_text(size=8),
+                plot.title = element_text(hjust = 0.5))
         
         
       }
       s_idx = s_idx + 1
     }
     
+  
+  
+  #ADD SINGLE LEGEND TO PLOT
+  library(gridExtra)
+  #extract legend
+  #https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+  g_legend<-function(a.gplot){
+    tmp <- ggplot_gtable(ggplot_build(a.gplot))
+    leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+    legend <- tmp$grobs[[leg]]
+    return(legend)}
+  
+  #chagne title of legend
+  
+                                           #ADDING SPACE TO CENTER LEGEND MANUALLY
+  PopPlot$YT$ConTemp$labels$colour <- "                                                                                                                                                                                                                                      "
+  mylegend<-g_legend(PopPlot$YT$ConTemp) 
+  
+
+  
+  
+  # grid.arrange(arrangeGrob(PopPlot$YT$ConTemp  + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  #                                                      panel.background = element_blank(),legend.position="none") ,
+  #                          PopPlot$YT$IncTemp + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  #                                                     panel.background = element_blank(),legend.position="none"),
+  #                          PopPlot$Cod$ConTemp + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  #                                                      panel.background = element_blank(),legend.position="none"),
+  #                          PopPlot$Cod$IncTemp +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  #                                                                     panel.background = element_blank(),legend.position="none"),
+  #                          PopPlot$Had$ConTemp +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  #                                                                     panel.background = element_blank(),legend.position="none"),
+  #                          PopPlot$Had$IncTemp +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  #                                                                     panel.background = element_blank(),legend.position="none"),
+  #                          nrow=3),
+  #              mylegend,heights=c(10, 1),left="Total Spring Biomass",bottom="Year")
+    
+  
+  
+  
+  grid.arrange(arrangeGrob(PopPlot$YT$ConTemp  + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                       panel.background = element_blank(),legend.position="none") ,
+                          
+                           PopPlot$Cod$ConTemp + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                       panel.background = element_blank(),legend.position="none"),
+                           PopPlot$Had$ConTemp +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                        panel.background = element_blank(),legend.position="none"), top = "Constant Temperature",bottom="Year")
+               ,
+               arrangeGrob( PopPlot$YT$IncTemp + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                       panel.background = element_blank(),legend.position="none"),
+                            
+                            PopPlot$Cod$IncTemp +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                        panel.background = element_blank(),legend.position="none"),
+                            
+                            PopPlot$Had$IncTemp +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                        panel.background = element_blank(),legend.position="none"),top="Increasing Temperature",bottom="Year"),
+               nrow=2,
+               mylegend,heights=c(10, 1),left="Total Spring Biomass")
+          
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  ######################################################################################
+  
+  
+  #7) PLOTTING POPULATION SCENARIOS USED FOR PUBLICATION
+  
+
+  
+  ######################################################################################
+  
+  
+  
+  #constant temp gradient
+  moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_ConstTemp_HaddockStrata")
+  
+  
+  #record desired values (weekly and yearly means)
+  
+  
+  
+  #plot each weekly mean
+  wk_meantemp <- vector()
+  yr_meantemp_con <- vector()
+  wk_mintemp <- vector()
+  wk_maxtemp <- vector()
+  
+  for(i in seq(steps)){
+    wk_meantemp <- c(wk_meantemp,mean(as.vector(as.matrix(moveCov[["cov.matrix"]][[i]])),na.rm=T))
+    
+    wk_mintemp <- c(wk_mintemp,min(as.vector(as.matrix(moveCov[["cov.matrix"]][[i]])),na.rm=T))
+    
+    wk_maxtemp <- c(wk_maxtemp,max(as.vector(as.matrix(moveCov[["cov.matrix"]][[i]])),na.rm=T))
+    
+    #record yearly temp
+    if(i %% 52 == 0){    
+      p <- i - 51
+      yr_meantemp_con <- c(yr_meantemp_con,mean(as.vector(wk_meantemp[p:i]),na.rm=T))
+    }
+    
+  }
+  
+  TempData <- cbind(seq(length(wk_maxtemp)),wk_mintemp,wk_maxtemp,wk_meantemp)
+  
+  colnames(TempData) <- c("Week","WklyMin","WklyMax","WklyMean")
+  TempData<-as.data.frame(TempData)
+  
+  YearMeanDataCon <- as.data.frame(cbind(seq(20),yr_meantemp_con))
+  colnames(YearMeanDataCon) <- c("Year","Temp")
+  
+  
+  
+  #PLOT WEEKLY CONSTANT MEAN TEMPERATURE
+  ConTempPlot <- ggplot() +
+    
+    geom_point(data = TempData, aes(x=Week,y=WklyMean),size=.5) +
+    
+    labs(x="Week",y="Mean Temperature", title = "Repeating Temperature Scenario")+ #x="year",y="Total Spring Biomass",
     
     
+    theme(axis.text=element_text(size=12),
+          axis.title=element_text(size=12),
+          title=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))
+  
+  
+  
+  
+  #PLOT SINGLE YEAR MEAN TEMPERATURE
+  YearTempPlot<- ggplot() +
     
-gridExtra::grid.arrange(PopPlot[["YT"]][["ConTemp"]],PopPlot[["YT"]][["IncTemp"]],ncol=2)
+    geom_point(data = subset(TempData,Week<=52), aes(x=Week,y=WklyMean),size=2) +
+    
+    labs(x="Week",y="Mean Temperature", title = "2012 Mean Weekly Temperature")+ #x="year",y="Total Spring Biomass",
+    
+    
+    theme(axis.text=element_text(size=12),
+          axis.title=element_text(size=12),
+          title=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))
+  
+  
+  
+  #PLOT YEARLY CONSTANT MEAN TEMPERATURE
+  YearConTempPlot <- ggplot() +
+    
+    geom_point(data = YearMeanDataCon, aes(x=Year,y=Temp),size=2) +
+    
+    labs(x="Year",y="Mean Temperature", title = "Repeating Temperature Scenario")+ #x="year",y="Total Spring Biomass",
+    
+    
+    theme(axis.text=element_text(size=12),
+          axis.title=element_text(size=12),
+          title=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))
   
   
   
@@ -2175,9 +2348,92 @@ gridExtra::grid.arrange(PopPlot[["YT"]][["ConTemp"]],PopPlot[["YT"]][["IncTemp"]
   
   
   
+  #increasing temperature
+  moveCov <- readRDS(file="20 year moveCov matrices/GeorgesBank/GB_22yr_IncrTemp_HaddockStrata_res2")
   
   
   
+  #record desired values (weekly and yearly means)
+  
+
+  
+  #plot each weekly mean
+  wk_meantemp <- vector()
+  yr_meantemp_inc <- vector()
+  wk_mintemp <- vector()
+  wk_maxtemp <- vector()
+  
+  for(i in seq(52*22)){
+    wk_meantemp <- c(wk_meantemp,mean(as.vector(as.matrix(moveCov[["cov.matrix"]][[i]])),na.rm=T))
+    
+    wk_mintemp <- c(wk_mintemp,min(as.vector(as.matrix(moveCov[["cov.matrix"]][[i]])),na.rm=T))
+    
+    wk_maxtemp <- c(wk_maxtemp,max(as.vector(as.matrix(moveCov[["cov.matrix"]][[i]])),na.rm=T))
+    
+    #record yearly temp
+    if(i %% 52 == 0){    
+      p <- i - 51
+      yr_meantemp_inc <- c(yr_meantemp_inc,mean(as.vector(wk_meantemp[p:i]),na.rm=T))
+    }
+    
+  }
+  
+  TempData <- cbind(seq(length(wk_maxtemp)),wk_mintemp,wk_maxtemp,wk_meantemp)
+  
+  colnames(TempData) <- c("Week","WklyMin","WklyMax","WklyMean")
+  TempData<-as.data.frame(TempData)
+  
+  YearMeanDataInc <- as.data.frame(cbind(seq(22),yr_meantemp_inc))
+  colnames(YearMeanDataInc) <- c("Year","Temp")
+  
+  #PLOT INCREASING MEAN TEMPERATURE
+ IncTempPlot<- ggplot() +
+    
+    geom_point(data = subset(TempData,Week>52), aes(x=Week,y=WklyMean),size=.5) +
+
+    labs(x="Week",y="Mean Temperature", title = "Increasing Temperature Scenario")+ #x="year",y="Total Spring Biomass",
+    
+  
+    theme(axis.text=element_text(size=12),
+          axis.title=element_text(size=12),
+          title=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))
+ 
+ 
+ 
+ #PLOT YEARLY INCREASING MEAN TEMPERATURE
+ YearIncTempPlot <- ggplot() +
+   
+   geom_point(data = subset(YearMeanDataInc,Year>2), aes(x=Year,y=Temp),size=2) +
+   
+   labs(x="Year",y="Mean Temperature", title = "Increasing Temperature Scenario")+ #x="year",y="Total Spring Biomass",
+   
+   
+   theme(axis.text=element_text(size=12),
+         axis.title=element_text(size=12),
+         title=element_text(size=10),
+         plot.title = element_text(hjust = 0.5))
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+  
+ library(gridExtra)
+  
+ grid.arrange(arrangeGrob(YearTempPlot,YearConTempPlot,YearIncTempPlot,nrow=1,ncol=3),
+              arrangeGrob(ConTempPlot,nrow=1,ncol=1),
+              arrangeGrob(IncTempPlot,nrow=1,ncol=1)
+ )
+ 
+ 
+  
+ 
+ 
+ 
   
   
   

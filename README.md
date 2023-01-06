@@ -100,7 +100,10 @@ GB_habitat_create reads in rasters created in Environmental_interp_kern_dens to 
 strata (numbers for each strata), and stratas (strata numbers marked spatially in matrix).
 This code also makes a number of plots at the end: temperature over time, species=specific temperature in constant and increasing scenarios, species-specific habitat + temp preferences for constant and increasing temps, 
 also plots the true model output, temperature, and habitat in survey weeks with the survey point locations on top of them,
-also plots the habitat in a 3 pane plot for publication.
+also plots the habitat in a 3 pane plot for publication
+also plots population line plots used in publications
+also plots final habitat used in poublication
+also plots temperature oscilations .
 
 Generic_Species_Profile.R is a bare bones version of Generic_Species.Rmd that is stripped down to the essential commands so it can be used for profiling. This was created early on to profile the code.
 
