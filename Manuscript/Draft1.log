@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  6 JAN 2023 16:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  7 JAN 2023 15:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -705,61 +705,61 @@ Package pdftex.def Info: Images/TempScenarios.png  used on input line 274.
 <Images/Population_scenarios.png, id=151, 997.47656pt x 527.72156pt>
 File: Images/Population_scenarios.png Graphic file (type png)
 <use Images/Population_scenarios.png>
-Package pdftex.def Info: Images/Population_scenarios.png  used on input line 348.
+Package pdftex.def Info: Images/Population_scenarios.png  used on input line 351.
 (pdftex.def)             Requested size: 465.05466pt x 246.04024pt.
 [14 <./Images/Population_scenarios.png>]
-Overfull \hbox (441.85887pt too wide) in paragraph at lines 369--440
+Overfull \hbox (441.85887pt too wide) in paragraph at lines 372--443
  [][] 
  []
 
 
-Overfull \hbox (144.20148pt too wide) in paragraph at lines 489--526
+Overfull \hbox (144.20148pt too wide) in paragraph at lines 492--529
  [][] 
  []
 
 [15] [16] [17] [18] [19] [20]
-Overfull \hbox (7.39761pt too wide) in alignment at lines 584--588
+Overfull \hbox (7.39761pt too wide) in alignment at lines 587--591
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (7.39761pt too wide) in alignment at lines 588--598
+Overfull \hbox (7.39761pt too wide) in alignment at lines 591--601
  [] [] [] [] [] [] [] 
  []
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 605.
+(Font)              <10> on input line 608.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 605.
+(Font)              <7> on input line 608.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 605.
+(Font)              <5> on input line 608.
 
-Overfull \hbox (36.30684pt too wide) in paragraph at lines 627--651
+Overfull \hbox (36.30684pt too wide) in paragraph at lines 630--654
  [][] 
  []
 
 
-Overfull \hbox (4.55157pt too wide) in paragraph at lines 670--670
+Overfull \hbox (4.55157pt too wide) in paragraph at lines 673--673
 []|\T1/lmr/m/n/12 FieldCOnfig|  
  []
 
 
-Overfull \hbox (4.7078pt too wide) in paragraph at lines 672--672
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 675--675
 []|\T1/lmr/m/n/12 X1_formula|  
  []
 
 
-Overfull \hbox (4.7078pt too wide) in paragraph at lines 673--673
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 676--676
 []|\T1/lmr/m/n/12 X2_formula|  
  []
 
 [21]
-Overfull \hbox (105.92778pt too wide) in paragraph at lines 680--888
+Overfull \hbox (105.92778pt too wide) in paragraph at lines 683--891
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 615.76936pt on input line 888.
+LaTeX Warning: Float too large for page by 615.76936pt on input line 891.
 
 [22] [23] [24] [25] (./Draft1.aux)
 
@@ -780,7 +780,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  72i,10n,77p,1626b,1028s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on Draft1.pdf (25 pages, 704717 bytes).
+Output written on Draft1.pdf (25 pages, 705974 bytes).
 PDF statistics:
  313 PDF objects out of 1000 (max. 8388607)
  245 compressed objects within 3 object streams
