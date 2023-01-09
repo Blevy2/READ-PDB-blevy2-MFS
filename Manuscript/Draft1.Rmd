@@ -50,9 +50,9 @@ if(!require(kableExtra)) {
 
 
 #read in results tables
-YT_results<-read.csv("Yellowtail_results.csv")
-Cod_results<-read.csv("Cod_results.csv")
-Had_results<-read.csv("Haddock_results.csv")
+YT_results<-read.csv("CSVs/Yellowtail_results.csv")
+Cod_results<-read.csv("CSVs/Cod_results.csv")
+Had_results<-read.csv("CSVs/Haddock_results.csv")
 ```
 
 
@@ -234,31 +234,36 @@ Stock assessment scientists use samples from the bottom trawl survey to estimate
 
 We follow the advice given in [@thorson2019guidance] to build VAST models to estimate biomass on Georges Bank using stratified mean samples from our model output. In addition to exploring different link functions and assumed distributions, our VAST model-building process included testing the impact of including spatial and/or spatio-temporal variation in our models, considering varying number of knots in our mesh, and testing different forms of temporal correlation. We also carried out the same process both including covariates in our model as well as running models without covariate information. We considered covariates in the form of dynamic temperature values and/or static habitat values from our population model. When using covariates we ultimately decided to provide the most information to the model by including both covariates for both linear predictors. Since we know the true population values in our models we calculate the absolute error of each VAST estimate to compare between potential settings. Through this process, and in consultation with the VAST package creator, we determined setting that allowed VAST models to converge for all of our scenarios while also providing the lowest absolute error values. Settings for our VAST models can be seen in Table ???.
 
-Our goal is to determine indexing approaches and settings that are robust to future environmental conditions and resulting spatial biomass patterns. An underlying assumption in all indexing methods is that individual random samples combine to accurately represent true abundance by a) sampling all strata in which the population exists and b) low enough noise level in the samples to allow for a discernible pattern. This assumption can be questioned given enough noise in the sampling process **cite?** and/or shifting spatial preferences driven by climate change causing a population to move into a previously uninhabited strata. To simulate the impact of noise, we compare indexing estimates after adding noise to our samples versus those using the true sampling values. We simulate the effect of populations moving into new habitat by comparing indexing estimates using samples from all strata inhabited by each species on Georges bank to those that only include a subset of the full spatial domain for each species.[[may need to spell the aspect of reduced spatial domain a bit more because it might be confusing to readers who are expected us to just add areas around the current ones instead of reducing the strata]]
+Our goal is to determine indexing approaches and settings that are robust to future environmental conditions and resulting spatial biomass patterns. An underlying assumption in all indexing methods is that individual random samples combine to accurately represent true abundance by a) containing a low enough noise level in the samples to allow for a discernible pattern and b) sampling all strata in which the population exists. These assumptions can be questioned given enough noise in the sampling process **cite?** and/or climate change causing a population to move into previously uninhabited strata. To simulate the impact of noise, we compare indexing estimates after adding noise to our samples versus those using the true sampling values. **BL: Help with correct notation for adding noise**. We simulate the effect of populations moving into new habitat by comparing indexing estimates using samples from all strata inhabited by each species on Georges bank to those that only include a subset of the full spatial domain for each species. We chose strata to exclude for each species by reviewing how spatial preferences evolved in our increasing temperature scenarios and removing strata that each species either shifted into, or away from. Tabl XXX lists all strata inhabited by each species, those that are removed from certain calculations, and the explanation of why these strata were removed.
 
-When combining population trends for each species, differing temperature scenarios, altering seasons, and sampling possibilities (noise, strata, covariates) there are a large number of scenario combinations to consider. The columns in Table COMBOS show the choices that define each scenario.
+**BL: I tried to provid emore detail above and also added another table**
+[[may need to spell the aspect of reduced spatial domain a bit more because it might be confusing to readers who are expected us to just add areas around the current ones instead of reducing the strata]]
 
-
-
-<div align="center">Table COMBOS Each index estimate chooses one condition from each of the following columns. There are $3*3*2*2*2*2*2=288$ VAST model combinations and $3*3*2*2*2=144$ stratified mean estimates.</div>
-
-```{r scenarios, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+When combining population trends for each species, differing temperature scenarios, altering seasons, and sampling possibilities (noise, strata, covariates) there are a large number of scenario combinations to consider. The columns in Table \@ref(tab:scenarios) show the choices that define each scenario.
 
 
-tabl <- "
-|	Species	|	Population Trend | Temperature Scenario | Strata Included | Noise Added | Covariates (VAST) | Season
-|:--	|:-- |:--- |:-- |:-- |:-- |:-
-|Yellowtail | Increasing | Repeating | All strata | No| No Covariates | Spring
-|Cod | Constant | Increasing 5$^{\\circ}$| Subset | Yes| Temp + Habitat | Fall
-|Haddock | Decreasing | | | | |
-"
 
-#knitr::kable(tabl, vline = "|")
+```{r scenarios,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 
-cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+options(knitr.kable.NA = '')
 
 
+combos_table = read_csv("CSVs/scenario_combos.csv")
+
+summary_tab <- combos_table %>% 
+   mutate_if(grepl('5deg',.), ~replace(., grepl('5deg', .), paste("Increasing 5","\U00B0","C",sep=""))) 
+
+
+# Create table to present the data]
+ kable(summary_tab, "simple",
+                     caption = "Each index estimate chooses one condition from each of the following
+225 columns. There are 3∗3∗2∗2∗2∗2∗2 = 288 VAST model combinations and 3∗3∗2∗2∗2 = 144
+226 stratified mean estimates.",
+          format = "latex", booktabs = TRUE) %>%
+          kable_styling(latex_options = "scale_down")
 ```
+
+
 
 
 \section{Results}
@@ -304,7 +309,7 @@ perhaps for discussion, but we should mention somewhere that MFS only tracks bio
 [[we should thank Jim (obviously), but also those who helped you with the habitat data (robyn, david Chev.) and others? also should note that funding provided by Climate-Groundfish source (I'll dig up the official name of the funding source)]] 
 
 ## Data and Code Availability
-All data and code used in this work are available at https://github.com/cmlegault/IBMWG. [[need to update this]]
+All data and code used in this work are available at https://github.com/Blevy2/READ-PDB-blevy2-MFS2. 
 
 ## References
 
@@ -359,7 +364,7 @@ library("forcats")
 
 
 
-param_table1 = read_csv("Parameters1.csv")
+param_table1 = read_csv("CSVs/Parameters1.csv")
 
 summary_tab1 <- param_table1 %>% 
  # dplyr::mutate_if(is.numeric, list(~as.character(signif(., 3))))%>%
@@ -500,7 +505,7 @@ library("forcats")
 
 
 
-param_table = read_csv("Parameters.csv")
+param_table = read_csv("CSVs/Parameters.csv")
 
 summary_tab <- param_table %>% 
   dplyr::mutate_if(is.numeric, list(~as.character(signif(., 3))))%>%
@@ -571,7 +576,7 @@ library("forcats")
 
 
 
-result_table = read_csv("Yellowtail_results_final.csv")
+result_table = read_csv("CSVs/Yellowtail_results_final.csv")
 
 summary_tab <- result_table %>% 
 
@@ -605,7 +610,7 @@ library("forcats")
 
 
 
-param_table1 = read_csv("Cod_results.csv")
+param_table1 = read_csv("CSVs/Cod_results.csv")
 
 summary_tab1 <- param_table1 %>% 
 # Group the table according to Parameter, Scenario
@@ -626,6 +631,12 @@ Fig_3a <-  kable(summary_tab1[, -1],
 ```{r, results='asis'}
 Fig_3a
 ```
+
+
+
+
+
+
 
 <!-- ```{r PMsallscenarios, echo=FALSE, message=FALSE, warnings=FALSE, out.width='7in', fig.cap=figcap1} -->
 <!-- #knitr::include_graphics(file.path(getwd(),"MS_tables_figs_rev1/final_ms_figs","Figure_1.pdf")) -->

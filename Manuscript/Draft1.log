@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  7 JAN 2023 15:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  9 JAN 2023 16:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -702,64 +702,64 @@ File: Images/TempScenarios.png Graphic file (type png)
 Package pdftex.def Info: Images/TempScenarios.png  used on input line 274.
 (pdftex.def)             Requested size: 446.27695pt x 238.48476pt.
 [9 <./Images/TempScenarios.png>] [10] [11] [12] [13]
-<Images/Population_scenarios.png, id=151, 997.47656pt x 527.72156pt>
+<Images/Population_scenarios.png, id=152, 997.47656pt x 527.72156pt>
 File: Images/Population_scenarios.png Graphic file (type png)
 <use Images/Population_scenarios.png>
-Package pdftex.def Info: Images/Population_scenarios.png  used on input line 351.
+Package pdftex.def Info: Images/Population_scenarios.png  used on input line 338.
 (pdftex.def)             Requested size: 465.05466pt x 246.04024pt.
 [14 <./Images/Population_scenarios.png>]
-Overfull \hbox (441.85887pt too wide) in paragraph at lines 372--443
+Overfull \hbox (441.85887pt too wide) in paragraph at lines 359--430
  [][] 
  []
 
 
-Overfull \hbox (144.20148pt too wide) in paragraph at lines 492--529
+Overfull \hbox (135.39348pt too wide) in paragraph at lines 479--516
  [][] 
  []
 
 [15] [16] [17] [18] [19] [20]
-Overfull \hbox (7.39761pt too wide) in alignment at lines 587--591
+Overfull \hbox (7.39761pt too wide) in alignment at lines 574--578
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (7.39761pt too wide) in alignment at lines 591--601
+Overfull \hbox (7.39761pt too wide) in alignment at lines 578--588
  [] [] [] [] [] [] [] 
  []
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 608.
+(Font)              <10> on input line 595.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 608.
+(Font)              <7> on input line 595.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 608.
+(Font)              <5> on input line 595.
 
-Overfull \hbox (36.30684pt too wide) in paragraph at lines 630--654
+Overfull \hbox (36.30684pt too wide) in paragraph at lines 617--641
  [][] 
  []
 
 
-Overfull \hbox (4.55157pt too wide) in paragraph at lines 673--673
+Overfull \hbox (4.55157pt too wide) in paragraph at lines 660--660
 []|\T1/lmr/m/n/12 FieldCOnfig|  
  []
 
 
-Overfull \hbox (4.7078pt too wide) in paragraph at lines 675--675
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 662--662
 []|\T1/lmr/m/n/12 X1_formula|  
  []
 
 
-Overfull \hbox (4.7078pt too wide) in paragraph at lines 676--676
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 663--663
 []|\T1/lmr/m/n/12 X2_formula|  
  []
 
 [21]
-Overfull \hbox (105.92778pt too wide) in paragraph at lines 683--891
+Overfull \hbox (105.92778pt too wide) in paragraph at lines 670--878
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 615.76936pt on input line 891.
+LaTeX Warning: Float too large for page by 615.76936pt on input line 878.
 
 [22] [23] [24] [25] (./Draft1.aux)
 
@@ -769,21 +769,21 @@ LaTeX Warning: There were undefined references.
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `Draft1.out' has not changed.
-(rerunfilecheck)             Checksum: 050EF31309E7EC369AD48CB9829A6394;1831.
+(rerunfilecheck)             Checksum: 94BB65BAEB3C563A674B1570BE630FAC;1831.
  ) 
 Here is how much of TeX's memory you used:
- 17234 strings out of 478053
- 323361 string characters out of 5838651
+ 17235 strings out of 478053
+ 323392 string characters out of 5838651
  1938787 words of memory out of 5000000
- 37004 multiletter control sequences out of 15000+600000
+ 37005 multiletter control sequences out of 15000+600000
  574362 words of font info for 78 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  72i,10n,77p,1626b,1028s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on Draft1.pdf (25 pages, 705974 bytes).
+Output written on Draft1.pdf (25 pages, 706479 bytes).
 PDF statistics:
- 313 PDF objects out of 1000 (max. 8388607)
- 245 compressed objects within 3 object streams
+ 316 PDF objects out of 1000 (max. 8388607)
+ 248 compressed objects within 3 object streams
  68 named destinations out of 1000 (max. 500000)
  122 words of extra memory for PDF output out of 10000 (max. 10000000)
 
