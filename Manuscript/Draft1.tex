@@ -314,16 +314,15 @@ When combining population trends for each species, differing temperature scenari
 \begin{table}
 
 \caption{\label{tab:scenarios}Each index estimate chooses one condition from each of the following
-225 columns. There are 3*3*2*2*2*2*2 = 288 VAST model combinations and 3*3*2*2*2 = 144
-226 stratified mean estimates.}
+7 columns. There are 3*3*2*2*2*2*2 = 288 VAST model combinations and 3*3*2*2*2*2 = 144 stratified mean estimates.}
 \centering
 \resizebox{\linewidth}{!}{
 \begin{tabular}[t]{lllllll}
 \toprule
-Species & Population Trend & Temperature Scenario & Strata Included & Noise Added & Covariates (VAST) & Season\\
+Species & Population Trend & Temperature Scenario & Strata Included & Noise Added & Season & Covariates (VAST)\\
 \midrule
-Yellowtail & Increasing & Repeating & All strata & No & Spring & \\
-Cod & Constant & Increasing 5°C & Subset & Yes & Fall & \\
+Yellowtail & Increasing & Repeating & All strata & No & Spring & No\\
+Cod & Constant & Increasing 5°C & Subset & Yes & Fall & Yes\\
 Haddock & Decreasing &  &  &  &  & \\
 \bottomrule
 \end{tabular}}

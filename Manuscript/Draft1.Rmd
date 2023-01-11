@@ -257,8 +257,7 @@ summary_tab <- combos_table %>%
 # Create table to present the data]
  kable(summary_tab, "simple",
                      caption = "Each index estimate chooses one condition from each of the following
-225 columns. There are 3∗3∗2∗2∗2∗2∗2 = 288 VAST model combinations and 3∗3∗2∗2∗2 = 144
-226 stratified mean estimates.",
+7 columns. There are 3∗3∗2∗2∗2∗2∗2 = 288 VAST model combinations and 3∗3∗2∗2∗2∗2 = 144 stratified mean estimates.",
           format = "latex", booktabs = TRUE) %>%
           kable_styling(latex_options = "scale_down")
 ```

@@ -1,4 +1,4 @@
-Species,Population Trend,Temperature Scenario,Strata Included,Noise Added,Covariates (VAST),Season
-Yellowtail,Increasing,Repeating,All strata,No,Spring,
-Cod,Constant,Increasing 5deg C,Subset,Yes,Fall,
+Species,Population Trend,Temperature Scenario,Strata Included,Noise Added,Season,Covariates (VAST)
+Yellowtail,Increasing,Repeating,All strata,No,Spring,No
+Cod,Constant,Increasing 5deg C,Subset,Yes,Fall,Yes
 Haddock,Decreasing,,,,,
