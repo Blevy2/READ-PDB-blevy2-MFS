@@ -148,6 +148,7 @@ We obtained a shapefile for the 15 strata that comprise Georges Bank, where stra
 
 ```{r strata-plot, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Strata inhabited by each species in our population models."}
 knitr::include_graphics(c("Images/Strata.png"))
+knitr::include_graphics(c("Images/Excluded_strata.png"))
 ```
 
 <font size="5">*Population Dynamics and Recruitment*</font>

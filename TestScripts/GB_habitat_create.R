@@ -1795,7 +1795,7 @@ max(temp_max[21:40,1])
 ######################################################################################
 
 
-#5) PLOTTING HABITAT FOR PUBLICATION
+#5a) PLOTTING HABITAT FOR PUBLICATION
 
 
 spp_names <- c("Yellowtail Flounder","Cod","Haddock")
@@ -1883,6 +1883,105 @@ for(s in seq(3)) {
     # ggtitle("Cod Habitat")+  
     # theme(plot.title = element_text(hjust = 0.5,size=50),legend.position="none" )
 
+  
+  
+  
+  
+  
+  ######################################################################################
+  
+  
+  #5b) PLOTTING SPECIES-SPECIFIC STRATA FOR PUBLICATION
+  
+    library(rgdal)
+    library(gridExtra)
+  
+  #load stratas for clipping etc
+  strata.dir <- "C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\" # strata shape files in this directory
+
+  # get the shapefiles
+  strata.areas <- readOGR(paste(strata.dir,"Survey_strata", sep="")) #readShapePoly is deprecated; use rgdal::readOGR or sf::st_read 
+  
+  #define georges bank for YELLOWTAIL
+  GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210")
+  #pull out indices corresponding to GB strata
+  GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+  #plot them
+  #plot(strata.areas[GB_strata_idx,])
+  #define GB strata as own object
+  GB_strata_YT <- strata.areas[GB_strata_idx,]
+  
+  #define georges bank for COD  
+ GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250")
+  #pull out indices corresponding to GB strata
+  GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+  #plot them
+  #plot(strata.areas[GB_strata_idx,])
+  #define GB strata as own object
+  GB_strata_Cod <- strata.areas[GB_strata_idx,]
+  
+  #define georges bank for HADDOCK  
+  GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300")
+  #pull out indices corresponding to GB strata
+  GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+  #plot them
+  #plot(strata.areas[GB_strata_idx,])
+  #define GB strata as own object
+  GB_strata_Had <- strata.areas[GB_strata_idx,]
+  
+  
+  
+  GB_strata <-list(GB_strata_YT,GB_strata_Cod,GB_strata_Had)
+  names(GB_strata) <- c("YT","Cod","Had")
+  
+  Exclude_strata <- list()
+    #YT Exclude
+Exclude_strata[["YT"]] <-  c(1130,1140,1150,1170,1180)
+  #Cod Exclude
+Exclude_strata[["Cod"]] <-  c(1230,1240,1250)
+  #Had Exclude
+Exclude_strata[["Had"]] <-  c(1230,1240,1250,1290,1300)
+  
+#add exclude to data frame
+plots <- list()
+
+  for(s in names(GB_strata)){
+    Exclude <- rep(1,length(GB_strata[[s]]$STRATA))
+    
+        idx = GB_strata[[s]]$FINSTR_ID %in% Exclude_strata[[s]]
+
+        Exclude[idx] <- 2
+        
+        df <- data.frame(cbind(GB_strata[[s]]@data,Exclude))
+        
+        GB_strata[[s]]@data <- df 
+        
+        plots[[s]] <- spplot(GB_strata[[s]],zcol="Exclude", col.regions = c("white","yellow"), colorkey=FALSE, par.settings =
+                      list(axis.line = list(col =  'transparent')))
+  
+        
+      
+      }
+  
+
+
+
+grid.arrange(plots[["YT"]],plots[["Cod"]],plots[["Had"]], nrow=1)
+
+  
+
+#plot with legend to copy color
+spplot(GB_strata[[s]],zcol="Exclude", col.regions = c("yellow","green"), par.settings =
+         list(axis.line = list(col =  'transparent')))
+   
+
+  
+  
+  
+  
+  
+  
+  
   
   
   
@@ -2251,7 +2350,7 @@ for(s in seq(3)) {
   ######################################################################################
   
   
-  #7) PLOTTING POPULATION SCENARIOS USED FOR PUBLICATION
+  #7) PLOTTING SUMMARY PLOTS FOR TEMPERATURE SCENARIOS USED FOR PUBLICATION
   
 
   
