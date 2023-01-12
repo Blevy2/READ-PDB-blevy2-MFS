@@ -21,7 +21,7 @@ surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
 scenario1 <- "DecPop_IncTemp"
 #survey results without noise
-list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
+list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
 exclude_strata <- FALSE
 
