@@ -691,7 +691,7 @@ for(j in 1:6){
   
   
   FC2 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =4)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 0, "Epsilon1" = 0, "Epsilon2" = 4)
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,

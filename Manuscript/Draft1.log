@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  11 JAN 2023 14:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.28)  12 JAN 2023 16:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -681,85 +681,90 @@ File: Images/Strata.png Graphic file (type png)
 <use Images/Strata.png>
 Package pdftex.def Info: Images/Strata.png  used on input line 216.
 (pdftex.def)             Requested size: 446.28374pt x 155.57367pt.
+<Images/Excluded_strata.png, id=91, 877.77937pt x 323.70938pt>
+File: Images/Excluded_strata.png Graphic file (type png)
+<use Images/Excluded_strata.png>
+Package pdftex.def Info: Images/Excluded_strata.png  used on input line 216.
+(pdftex.def)             Requested size: 446.2686pt x 164.5759pt.
 
 LaTeX Warning: Reference `paramsALL' on page 6 undefined on input line 225.
 
-[6 <./Images/Strata.PNG>] [7]
-<Images/hab_snip3.png, id=114, 930.47626pt x 435.12563pt>
+[6 <./Images/Strata.PNG> <./Images/Excluded_strata.PNG>] [7]
+<Images/hab_snip3.png, id=116, 930.47626pt x 435.12563pt>
 File: Images/hab_snip3.png Graphic file (type png)
 <use Images/hab_snip3.png>
 Package pdftex.def Info: Images/hab_snip3.png  used on input line 252.
 (pdftex.def)             Requested size: 446.25438pt x 208.68529pt.
-<Images/Habitat_3species.png, id=115, 1285.05093pt x 415.5525pt>
+<Images/Habitat_3species.png, id=117, 1285.05093pt x 415.5525pt>
 File: Images/Habitat_3species.png Graphic file (type png)
 <use Images/Habitat_3species.png>
 Package pdftex.def Info: Images/Habitat_3species.png  used on input line 261.
 (pdftex.def)             Requested size: 446.2647pt x 144.31055pt.
-[8 <./Images/hab_snip3.PNG> <./Images/Habitat_3species.png (PNG copy)>]
-<Images/TempScenarios.png, id=124, 952.30782pt x 508.90125pt>
+[8 <./Images/hab_snip3.PNG>]
+<Images/TempScenarios.png, id=126, 952.30782pt x 508.90125pt>
 File: Images/TempScenarios.png Graphic file (type png)
 <use Images/TempScenarios.png>
 Package pdftex.def Info: Images/TempScenarios.png  used on input line 274.
 (pdftex.def)             Requested size: 446.27695pt x 238.48476pt.
-[9 <./Images/TempScenarios.png>] [10] [11] [12] [13]
-<Images/Population_scenarios.png, id=152, 997.47656pt x 527.72156pt>
+[9 <./Images/Habitat_3species.png (PNG copy)>] [10 <./Images/TempScenarios.png>] [11] [12] [13]
+<Images/Population_scenarios.png, id=154, 997.47656pt x 527.72156pt>
 File: Images/Population_scenarios.png Graphic file (type png)
 <use Images/Population_scenarios.png>
-Package pdftex.def Info: Images/Population_scenarios.png  used on input line 337.
+Package pdftex.def Info: Images/Population_scenarios.png  used on input line 336.
 (pdftex.def)             Requested size: 465.05466pt x 246.04024pt.
-[14 <./Images/Population_scenarios.png>]
-Overfull \hbox (441.85887pt too wide) in paragraph at lines 358--429
+[14] [15 <./Images/Population_scenarios.png>]
+Overfull \hbox (441.85887pt too wide) in paragraph at lines 357--428
  [][] 
  []
 
 
-Overfull \hbox (135.39348pt too wide) in paragraph at lines 478--515
+Overfull \hbox (135.39348pt too wide) in paragraph at lines 477--514
  [][] 
  []
 
-[15] [16] [17] [18] [19] [20]
-Overfull \hbox (7.39761pt too wide) in alignment at lines 573--577
+[16] [17] [18] [19] [20]
+Overfull \hbox (7.39761pt too wide) in alignment at lines 572--576
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (7.39761pt too wide) in alignment at lines 577--587
+Overfull \hbox (7.39761pt too wide) in alignment at lines 576--586
  [] [] [] [] [] [] [] 
  []
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 594.
+(Font)              <10> on input line 593.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 594.
+(Font)              <7> on input line 593.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 594.
+(Font)              <5> on input line 593.
 
-Overfull \hbox (36.30684pt too wide) in paragraph at lines 616--640
+Overfull \hbox (36.30684pt too wide) in paragraph at lines 615--639
  [][] 
  []
 
 
-Overfull \hbox (4.55157pt too wide) in paragraph at lines 659--659
+Overfull \hbox (4.55157pt too wide) in paragraph at lines 658--658
 []|\T1/lmr/m/n/12 FieldCOnfig|  
  []
 
 
-Overfull \hbox (4.7078pt too wide) in paragraph at lines 661--661
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 660--660
 []|\T1/lmr/m/n/12 X1_formula|  
  []
 
 
-Overfull \hbox (4.7078pt too wide) in paragraph at lines 662--662
+Overfull \hbox (4.7078pt too wide) in paragraph at lines 661--661
 []|\T1/lmr/m/n/12 X2_formula|  
  []
 
 [21]
-Overfull \hbox (105.92778pt too wide) in paragraph at lines 669--877
+Overfull \hbox (105.92778pt too wide) in paragraph at lines 668--876
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 615.76936pt on input line 877.
+LaTeX Warning: Float too large for page by 615.76936pt on input line 876.
 
 [22] [23] [24] [25] (./Draft1.aux)
 
@@ -772,18 +777,18 @@ Package rerunfilecheck Info: File `Draft1.out' has not changed.
 (rerunfilecheck)             Checksum: 94BB65BAEB3C563A674B1570BE630FAC;1831.
  ) 
 Here is how much of TeX's memory you used:
- 17235 strings out of 478053
- 323392 string characters out of 5838651
+ 17246 strings out of 478053
+ 323718 string characters out of 5838651
  1938787 words of memory out of 5000000
- 37005 multiletter control sequences out of 15000+600000
+ 37015 multiletter control sequences out of 15000+600000
  574362 words of font info for 78 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 72i,10n,77p,1626b,1028s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,10n,77p,1663b,1028s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on Draft1.pdf (25 pages, 706492 bytes).
+Output written on Draft1.pdf (25 pages, 786098 bytes).
 PDF statistics:
- 316 PDF objects out of 1000 (max. 8388607)
+ 318 PDF objects out of 1000 (max. 8388607)
  248 compressed objects within 3 object streams
  68 named destinations out of 1000 (max. 500000)
- 122 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 127 words of extra memory for PDF output out of 10000 (max. 10000000)
 
