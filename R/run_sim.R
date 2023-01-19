@@ -177,6 +177,9 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
    # print(t)
     ## Loop messages
     
+
+    
+    
     ## Print when new year
     if(t == 1){
       print(paste("----------year", year.breaks[t], "-----------"))
@@ -207,7 +210,7 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
     #                                     | ( t %in% unlist(sapply(pop_init$dem_params, function(x) tail(x[["spwn_wk"]],n=1))))),
     #                                  TRUE, FALSE), FALSE) 
     # 
-    
+
     #new method (allows for different recruit and spawn weeks for each species)
     
     Recruit  <- lapply(paste0("spp", seq_len(n_spp)), function(s) {   
@@ -228,6 +231,13 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
   # 
   #  print(Recruit[[3]])
   #   
+    
+    if(t>4){stop
+      sfsdfsdf 
+      d+sdfsd}
+    print(t)
+    gc()
+   
     
     if(t != ntow) {
       Pop_dyn  <- ifelse(day.breaks[t] != day.breaks[t+1], TRUE, FALSE) ## weekly delay diff
@@ -653,6 +663,9 @@ run_sim <- function(nz = NULL, MoveProb = NULL, MoveProb_spwn = NULL, sim_init =
       
       
     } # end if statement
+    # print(pryr::object_size(B))
+    # print(pryr::object_size(Bp1))
+    # print(pryr::object_size(Bm1))
    # print("here2")
     #######################
     ##### Pop movement ####
