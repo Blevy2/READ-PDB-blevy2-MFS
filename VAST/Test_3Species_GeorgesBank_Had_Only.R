@@ -18,7 +18,7 @@ orig.dir <- getwd()
 # surv_random_sample <- readRDS(file="surv_random_sample.RDS")
 # surv_random_sample <- as.matrix(surv_random_sample,ncol= 12)
 
-scenario1 <- "IncPop_ConTemp"
+scenario1 <- "IncPop_IncTemp"
 #survey results without noise
 list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
@@ -26,7 +26,7 @@ exclude_strata <- FALSE
 
 with_noise <- FALSE
 
-covariates <- FALSE
+covariates <- TRUE
 
 cov_used <- "_WithCov"  #"Temp_LinearBasic" 
 
@@ -37,7 +37,7 @@ cov_used <- "_WithCov"  #"Temp_LinearBasic"
 #DecPop_ConTemp 6 is pretty good
 #DecPop_IncTemp 9 is pretty good
 
-surv_random_sample <- list_all[[98]]
+surv_random_sample <- list_all[[100]]
 
 
 setwd(orig.dir)
@@ -497,7 +497,7 @@ for(j in 1:6){
     #  X2_formula = ~ poly(MoveCov, degree=2 )
     #   
     #Chris C idea for including 2 covariates
-    X1_formula = ~ poly(Temp, degree=2 )
+   # X1_formula = ~ poly(Temp, degree=2 )
     X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
     
     # X1_formula = ~ 1
@@ -532,7 +532,7 @@ for(j in 1:6){
                                 "c_iz"=as.numeric(rep(0,nrow(spring))), 
                                 "b_i"=as.numeric(spring[,'Catch_KG']), 
                                 "a_i"=as.numeric(spring[,'AreaSwept_km2']),
-                                X1_formula = X1_formula,
+                             #   X1_formula = X1_formula,
                                 X2_formula = X2_formula,
                                 covariate_data = covdata_spring,
                                 optimize_args=list("lower"=-Inf,"upper"=Inf)),
@@ -762,7 +762,7 @@ for(j in 1:6){
                               "c_iz"=as.numeric(rep(0,nrow(fall))), 
                               "b_i"=as.numeric(fall[,'Catch_KG']), 
                               "a_i"=as.numeric(fall[,'AreaSwept_km2']),
-                              X1_formula = X1_formula,
+                         #     X1_formula = X1_formula,
                               X2_formula = X2_formula,
                               covariate_data = covdata_fall,
                               optimize_args=list("lower"=-Inf,"upper"=Inf)),
