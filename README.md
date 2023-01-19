@@ -98,7 +98,12 @@ Fish_life.R is a script that uses the package FishLife to extract key parameters
 
 GB_habitat_create reads in rasters created in Environmental_interp_kern_dens to create the hab object used in simulation. hab is 4 components: hab (spatial habitat for each species), spawn_hab (spawning habitat for each species), 
 strata (numbers for each strata), and stratas (strata numbers marked spatially in matrix).
-This code also makes a number of plots at the end: temperature over time, species=specific temperature in constant and increasing scenarios, species-specific habitat + temp preferences for constant and increasing temps.
+This code also makes a number of plots at the end: temperature over time, species=specific temperature in constant and increasing scenarios, species-specific habitat + temp preferences for constant and increasing temps, 
+also plots the true model output, temperature, and habitat in survey weeks with the survey point locations on top of them,
+also plots the habitat in a 3 pane plot for publication
+also plots population line plots used in publications
+also plots final habitat used in poublication
+also plots temperature oscilations .
 
 Generic_Species_Profile.R is a bare bones version of Generic_Species.Rmd that is stripped down to the essential commands so it can be used for profiling. This was created early on to profile the code.
 
@@ -114,7 +119,7 @@ Strat_Rand_Samp is a script I created very early on to practice generating a ran
 
 reprex_generic_species.R is  script I created to try and recreate the C++ issus I was having (ie, reproducible example). This script eventually become the basis for rewriting the C++ code in the package
 
-Run_survey_BENS was created to run the scientific bottom trawl survey after a simulation has run (ie, assumes object "result" has been created that has all the different simulation iterations). This survey in this script was not was
+Run_survey_BENS was created to run the scientific bottom trawl survey after a simulation has run (ie, assumes object "result" has been created that has all the different simulation iterations). The survey in this script was not was
 Chris has in mind so I created a new version (below)
 
 Run_survey_BENS_NEW is the same as above except it applies noise in the correct locations to generate the correct number of samples and also allows for different numbers of different sized strata. 
@@ -180,6 +185,20 @@ stratified_mean_limited.R is a script that calculates the stratified mean from s
 true seasonal values from the model. Finally the script will plot each individual estimate with each simulation and save as a 100 page pdf and also saves error values from each to create a scatter plot. 
 If we want to compare scatterplots for included all strata in mean calcs vs not including all, we need to run the script twice. FIrst time to create gg object 'cc', second time to add cc to second scatterplot
 
+stratified_mean_limited_VAST.R
+stratified_mean_limited_VAST_Multiple_Surveys.R
+VAST_ModelSelection_Error_YT.R
+VAST_ModelSelection_Error_All.R
+VAST_ModelSelection_Error_Comparison_All.R
+VAST_ModelSelection_Error_All_withCovs.R
+VAST_ModelSelection_Error_All_withCovs_ForPaper.R
+
+The above 8 .R files are all similar in that they compare the error between index calcluations and the true value, and plot the output. They differ in that they are successive iterations of each other. They start by just comparing
+stratified mean and then we add VAST, we add noise, we add multiple species etc. The final version is the bottom one with the _ForPaper designation which will specify things at the top, read in and pull out the needed simulation info,
+calculate the stratified mean given the settings (strata, noise, species etc), find the error between the vast/stratified mean and true model values, and plot everything available for all species and scenarios in a pdf
+
+
+
 Percent_area_occupied.R is a script used to calculate the percent of the population that is in each strata and plot them over time. This can be used to see species shift as temp shifts
 
 movement_check.R is a script that can be used to compare spatial model results with observation data from surveys. Use this to set movement values like lambda
@@ -191,6 +210,7 @@ compile_results.R is a script used to take individual simulation runs that would
 x_y_to_lat_lon.R is a test script I used to practice reading in x,y locations from a survey and converting them into lat lon coordinates by relating them to the related habitat raster
 
 
+strata_area_cell_size.R is a file that compares cell sizes given to me by David Chevrier with those given to me by Liz Brooks to try and find "true" cell sizes on George's Bank
 
-
+Visualize_covariate_response.R is a script where I was testing different ways to visualze covariate responses from VAST models. I ultimately went with the one suggested in the VAST wiki which can be see in my VAST model scripts
 

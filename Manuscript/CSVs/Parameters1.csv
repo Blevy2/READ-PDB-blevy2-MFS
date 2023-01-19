@@ -1,0 +1,9 @@
+Parameter,Description,Unit,Yellowtail,Cod,Haddock,Source
+rrr,Ford's growth coefficient,1/wk,4.48,4.43,4.49,
+M,Natural mortality,1/wk,0.2064,0.2728,0.334,
+W1,Weight of fully recruited fish,kg,0.39,2.95,1.12,
+W2,Weight of pre-recruit fish,kg,0.13,0.39,0.19,
+sigma,Variance in recruited fish,kg*kg,0.55,0.55,0.55,
+lambda,Decay rate for movement,-,0.7,0.7,0.7,
+spwn,Spawning weeks for species s,wks,9-12,8-13,11-14,
+rec,Recruitment weeks for species s,wks,9-12,8-13,11-14,

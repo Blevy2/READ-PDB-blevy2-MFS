@@ -20,7 +20,7 @@ orig.dir <- getwd()
 
 scenario1 <- "DecPop_ConTemp"
 #survey results without noise
-list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
+list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
 exclude_strata <- FALSE
 
@@ -483,7 +483,7 @@ for(j in 1:6){
   # FC1[2,2] <-0
   
   FC1 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 4)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 0, "Epsilon1" = 0, "Epsilon2" = 4)
   
   #FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0
   
@@ -732,7 +732,7 @@ for(j in 1:6){
   
   
   FC2 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =4)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 0, "Epsilon1" = 0, "Epsilon2" = 4)
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,

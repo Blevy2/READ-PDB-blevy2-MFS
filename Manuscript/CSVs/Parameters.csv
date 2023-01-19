@@ -1,0 +1,37 @@
+Species,Scenario,Parameter,Description,Unit,Value
+Yellowtail,Constant Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.764
+Yellowtail,Constant Population,P0,Initial Biomass,kg,3194
+Yellowtail,Constant Population,alpha,Max recruitment rate,kg,30445
+Yellowtail,Constant Population,beta,Recruitment half saturation value,kg,4301
+Yellowtail,Increasing Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.564
+Yellowtail,Increasing Population,P0,Initial Biomass,kg,3194
+Yellowtail,Increasing Population,alpha,Max recruitment rate,kg,40000
+Yellowtail,Increasing Population,beta,Recruitment half saturation value,kg,43010
+Yellowtail,Decreasing Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.764
+Yellowtail,Decreasing Population,P0,Initial Biomass,kg,50000
+Yellowtail,Decreasing Population,alpha,Max recruitment rate,kg,1.07E+12
+Yellowtail,Decreasing Population,beta,Recruitment half saturation value,kg,2.30E+12
+Cod,Constant Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.83
+Cod,Constant Population,P0,Initial Biomass,kg,21500
+Cod,Constant Population,alpha,Max recruitment rate,kg,27868
+Cod,Constant Population,beta,Recruitment half saturation value,kg,10472
+Cod,Increasing Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.372
+Cod,Increasing Population,P0,Initial Biomass,kg,21500
+Cod,Increasing Population,alpha,Max recruitment rate,kg,45000
+Cod,Increasing Population,beta,Recruitment half saturation value,kg,62832
+Cod,Decreasing Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.623
+Cod,Decreasing Population,P0,Initial Biomass,kg,21500
+Cod,Decreasing Population,alpha,Max recruitment rate,kg,389480664
+Cod,Decreasing Population,beta,Recruitment half saturation value,kg,980163673
+Haddock,Constant Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.309
+Haddock,Constant Population,P0,Initial Biomass,kg,180000
+Haddock,Constant Population,alpha,Max recruitment rate,kg,73568
+Haddock,Constant Population,beta,Recruitment half saturation value,kg,40530
+Haddock,Increasing Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.134
+Haddock,Increasing Population,P0,Initial Biomass,kg,180000
+Haddock,Increasing Population,alpha,Max recruitment rate,kg,100000
+Haddock,Increasing Population,beta,Recruitment half saturation value,kg,405300
+Haddock,Decreasing Population,M+F,Adjusted Mortality (Natural + Fishing),wk,0.334
+Haddock,Decreasing Population,P0,Initial Biomass,kg,180000
+Haddock,Decreasing Population,alpha,Max recruitment rate,kg,497371062
+Haddock,Decreasing Population,beta,Recruitment half saturation value,kg,2078612769

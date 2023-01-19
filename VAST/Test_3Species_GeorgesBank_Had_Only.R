@@ -20,13 +20,13 @@ orig.dir <- getwd()
 
 scenario1 <- "IncPop_ConTemp"
 #survey results without noise
-list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
+list_all <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
 
 exclude_strata <- FALSE
 
 with_noise <- FALSE
 
-covariates <- TRUE
+covariates <- FALSE
 
 cov_used <- "_WithCov"  #"Temp_LinearBasic" 
 
@@ -451,7 +451,7 @@ for(j in 1:6){
   
   
   FC1 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" = 4)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 0, "Epsilon1" = 0, "Epsilon2" = 4) #tried 2 #was 4 for most runs
   
   #FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"="IID", "Epsilon2"=0
   
@@ -572,7 +572,7 @@ for(j in 1:6){
   plot(fit_spring)
   
   #copy parameter files into iteration folder
-  remove(fit_spring)
+#  remove(fit_spring)
   
   file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/settings.txt",sep="") 
               ,to =paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/spring/settings.txt",sep=""))
@@ -709,7 +709,7 @@ for(j in 1:6){
   #FC2 = c("Omega1" = 1, "Epsilon1" = 1, "Omega2" = 1, "Epsilon2" = 1) 
   
   FC2 = c("Omega1" = 0, "Epsilon1" =0, "Omega2" = 1, "Epsilon2" = 1) 
-  RhoConfig = c("Beta1" = 3, "Beta2" = 3, "Epsilon1" = 0, "Epsilon2" =4)
+  RhoConfig = c("Beta1" = 3, "Beta2" = 0, "Epsilon1" = 0, "Epsilon2" = 4) #used to be 4
   
   settings <- make_settings(n_x = 500,
                             Region=example$Region,
@@ -799,7 +799,7 @@ for(j in 1:6){
   
   plot(fit_fall)
   
-  remove(fit_fall)
+ # remove(fit_fall)
   
   file.rename(from= paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/settings.txt",sep="") 
               ,to =paste(orig.dir,"/VAST/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/obsmodel",j,"/fall/settings.txt",sep=""))
@@ -915,7 +915,7 @@ for(j in 1:6){
 #might need to go up another directory
 setwd('..')
 
-saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Had/",str_dir,cov_dir,"/model_aic.RDS",sep=""))
+saveRDS(model_aic, file = paste(getwd(),"/",scenario,"/Had/",str_dir,cov_dir,noise_dir,"/model_aic.RDS",sep=""))
 
 
 
