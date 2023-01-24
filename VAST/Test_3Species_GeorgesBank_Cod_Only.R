@@ -561,7 +561,6 @@ for(j in 1:6){
   
   plot(fit_spring)
   
-  remove(fit_spring)
   
   #copy parameter files into iteration folder
   

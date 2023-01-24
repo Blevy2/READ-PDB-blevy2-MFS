@@ -521,7 +521,7 @@ for(j in 1:6){
   #  X2_formula = ~ poly(MoveCov, degree=2 )
   #   
   #Chris C idea for including 2 covariates
-  X1_formula = ~ poly(Temp, degree=2 )
+ # X1_formula = ~ poly(Temp, degree=2 )
   X2_formula = ~ poly(Temp, degree=2 ) + poly(Habitat, degree=2 )
 
   # X1_formula = ~ 1
@@ -556,7 +556,7 @@ for(j in 1:6){
                           "c_iz"=as.numeric(rep(0,nrow(spring))), 
                           "b_i"=as.numeric(spring[,'Catch_KG']), 
                           "a_i"=as.numeric(spring[,'AreaSwept_km2']),
-                          X1_formula = X1_formula,
+                        #  X1_formula = X1_formula,
                           X2_formula = X2_formula,
                           covariate_data = covdata_spring,
                           optimize_args=list("lower"=-Inf,"upper"=Inf)),
@@ -786,7 +786,7 @@ for(j in 1:6){
                               "c_iz"=as.numeric(rep(0,nrow(fall))), 
                               "b_i"=as.numeric(fall[,'Catch_KG']), 
                               "a_i"=as.numeric(fall[,'AreaSwept_km2']),
-                              X1_formula = X1_formula,
+                            #  X1_formula = X1_formula,
                               X2_formula = X2_formula,
                               covariate_data = covdata_fall,
                               optimize_args=list("lower"=-Inf,"upper"=Inf)),
