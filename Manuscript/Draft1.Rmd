@@ -2,6 +2,7 @@
 csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
 output:
   bookdown::pdf_document2:
+    latex_engine: xelatex
     toc: no
     number_sections: no
     fig_caption: yes
