@@ -64,6 +64,12 @@ gis$YTF <- gis$CatchWt
 surv_random_sample <- gis
 ################################################################################
 
+#DEFINE NORMAL DISTRIBUTION INSTEAD OF USING MIXFISHSIM SO EASIER TO USE ON DIFFERENT MACHINES
+normfun <- function(x, mu, va){
+ nf = (1/(sqrt(2 * pi * va))) * (exp(-(((x - mu)^2)/(2 * va))))
+ return(nf)
+}
+
 #read in habitat matrix
 hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
 names(hab$hab) <- c("YT","Cod","Had")
@@ -131,9 +137,9 @@ for(i in seq(length(surv_random_sample[,1]))){
   temperature[i] <- moveCov$cov.matrix[[52*(yr-1)+wk]][rw,cl]
   
   #PULLING MOVEMENT = HAB^2*TEMP_PREFERENCE VALUES
- movement_cov[["YT"]][i] <- (hab$hab[["YT"]][rw,cl]^2)*MixFishSim::norm_fun(temperature[i],mu=moveCov$spp_tol$YT$mu,va=moveCov$spp_tol$YT$va)
- movement_cov[["Cod"]][i] <- (hab$hab[["Cod"]][rw,cl]^2)*MixFishSim::norm_fun(temperature[i],mu=moveCov$spp_tol$Cod$mu,va=moveCov$spp_tol$Cod$va)    
- movement_cov[["Had"]][i] <- (hab$hab[["Had"]][rw,cl]^2)*MixFishSim::norm_fun(temperature[i],mu=moveCov$spp_tol$Had$mu,va=moveCov$spp_tol$Had$va)
+ movement_cov[["YT"]][i] <- (hab$hab[["YT"]][rw,cl]^2)*normfun(temperature[i],mu=moveCov$spp_tol$YT$mu,va=moveCov$spp_tol$YT$va)
+ movement_cov[["Cod"]][i] <- (hab$hab[["Cod"]][rw,cl]^2)*normfun(temperature[i],mu=moveCov$spp_tol$Cod$mu,va=moveCov$spp_tol$Cod$va)    
+ movement_cov[["Had"]][i] <- (hab$hab[["Had"]][rw,cl]^2)*normfun(temperature[i],mu=moveCov$spp_tol$Had$mu,va=moveCov$spp_tol$Had$va)
  
  #PULLING HABITAT VALUES
   #This uses the normalized habitat values, which are extremely small 
