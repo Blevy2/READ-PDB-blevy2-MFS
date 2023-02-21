@@ -29,9 +29,11 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 #number of extra years in simulation. subtract this value from year in log matrix
 years_cut <- 2
 
+scenario <- "ConPop_IncTemp"
+
 #FIRST READ IN RES WHICH CONTAINS SPATIAL OUTPUT FOR GIVEN SCENARIO
 
-res <- readRDS("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\ConPop_ConTemp\\res_ConPop_ConTemp.RDS")
+res <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario,"\\res_",scenario,".RDS",sep=""))
 
 #read in habitat
 hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
@@ -181,7 +183,7 @@ for(s in short_names){
 
 
 
-
+pdf(file=paste0('testfolder/',scenario,'_Spatial_pop_plots','.pdf'))
 
 #################################################################################
 # PLOTS
@@ -223,7 +225,7 @@ for(s in short_names){
 
 
 for(s in short_names){
-  par( mfrow = c(1,2), mar = c(1, 1, 1, 1))
+  par( mfrow = c(2,1), mar = c(1, 1, 1, 1))
   for(wk in plot_wks){
   
     #WITHOUT USING BREAKS
@@ -261,7 +263,7 @@ for(s in short_names){
 
 
 
-pdf(file=paste0('testfolder/Spatial_pop_plots','.pdf'))
+
 
 for(s in short_names){
 
@@ -277,7 +279,7 @@ for(s in short_names){
     text(0.5, 0.98, labels = paste( s, 'Week', wk, "Year", yr), cex = 1)
     
     }
-        par( mfrow = c(1,2), mar = c(1,1,1,1))
+        par( mfrow = c(2,1), mar = c(1,1,1,1))
     #plot first and last years for easy comparison
     fields::image.plot(rotate(spatial_pop[[s]][[wk]][[1]]), breaks = Qbreaks_list[[s]][[wk]]$brks, nlevel = (length( Qbreaks_list[[s]][[wk]]$brks)-1) )
     text(0.5, 0.98, labels = paste( s, 'Week', wk, "Year", 1), cex = 1)
@@ -290,7 +292,7 @@ for(s in short_names){
     
   }
 }
-dev.off()
+
 
 
 
@@ -317,7 +319,7 @@ print(p)
 
 
 
-
+dev.off()
 
 
 

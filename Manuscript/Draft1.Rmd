@@ -110,7 +110,7 @@ The Northeast United States continental shelf spans from the Outer Banks of Nort
 
 - Bottom trawl survey is important for monitoring population trends
 
-Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration’s (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal scientists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 [@azarovitz1981brief; @politis2014northeast]. The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits **just listed a few uses of survey. change/add others?**. [[I think these are fine as they are the ones we are concerned with in this paper]]  
+Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration’s (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal scientists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 [@azarovitz1981brief; @politis2014northeast]. The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits
 
 The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and  projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling during approximately the same 2-3 week time period in each season. [[the survey for the entire region takes ~8 weeks to complete each season, the GB strata get covered in a similar time period each season because the survey starts in the south and moves north. But there are times when logistics, e.g., storms, Covid, cause a change in the timing of any particular stratum being sampled. This timing issue has come up in the past and we've looked at it using the dates of sampled stations within a particular stock definition. See for example GBYT_survey_timing_cdf.png taken from the 2018 assessment of Georges Bank yellowtail flounder that I copied into a newly created "miscellaneous" folder on the Google Drive. Given all this, I suggest modifying the wording to something like "NOAA's survey design includes sampling Georges Bank during approximately the same 3-4 week time period in each season"]]  
 
@@ -268,34 +268,43 @@ summary_tab <- combos_table %>%
 
 \section{Results}
 
-The goal of our project was to analyze how well contemporary population indexing methods can track population trends under a host of conditions, as depicted in Table COMBOS. Historically, Atlantic Cod has seen significant decline over the last XXX years while Haddock has increased in abundance in recent year [[can cite the 2022 management track assessments, see https://apps-nefsc.fisheries.noaa.gov/saw/sari.php for when the document becomes available]] **cite**. For this reason we compare indexing estimates using stratified random samples from decreasing population scenarios for Cod (see Table ???) and increasing population scenarios for Haddock (see Table ???). To provide a comprehensive analysis of population indexing methods we consider all possible scenario combinations for Yellowtail Flounder (see Table ???). The specific population trends used in our analyses can be see in Figure \@ref(fig:pop-scenarios)
+The goal of our project was to analyze how well contemporary population indexing methods can track population trends under a variety of conditions, as depicted in Table \@ref(tab:scenarios) Historically, Atlantic Cod has seen significant decline over the last XXX years while Haddock has increased in abundance in recent year [[can cite the 2022 management track assessments, see https://apps-nefsc.fisheries.noaa.gov/saw/sari.php for when the document becomes available]] **cite**. For this reason we compare indexing estimates using stratified random samples from decreasing population scenarios for Cod (see Table ???) and increasing population scenarios for Haddock (see Table ???). To provide a comprehensive analysis of population indexing methods we consider all possible scenario combinations for Yellowtail Flounder (see Table ???). The specific population trends used in our analyses can be see in Figure \@ref(fig:pop-scenarios)
 
 ```{r pop-scenarios, echo=FALSE,out.width="99%",fig.show='hold', fig.align='center', fig.cap="True population trends used in indexing analyses. Spring biomass plots are shown with fall values being very similar."}
 knitr::include_graphics(c("Images/Population_scenarios.png"))
 ```
 
-General themes that exist in Tables X, Y and Z are that VAST estimates provide lower errors relative to those derived from the stratified mean, with VAST models that include covariate information providing the lowest overall errors. We also see individual cases where the stratified mean produced the lowest absolut [[absolute]] error and instances where including covarites in VAST models actually increase the absolute error. When we reduce the number of strata that are included in indexing calculations to simulation species shifting into new territory, we typically see an increase in absolute error [[as expected]], though there are some scenarios where the impact is minimal. 
+General themes that exist in Tables X, Y and Z are that VAST estimates provide lower errors relative to those derived from the stratified mean, with VAST models that include covariate information providing the lowest overall errors. We also see individual cases where the stratified mean produced the lowest absolute error and instances where including covarites in VAST models actually increase the absolute error. When we reduce the number of strata that are included in indexing calculations to simulation species shifting into new territory, we typically see an increase in absolute error (as expected), though there are some scenarios where the impact is minimal. 
 
 In the Cod results, when using reduced strata adding covariates produces worst VAST results (though still better than stratified mean). VAST without covariates much worse than stratified mean in fall with increasing temperature and all strata, but adding covariates corrects this.  
 
 For Haddock, VAST has a particularly hard time in spring regularly producing larger errors than the stratified mean with added covariates only improving to the level of the stratified mean. VAST shows improved results in fall relative to the stratified mean with added covaraites producing extremely low errors in some cases.
 
-In considering the Yellowtail Flounder results in Table XXX, we can see VAST estimates generally provide lower errors relative to those derived from the stratified mean, with models that include covariate information typically providing the lowest errors. However, there are several instances in which VAST failed to provide improved abundance estimates during the fall season without covariate information, producing the largest errors seen in the Table. These errors are corrected by including covariate information allowing for an improved VAST estimate that are significantly lower than their stratified mean counterparts. 
+In considering the Yellowtail Flounder results in Tables \@ref(tab:YTresultsallstrata) and \@ref(tab:YTresultsreducedstrata), we can see VAST estimates generally provide lower errors relative to those derived from the stratified mean, with models that include covariate information typically providing the lowest errors. However, there are several instances in which VAST failed to provide improved abundance estimates during the fall season without covariate information, producing the largest errors seen in the Table. These errors are corrected by including covariate information allowing for an improved VAST estimate that are significantly lower than their stratified mean counterparts. 
+
+Notes on differences between VAST settings: For YTF, 29/96 ~ 30% of VAST runs with new settings were better (70% were worse). 80/96 ~ 83% of scenarios had a VAST run with a better error than the stratified mean. 15/16 of the times the stratified mean was better VAST was not using covariates. The 1 time that VAST was using covariates and was still worse than the stratified mean was IncPop_IncTemp_Allstrata_WCov_WNoise in the Fall (VAST had strong overestimate in the fall during IncPOP_IncTemP_allstrata for Had and YT). The overestimate in the fall only seems to be related to the way the population shifts between season. Looking at the percent shift plots, the population is shifting out of strata 16 in both seasons (large east strata). In the spring the population is shifting mostly into strata 17 (thin strata adjacent to 16), but in the fall they are shifting into both 17 and 18 (18 thin one adjacent to 17). Thus it seems like with much of the population concentrated in the really small outer most strata, VAST produces an underestimate, even with covariates  
+
+For Haddock (IncPop), 18/32 ~ 57% of VAST runs better with new settings. 24/32 = 75% of scenarios had a VAST run with a better error than the stratified mean. 14/16 VAST were better with covariates (the two that were worse were essentially the same) while only 10/16 were better without covariates. Stratified mean tended to perform better when all strata were included in the calculation, while VAST tended to perform better when strata are removed.
+
+For Cod (DecPop), only 11/32 ~ 34% of VAST runs were better with new settings. 28/32~ 88% of scenarios had a VAST run with a better estimate than the stratified mean. All 16/16 = 100% of VAST runs with a covariate were better than the stratified mean. 12/16 VAST were better without covariates. The 4 runs without covariates that were worse were all extremely large errors and all from increasing temp in the fall (with and without all strata and noise). In the fall the population is moving out of strata 16 (large eastern strata) and 21 (north large) and into a number of strata (22 (tiny north), 24 (large north), 18 (tiny north)). Might be having trouble tracking in to smaller strata again.
 
 [[We'll want to expand the results section to focus on the impact of each factor one at at time within each species. This will be a bit dull, but it is important to walk through the results in words to ensure that readers get the message. They can of course examine the tables in detail and draw their own conclusions, but we should put our interpretation down on paper.]]
 
-```{r}
-
-
-knitr::kable(YT_results, caption = "Yellowtail error results")
-
-knitr::kable(Cod_results, caption = "Cod error results")
-
-knitr::kable(Had_results, caption = "Haddock error results")
-```
+<!-- # ```{r} -->
+<!-- # -->
+<!-- # -->
+<!-- # knitr::kable(YT_results, caption = "Yellowtail error results") -->
+<!-- # -->
+<!-- # knitr::kable(Cod_results, caption = "Cod error results") -->
+<!-- # -->
+<!-- # knitr::kable(Had_results, caption = "Haddock error results") -->
+<!-- # ``` -->
 
 
 \section{Discussion}
+
+Estimation methods that have large, inaccurate swings (stratified mean) can lead to changes in quotas that do not correspond to the true population trend, which could have a compounding effect (can lead to quotas that are too high/low given an incorrect assumption of increase/decrease in biomass). Our model has a constant assumed mortality that accounts for fishing and natural death and will not account for impacts of these decisions. VAST may provide more consistent biomass predictions(?) 
+
 [[ some things that I think we'll need to address, in addition to those mentioned above are (in no particular order):
 number of simulations done for each scenario - time required to do them and analyses
 pros and cons of using VAST with covariates in a changing environment
@@ -566,7 +575,41 @@ cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 
 
 
-```{r YT_results,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+<!-- ```{r YT_results,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'} -->
+<!-- library("knitr") -->
+<!-- library("kableExtra") -->
+<!-- library("dplyr") -->
+<!-- library("readr") -->
+<!-- library("tidyr") -->
+<!-- library("forcats") -->
+
+
+
+<!-- result_table = read_csv("CSVs/Yellowtail_results_final.csv") -->
+
+<!-- summary_tab <- result_table %>%  -->
+
+
+<!-- # Group the table according to Parameter, Scenario -->
+<!--   group_by(Scenario,Strata) -->
+
+
+
+<!-- # Create table to present the data] -->
+<!-- Fig_5 <- kable(summary_tab) %>% -->
+<!--   kable_styling(font_size = 10)  %>% -->
+<!--   pack_rows(tab_kable, colnum = c(1,4), -->
+<!--     index = table(fct_inorder(summary_tab$Strata), useNA = "no")) %>% -->
+<!--   pack_rows(tab_kable, colnum = 1, -->
+<!--     index = table(fct_inorder(summary_tab$Scenario), useNA = "no"))  -->
+
+<!-- ``` -->
+<!-- ```{r, results='asis'} -->
+<!-- Fig_5 -->
+<!-- ``` -->
+
+
+```{r YTresultsallstrata,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 library("knitr")
 library("kableExtra")
 library("dplyr")
@@ -576,27 +619,111 @@ library("forcats")
 
 
 
-result_table = read_csv("CSVs/Yellowtail_results_final.csv")
+#result_table = read_csv("CSVs/Yellowtail_results_final.csv")
+result_table = read_csv("CSVs/Yellowtail_results_final_newsettings_forpaper.csv")
 
-summary_tab <- result_table %>% 
 
-  
-# Group the table according to Parameter, Scenario
-  group_by(Scenario,Strata)
 
+summary_tab_all <- result_table %>% 
+  subset(Strata == "all")%>%
+ # subset(Scenario=="Constant Population")%>%
+
+#   group_by(`Temperature Scenario`)%>%
+# # 
+# #   group_by(Scenario)%>%
+#   mutate(`Temperature Scenario` = factor(`Temperature Scenario`))%>%
+#   
+#   arrange(`Temperature Scenario`) %>%
+  select(Scenario,`Temperature Scenario`,Season,Covariate,Noise,`VAST A`,`VAST B`, `Stratified Mean`) 
+
+
+
+#COLOR INDIVIDUAL ROWS BY CATEGORY
+#define colors
+
+
+# summary_tab_all <- result_table %>% 
+# # Group the table according to Parameter, Scenario
+#   group_by(Scenario)%>%
+#   mutate(Scenario = factor(Scenario)) %>%
+#   arrange(Scenario) %>%
+#   select(Scenario, everything())
 
 
 # Create table to present the data]
-Fig_5 <- kable(summary_tab) %>%
+Fig_5a <- kable(summary_tab_all[, -1],
+      align = c("l", "l", "l", "l", "c", "c", "c"),
+  caption = "Yellowtail flounder error results with all strata included in calculations. Row colors correspond to the same settings applied in different seasons.") %>%
+  row_spec(0,bold = TRUE)%>% #bold column titles
   kable_styling(font_size = 10)  %>%
-  pack_rows(tab_kable, colnum = c(1,4),
-    index = table(fct_inorder(summary_tab$Strata), useNA = "no")) %>%
-  pack_rows(tab_kable, colnum = 1,
-    index = table(fct_inorder(summary_tab$Scenario), useNA = "no")) 
+  pack_rows(tab_kable(), colnum = 1,
+    index = table(fct_inorder(summary_tab_all$Scenario), useNA = "no"))%>%
+  #color every 4th row a different color
+  row_spec(seq(1,96,4), bold = T, color = "white", background = "black")%>%
+  row_spec(seq(2,96,4), bold = T, color = "white", background = "#5C5E60")%>%
+  row_spec(seq(3,96,4), bold = T, color = "white", background = "#A4A4A4")%>%
+  row_spec(seq(4,96,4), bold = T, color = "white", background = "#D2D2D2")
+  
+   
+  
 
 ```
+
+
+```{r YTresultsreducedstrata,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("forcats")
+
+
+
+#result_table = read_csv("CSVs/Yellowtail_results_final.csv")
+result_table = read_csv("CSVs/Yellowtail_results_final_newsettings_forpaper.csv")
+
+
+
+
+
+summary_tab_exclude <- result_table %>% 
+  subset(Strata == "reduced")%>%
+ # subset(Scenario=="Constant Population")%>%
+
+#   group_by(`Temperature Scenario`)%>%
+# # 
+# #   group_by(Scenario)%>%
+#   mutate(`Temperature Scenario` = factor(`Temperature Scenario`))%>%
+#   arrange(`Temperature Scenario`) %>%
+  select(Scenario,`Temperature Scenario`,Season,Covariate,Noise,`VAST A`,`VAST B`, `Stratified Mean`) 
+
+#COLOR INDIVIDUAL ROWS BY CATEGORY
+#define colors
+
+
+Fig_5b <- kable(summary_tab_exclude[, -1],
+      align = c("l", "l", "l", "l", "c", "c", "c"),
+  caption = "Yellowtail flounder error results with certain strata excluded from calculations. Row colors correspond to the same settings applied in different seasons.") %>%
+  row_spec(0,bold = TRUE)%>% #bold column titles
+  kable_styling(font_size = 10)  %>%
+  pack_rows(tab_kable(), colnum = 1,
+    index = table(fct_inorder(summary_tab_exclude$Scenario), useNA = "no"))%>%
+  #color every 4th row a different color
+   row_spec(seq(1,96,4), bold = T, color = "white", background = "black")%>%
+  row_spec(seq(2,96,4), bold = T, color = "white", background = "#5C5E60")%>%
+  row_spec(seq(3,96,4), bold = T, color = "white", background = "#A4A4A4")%>%
+  row_spec(seq(4,96,4), bold = T, color = "white", background = "#D2D2D2");
+
+
+```
+
+
 ```{r, results='asis'}
-Fig_5
+Fig_5a
+```
+```{r, results='asis'}
+Fig_5b
 ```
 
 
@@ -610,7 +737,8 @@ library("forcats")
 
 
 
-param_table1 = read_csv("CSVs/Cod_results.csv")
+#param_table1 = read_csv("CSVs/Cod_results.csv")
+param_table1 = read_csv("CSVs/Cod_results_newsettings_forpaper.csv")
 
 summary_tab1 <- param_table1 %>% 
 # Group the table according to Parameter, Scenario
@@ -618,6 +746,9 @@ summary_tab1 <- param_table1 %>%
   mutate(Temp = factor(Temp)) %>%
   arrange(Temp) %>%
   select(Temp, everything())
+
+
+
 
 # Create table to present the data]
 Fig_3a <-  kable(summary_tab1[, -1], 
@@ -632,6 +763,39 @@ Fig_3a <-  kable(summary_tab1[, -1],
 Fig_3a
 ```
 
+
+```{r HadERROR,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("forcats")
+
+
+
+#param_table1 = read_csv("CSVs/Cod_results.csv")
+param_table1 = read_csv("CSVs/Haddock_results_newsettings_forpaper.csv")
+
+summary_tab1 <- param_table1 %>% 
+# Group the table according to Parameter, Scenario
+  group_by(Temp)%>%
+  mutate(Temp = factor(Temp)) %>%
+  arrange(Temp) %>%
+  select(Temp, everything())
+
+# Create table to present the data]
+Fig_3b <-  kable(summary_tab1[, -1], 
+  caption = "Haddock error results.",
+    format = "latex", booktabs = TRUE) %>%
+  kable_styling(font_size = 10) %>%
+  pack_rows(tab_kable(), colnum = 1,
+    index = table(fct_inorder(summary_tab1$Temp), useNA = "no"))
+```
+
+```{r, results='asis'}
+Fig_3b
+```
 
 
 
