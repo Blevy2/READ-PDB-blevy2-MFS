@@ -29,7 +29,16 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 #number of extra years in simulation. subtract this value from year in log matrix
 years_cut <- 2
 
-scenario <- "ConPop_IncTemp"
+scenario <- "DecPop_IncTemp"
+
+
+#define for labeling later
+if(scenario=="ConPop_ConTemp"){temp_scenario <- " (Constant Temperature)"}
+if(scenario=="ConPop_IncTemp"){temp_scenario <- " (Increasing Temperature)"}
+if(scenario=="IncPop_ConTemp"){temp_scenario <- " (Constant Temperature)"}
+if(scenario=="IncPop_IncTemp"){temp_scenario <- " (Increasing Temperature)"}
+if(scenario=="DecPop_ConTemp"){temp_scenario <- " (Constant Temperature)"}
+if(scenario=="DecPop_IncTemp"){temp_scenario <- " (Increasing Temperature)"}
 
 #FIRST READ IN RES WHICH CONTAINS SPATIAL OUTPUT FOR GIVEN SCENARIO
 
@@ -183,7 +192,7 @@ for(s in short_names){
 
 
 
-pdf(file=paste0('testfolder/',scenario,'_Spatial_pop_plots','.pdf'))
+#pdf(file=paste0('testfolder/',scenario,'_Spatial_pop_plots','.pdf'))
 
 #################################################################################
 # PLOTS
@@ -304,14 +313,20 @@ long_names <- c("Yellowtail Flounder","Cod","Haddock")
 idx<-1
 for(s in short_names){
 p<- ggplot() +
-  geom_line(data=species_pct2[[s]], aes(x=as.numeric(year), y=as.numeric(`% Pop`), group=week, color=week))+
-  geom_point(data=species_pct2[[s]], aes(x=as.numeric(year), y=as.numeric(`% Pop`), group=week, color=week))+
+  geom_line(data=subset(species_pct2[[s]],stratum %in% strata_species[[s]]), aes(x=as.numeric(year), y=as.numeric(`% Pop`), group=week, color=week))+
+  geom_point(data=subset(species_pct2[[s]],stratum %in% strata_species[[s]]), aes(x=as.numeric(year), y=as.numeric(`% Pop`), group=week, color=week))+
   
-  geom_hline(data = species_pct2[[s]],aes( yintercept = as.numeric(`pct area`), linetype = "")) +
+  geom_hline(data = subset(species_pct2[[s]],stratum %in% strata_species[[s]]),aes( yintercept = as.numeric(`pct area`), linetype = "")) +
   scale_linetype_manual(name = "Stratum %", values = c(2, 2)) +
                         
   facet_wrap(~ name)+
-labs(x="Year",y="% Pop in Each Stratum", title = long_names[idx], color ="" )
+labs(x="Year",y="% Pop in Each Stratum", title = paste(long_names[idx]," ",temp_scenario,sep=""), color ="" )+
+  
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14),
+        title=element_text(size=14),
+        strip.text = element_text(size=12))
+
 idx<-idx+1
 print(p)
 }

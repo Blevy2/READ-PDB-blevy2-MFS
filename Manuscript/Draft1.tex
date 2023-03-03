@@ -187,7 +187,7 @@ Due to a combination of climate change and shifts in circulation, the Northeast 
   Briefly describe our study to test this
 \end{itemize}
 
-To test the ability of the bottom trawl survey to track population trends under shifting environmental conditions, we construct spatial models for fish where movement depend on temperature preferences. We can then consider the impact of climate change by simulating scenarios with repeating temperature patterns and those where temperature increases on average over time. In both cases we analyze the ability of stratified random sampling to track population trends.
+To test the ability of the bottom trawl survey to track population trends under shifting environmental conditions, we construct spatial models for fish where movement depend on temperature preferences. We consider the impact of climate change by comparing simulations that use a repeating temperature pattern to those where temperature increases on average over time. In both cases we analyze the ability of stratified random sampling to track population trends.
 
 \section{Methods}
 
@@ -197,7 +197,7 @@ To test the ability of the bottom trawl survey to track population trends under 
   Describe simulation study
 \end{itemize}
 
-We construct spatial models for Yellowtail Flounder, Atlantic Cod, and Haddock on Georges Bank, where movement of each species combine static species-specific habitat preferences with temperature preferences. Model dynamics are driven by a time series of temperature gradients that were estimated from data to create simulated data sets for each population where the true biomass is known. Using temperature gradients that repeat each year creates data sets with predictable, repeating spatial patterns, whereas using a temperature gradient that increases on average throughout the simulation leads to spatial distributions that shift over time, approximating the future distribution in the region under climate change. We conducting stratified random sampling on our simulation output to mimic the bottom trawl survey and compare the ability of contemporary indexing methods to track population trends.
+We construct spatial models for Yellowtail Flounder, Atlantic Cod, and Haddock on Georges Bank, where movement of each species combine static species-specific habitat preferences with temperature preferences. Model dynamics are driven by a time series of temperature gradients that were estimated from data to create simulated data sets for each population where the true biomass is known. Using temperature gradients that repeat each year creates data sets with predictable, repeating spatial patterns, whereas using a temperature gradient that increases on average throughout the simulation leads to spatial distributions that shift over time. We conduct stratified random sampling on our simulation output to mimic the bottom trawl survey and use the samples to compare the ability of contemporary indexing methods to track population trends.
 
 \subsection{Population Model Formulation}
 
@@ -348,18 +348,22 @@ For Cod (DecPop), only 11/32 \textasciitilde{} 34\% of VAST runs were better wit
 
 {[}{[}We'll want to expand the results section to focus on the impact of each factor one at at time within each species. This will be a bit dull, but it is important to walk through the results in words to ensure that readers get the message. They can of course examine the tables in detail and draw their own conclusions, but we should put our interpretation down on paper.{]}{]}
 
+\emph{Yellowtail Flounder Results}
+
+Figure \ref{fig:PopPct} depicts the spatial shifting that occurs in our population models in each of the survey weeks.
+
+Of the scenarios without covariates, \(33/48\approx68\)\% had a VAST fit with a lower relative error compared to the stratified mean estimate. All 15 of the covariate-free VAST estimates that resulted in a higher error than the stratified mean were for the Fall season. These 15 Fall estimates span all other scenario variations and had a common theme of producing abundance estimates that are well above the true model value. Including detailed covariate information made a noticeable difference in our Yellowtail Flounder VAST estimates. Of the VAST estimates that included covariates information, \(47/48\approx98\)\% had a lower relative error than the corresponding stratified mean estimate.
+\textbf{For discussion: clearly our perfect covariate information made a big difference here, but the question is could we achieve similar results without ``perfect'' information? Which covariate is best? Good question for future research}
+
 \emph{Cod Results}
 
-Of the scenarios without covariates, \(12/16=75\)\% had a VAST fit with a lower relative error compared to the stratified mean estimate. Including detailed covariate information in our Cod VAST estimates resulted in all \(16/16=100\%\) having a lower relative error than the corresponding stratified mean estimate. The 4 scenarios without covariates that had a higher VAST error were each overestimates for the fall season that involved an increasing temperature gradient. As seen in Figure XXX, Cod are shifting their spatial distribution much more in the fall than they are in the spring. While adding covariates to these fits allowed for an improved error relative to the stratified mean, the VAST abundance still display an overestimate early in the time series before covariates correct the trend, allowing for a lower overall absolute error \textbf{(show these plots? IncTemp fall scenarios)}.
+As seen in Figure \ref{fig:PopPct}, in the constant temperature scenario the Cod population is decreasing its presence in stratas 19 and 20 over the duration of the simulation in both seasons, while simultaneously increasing their presence in strata 16. However, an increase in average temperature had a seasonal impact on Cod's presence in strata 16 in our simulations. In the spring the population followed a similar trend of leaving 19 and 20 while simultaneously entering 16. However, in the fall the increasing temperature drives the population out of strata 16 and 21, and into 18, 22, and 24. \textbf{check the impact of this difference on estiamtes}
+
+Of the abundance estimates without covariates, \(12/16=75\)\% had a VAST fit with a lower relative error compared to the stratified mean estimate. Including detailed covariate information in our Cod VAST estimates resulted in all \(16/16=100\%\) having a lower relative error than the corresponding stratified mean estimate. The 4 scenarios without covariates that had a higher VAST error were each overestimates for the fall season that involved an increasing temperature gradient. As seen in Figure XXX, Cod are shifting their spatial distribution much more in the fall than they are in the spring. While adding covariates to these fits allowed for an improved error relative to the stratified mean, the VAST abundance still display an overestimate early in the time series before covariates correct the trend, allowing for a lower overall absolute error \textbf{(show these plots? IncTemp fall scenarios)}.
 
 \emph{Haddock Results}
 
 \(10/16\approx63\)\% of the scenarios without covariates had a VAST fit with a lower relative error compared to the stratified mean estimate. The 6 covariate-free VAST estimates that resulted in a higher error than the stratified mean spanned all scenarios and seasons, with several fall errors being especially large (significant overestimates). Adding covariate information resulted in \(14/16\approx88\)\% of VAST estimates having improved error compared to the stratified mean. The 2 scenarios that procedure worse error spanned temperature scenarios, but were both in the spring season when the proportion of the population in each strata remained constant in each scenario.\textbf{why?? doesnt make sense. the values with cov are about the same as SM} Qualitatively, including covariate information has a larger impact on decreasing the relative error compared to the stratified mean compared to failing to include covariates.
-
-\emph{Yellowtail Flounder Results}
-
-Of the scenarios without covariates, \(33/48\approx68\)\% had a VAST fit with a lower relative error compared to the stratified mean estimate. All 15 of the covariate-free VAST estimates that resulted in a higher error than the stratified mean were for the Fall season. These 15 Fall estimates span all other scenario variations and had a common theme of producing abundance estimates that are well above the true model value. Including detailed covariate information made a noticeable difference in our Yellowtail Flounder VAST estimates. Of the VAST estimates that included covariates information, \(47/48\approx98\)\% had a lower relative error than the corresponding stratified mean estimate.
-\textbf{For discussion: clearly our perfect covariate information made a big difference here, but the question is could we achieve similar results without ``perfect'' information? Which covariate is best? Good question for future research}
 
 A more careful visual analysis of all error plots for each species reveals that VAST estimates tend to provide error estimates that are too high, while the stratified mean estimates are, on average, too low. Additionally, model/estimate ratio plots for all VAST estimates remain much closer to the desired value of 1 compared to stratified mean estimates, which can range as high as 10 and exhibit large yearly changes.
 
@@ -421,11 +425,11 @@ Thorson, J.T. 2019. Guidance for decisions using the vector autoregressive spati
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.95\linewidth]{Images/PercentPlots_ConPopConTemp_YT} \includegraphics[width=0.95\linewidth]{Images/PercentPlots_ConPopIncTemp_YT} 
+{\centering \includegraphics[width=0.475\linewidth]{Images/PercentPlots_ConPopConTemp_YT} \includegraphics[width=0.475\linewidth]{Images/PercentPlots_ConPopIncTemp_YT} \includegraphics[width=0.475\linewidth]{Images/PercentPlots_DecPopConTemp_Cod} \includegraphics[width=0.475\linewidth]{Images/PercentPlots_DecPopIncTemp_Cod} \includegraphics[width=0.475\linewidth]{Images/PercentPlots_IncPopConTemp_Had} \includegraphics[width=0.475\linewidth]{Images/PercentPlots_IncPopIncTemp_Had} 
 
 }
 
-\caption{add caption}\label{fig:YTpct}
+\caption{Percent of each species in each strata for during survey weeks in our spatial simulations. All constant temperature scenarios follow the patterns on the left while increasing temperature scenarios follow the patterns on the right.}\label{fig:PopPct}
 \end{figure}
 
 Table 1. Parameters used in all population models.
