@@ -1,11 +1,11 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.2.14)  1 MAR 2023 09:50
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.2)  2 MAR 2023 21:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **Draft1.tex
 (./Draft1.tex
 LaTeX2e <2022-11-01> patch level 1
-L3 programming layer <2023-02-07> (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
+L3 programming layer <2023-02-22> (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size12.clo
 File: size12.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
@@ -130,7 +130,7 @@ LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2022/02/03 v1.0f TeX engine tests
 ) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/unicode-math/unicode-math.sty (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3kernel/expl3.sty
-Package: expl3 2023-02-07 L3 programming layer (loader) 
+Package: expl3 2023-02-22 L3 programming layer (loader) 
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-xetex.def
 File: l3backend-xetex.def 2023-01-16 L3 backend support: XeTeX
 \g__graphics_track_int=\count267
@@ -446,7 +446,7 @@ Package caption Info: longtable package is loaded.
 (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/caption/ltcaption.sty
 Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
 )) (c:/Users/benjamin.levy/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/siunitx/siunitx.sty
-Package: siunitx 2023-01-03 v3.2.0 A comprehensive (SI) units package
+Package: siunitx 2023-02-21 v3.2.1 A comprehensive (SI) units package
 \l__siunitx_angle_tmp_dim=\dimen199
 \l__siunitx_angle_marker_box=\box64
 \l__siunitx_angle_unit_box=\box65
@@ -936,84 +936,91 @@ File: Images/Habitat_3species.png Graphic file (type bmp)
 [8]
 File: Images/TempScenarios.png Graphic file (type bmp)
 <Images/TempScenarios.png>
-[9] [10] [11] [12] [13]
+[9] [10] [11]
+
+LaTeX Warning: Reference `tab:VASTsettings' on page 12 undefined on input line 299.
+
+[12] [13]
 File: Images/Population_scenarios.png Graphic file (type bmp)
 <Images/Population_scenarios.png>
-[14] [15] [16] [17] [18] [19]
-Overfull \hbox (7.98383pt too wide) in alignment at lines 412--416
+[14] [15] [16] [17] [18] [19] [20] [21]
+File: Images/PercentPlots_ConPopConTemp_YT.png Graphic file (type bmp)
+<Images/PercentPlots_ConPopConTemp_YT.png>
+File: Images/PercentPlots_ConPopIncTemp_YT.png Graphic file (type bmp)
+<Images/PercentPlots_ConPopIncTemp_YT.png>
+
+LaTeX Warning: Float too large for page by 184.41037pt on input line 429.
+
+
+Overfull \hbox (7.98383pt too wide) in alignment at lines 433--437
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (7.98383pt too wide) in alignment at lines 416--426
+Overfull \hbox (7.98383pt too wide) in alignment at lines 437--447
  [] [] [] [] [] [] [] 
  []
 
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 10.0pt on input line 433.
+(Font)              scaled to size 10.0pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 7.0pt on input line 433.
+(Font)              scaled to size 7.0pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 5.0pt on input line 433.
+(Font)              scaled to size 5.0pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.00092pt on input line 433.
+(Font)              scaled to size 10.00092pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 7.00064pt on input line 433.
+(Font)              scaled to size 7.00064pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 5.00046pt on input line 433.
+(Font)              scaled to size 5.00046pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.99893pt on input line 433.
+(Font)              scaled to size 9.99893pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.99925pt on input line 433.
+(Font)              scaled to size 6.99925pt on input line 454.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 4.99947pt on input line 433.
+(Font)              scaled to size 4.99947pt on input line 454.
 
-Overfull \hbox (36.29501pt too wide) in paragraph at lines 455--479
+Overfull \hbox (36.29501pt too wide) in paragraph at lines 476--500
  [][] 
  []
 
 
-Overfull \hbox (4.55768pt too wide) in paragraph at lines 498--498
-[]|\TU/lmr/m/n/12 FieldCOnfig|  
- []
-
-
-Overfull \hbox (4.72568pt too wide) in paragraph at lines 500--500
+Overfull \hbox (1.95056pt too wide) in paragraph at lines 524--524
 []|\TU/lmr/m/n/12 X1_formula|  
  []
 
 
-Overfull \hbox (4.72568pt too wide) in paragraph at lines 501--501
+Overfull \hbox (1.95056pt too wide) in paragraph at lines 525--525
 []|\TU/lmr/m/n/12 X2_formula|  
  []
 
-[20]
-Overfull \hbox (3.505pt too wide) in paragraph at lines 510--617
+[22]
+Overfull \hbox (3.505pt too wide) in paragraph at lines 534--641
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 23.76965pt on input line 617.
+LaTeX Warning: Float too large for page by 23.76965pt on input line 641.
 
 
-Overfull \hbox (3.505pt too wide) in paragraph at lines 623--730
+Overfull \hbox (3.505pt too wide) in paragraph at lines 647--754
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 23.76965pt on input line 730.
+LaTeX Warning: Float too large for page by 23.76965pt on input line 754.
 
 
-Overfull \hbox (60.49501pt too wide) in paragraph at lines 737--763
+Overfull \hbox (60.49501pt too wide) in paragraph at lines 761--787
  [][] 
  []
 
 
-Overfull \hbox (60.49501pt too wide) in paragraph at lines 770--796
+Overfull \hbox (60.49501pt too wide) in paragraph at lines 794--820
  [][] 
  []
 
-[21] [22] [23] [24] [25] (./Draft1.aux)
+[23] [24] [25] [26] [27] [28] (./Draft1.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -1021,12 +1028,12 @@ Package rerunfilecheck Info: File `Draft1.out' has not changed.
 (rerunfilecheck)             Checksum: DB4DEE45B37E0223C7E983979BA5D6AC;1831.
  ) 
 Here is how much of TeX's memory you used:
- 23002 strings out of 478687
- 463007 string characters out of 5846863
- 1958001 words of memory out of 5000000
- 42790 multiletter control sequences out of 15000+600000
+ 23037 strings out of 478683
+ 464495 string characters out of 5846748
+ 1958012 words of memory out of 5000000
+ 42827 multiletter control sequences out of 15000+600000
  518836 words of font info for 85 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 86i,10n,121p,1626b,916s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 86i,10n,121p,1626b,914s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on Draft1.pdf (25 pages).
+Output written on Draft1.pdf (28 pages).
