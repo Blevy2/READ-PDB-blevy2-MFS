@@ -9,13 +9,13 @@ orig.dir <- getwd()
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario1 <- "ConPop_ConTemp" #the folder name
+scenario1 <- "DecPop_IncTemp" #the folder name
 
 #spp1 spp2 spp3
 #short_names <- c("YT","Cod","Had")   #fixed above
-short_names <- c("YT")#,"Had")
+short_names <- c("YT","Cod")
 
-exclude_strata <- TRUE
+exclude_strata <- FALSE
 
 #for getting into correct subfolder
 ifelse(exclude_strata==TRUE, 
@@ -386,7 +386,7 @@ dir.create( paste0(getwd(),"/VAST/",scenario)) #create folder to store upcoming 
 
 ifelse(exclude_strata==TRUE, strat_ex <- "excludestrata", strat_ex <- "allstrata")
 
-saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scenario1,"_",strat_ex,".RDS"))
+#saveRDS(strat_mean_all,paste0(getwd(),"/VAST/",scenario,"/strat_mean_all_",scenario1,"_",strat_ex,".RDS"))
 
 
 
@@ -548,7 +548,7 @@ for(folder in model_types[[s]]){
   colnames(FC_settings[[s]][[cov_direct]][[noise]][["fall"]]) <- c("Omega1","Epsilon1","Omega2","Epsilon2")
   }
 
-write.csv(FC_settings_DF,file = paste(getwd(),"/",scenario1,"_",str_dir,"_FC_settings.csv",sep=""))
+#write.csv(FC_settings_DF,file = paste(getwd(),"/",scenario1,"_",str_dir,"_FC_settings.csv",sep=""))
 
 
 
@@ -564,7 +564,7 @@ write.csv(FC_settings_DF,file = paste(getwd(),"/",scenario1,"_",str_dir,"_FC_set
 
 #All (potentially) species
 
-pdf(file=paste(getwd(),"/",scenario1,"_",str_dir,".pdf",sep=""))
+pdf(file=paste(getwd(),"/",scenario1,"_",str_dir,"_new.pdf",sep=""))
 
 #Just YT
 #pdf(file=paste(getwd(),"/YT/",scenario1,"_",str_dir,"_YT.pdf",sep=""))
@@ -581,7 +581,7 @@ Est_ratio <- list()
 SRS_ratio <- list()
 Est_ratio_plot <- list()
 
-Ratio_summary_info <- matrix(nrow=8,ncol=13)
+Ratio_summary_info <- matrix(nrow=8*length(short_names),ncol=13)
 ratio_idx <- 1
 #colnames(Ratio_summary_info) <- c("Scenario","Estimate", "N_Spring >1", "N_Fall >1","Pct_Spring >1", "Pct_Fall >1", "Total>1", "Pct_Total>1", "Mean_Spring", "Mean_Fall", "Mean_overall","Mean_overall_finite", "SD_overall")
 
@@ -635,9 +635,9 @@ for(folder in model_types[[s]]){
 
   #calculate ratio of estimate vs true value
   Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- 99  
-  try(Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- model_spring/VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"Estimate"],silent=TRUE)
+  try(Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"Estimate"]/model_spring,silent=TRUE)
   Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- 99  
-  try(Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- model_fall/VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"Estimate"],silent=TRUE)
+  try(Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"Estimate"]/model_fall,silent=TRUE)
   
   oldnames = names(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
   #add Est_ratio to VAST_est to plot later
@@ -670,8 +670,8 @@ for(folder in model_types[[s]]){
   
   
   #calculate SRS ratio and add to data
-  SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- model_fall/SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"mean.yr.absolute"]
-  SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- model_spring/SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"mean.yr.absolute"]
+  SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"mean.yr.absolute"]/model_fall
+  SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"mean.yr.absolute"]/model_spring
   
   namesorig=colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
   SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- cbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]],SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
@@ -699,31 +699,31 @@ for(folder in model_types[[s]]){
  
    Ratio_summary_info[ratio_idx,1] <-  paste(s,"_",cov_direct,"_",noise,"_",folder,"_",sep="")
    Ratio_summary_info[ratio_idx,2] <-  "Strat Mean"
-   Ratio_summary_info[ratio_idx,3] <-  as.numeric(nrow(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 & SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
-   Ratio_summary_info[ratio_idx,4] <-  as.numeric(nrow(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 & SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
+   Ratio_summary_info[ratio_idx,3] <-  as.numeric(length(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 & SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,1]))  #as.numeric(nrow(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 & SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
+   Ratio_summary_info[ratio_idx,4] <-  as.numeric(length(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 & SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,1]))  #as.numeric(nrow(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 & SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
    Ratio_summary_info[ratio_idx,5] <-  as.numeric(Ratio_summary_info[ratio_idx,3])/20
    Ratio_summary_info[ratio_idx,6] <-  as.numeric(Ratio_summary_info[ratio_idx,4])/20
    Ratio_summary_info[ratio_idx,7] <-  as.numeric(Ratio_summary_info[ratio_idx,3])+as.numeric(Ratio_summary_info[ratio_idx,4])
    Ratio_summary_info[ratio_idx,8] <-  as.numeric(Ratio_summary_info[ratio_idx,7])/40
-   Ratio_summary_info[ratio_idx,9] <- mean(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 ,"Est_ratio"])
+   Ratio_summary_info[ratio_idx,9] <-  mean(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 ,"Est_ratio"])
    Ratio_summary_info[ratio_idx,10] <- mean(SRS_data[[s]][[cov_direct]][[noise]][[folder]][SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 ,"Est_ratio"])
    Ratio_summary_info[ratio_idx,11] <- mean(SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])
    Ratio_summary_info[ratio_idx,12] <- mean(SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"][is.finite(SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])])
-   Ratio_summary_info[ratio_idx,13] <- sd(SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])
+   Ratio_summary_info[ratio_idx,13] <- sd(SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"][is.finite(SRS_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])])
    
    Ratio_summary_info[ratio_idx+1,1] <-  paste(s,"_",cov_direct,"_",noise,"_",folder,"_",sep="")
    Ratio_summary_info[ratio_idx+1,2] <-  "VAST"
-   Ratio_summary_info[ratio_idx+1,3] <-  as.numeric(nrow(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 & VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
-   Ratio_summary_info[ratio_idx+1,4] <-  as.numeric(nrow(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 & VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
+   Ratio_summary_info[ratio_idx+1,3] <-  as.numeric(length(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 & VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,1]))  #as.numeric(nrow(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 & VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
+   Ratio_summary_info[ratio_idx+1,4] <-  as.numeric(length(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 & VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,1])) #as.numeric(nrow(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 & VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"]>1,]))  
    Ratio_summary_info[ratio_idx+1,5] <-  as.numeric(Ratio_summary_info[ratio_idx+1,3])/20
    Ratio_summary_info[ratio_idx+1,6] <-  as.numeric(Ratio_summary_info[ratio_idx+1,4])/20
    Ratio_summary_info[ratio_idx+1,7] <-  as.numeric(Ratio_summary_info[ratio_idx+1,3])+as.numeric(Ratio_summary_info[ratio_idx+1,4])
    Ratio_summary_info[ratio_idx+1,8] <-  as.numeric(Ratio_summary_info[ratio_idx+1,7])/40
-   Ratio_summary_info[ratio_idx+1,9] <- mean(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 ,"Est_ratio"])
+   Ratio_summary_info[ratio_idx+1,9] <-  mean(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==1 ,"Est_ratio"])
    Ratio_summary_info[ratio_idx+1,10] <- mean(VAST_data[[s]][[cov_direct]][[noise]][[folder]][VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"season"]==2 ,"Est_ratio"])
    Ratio_summary_info[ratio_idx+1,11] <- mean(VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])
    Ratio_summary_info[ratio_idx+1,12] <- mean(VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"][is.finite(VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])])
-    Ratio_summary_info[ratio_idx+1,13] <- sd(VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])
+   Ratio_summary_info[ratio_idx+1,13] <- sd(VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"][is.finite(VAST_data[[s]][[cov_direct]][[noise]][[folder]][,"Est_ratio"])])
    
         ratio_idx <- ratio_idx + 2
   
@@ -983,7 +983,7 @@ s_idx=s_idx+1
 #name columns
 colnames(Ratio_summary_info) <- c("Scenario","Estimate", "N_Spring >1", "N_Fall >1","Pct_Spring >1", "Pct_Fall >1", "Total>1", "Pct_Total>1", "Mean_Spring", "Mean_Fall", "Mean_overall", "Mean_overall_finite","SD_overall")
 #save as csv
-write.csv(Ratio_summary_info,file = paste(getwd(),"/",scenario1,"_",str_dir,"_Ratio_summary_info.csv",sep=""))
+write.csv(Ratio_summary_info,file = paste(getwd(),"/",scenario1,"_",str_dir,"_Ratio_summary_info_new.csv",sep=""))
 
 
 
