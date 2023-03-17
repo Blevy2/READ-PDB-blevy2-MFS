@@ -74,7 +74,7 @@ Corresponding author: Ben Levy (benjamin.levy@noaa.gov)
 
 Competing interests: The authors declare there are no competing interests.
 
-[[Chris comments in double square brackets, search for them to see comments]]
+<!-- [[Chris comments in double square brackets, search for them to see comments]] -->
 
 <!-- Table1 <- YT_results -->
 
@@ -97,23 +97,23 @@ keyword 1, keyword 2
 \section{Introduction}
 
 
-much of below is from https://apps-nefsc.fisheries.noaa.gov/nefsc/ecosystem-ecology/
-or
-https://www.fisheries.noaa.gov/data-tools/fisheries-economics-united-states-data-and-visualizations
+<!-- much of below is from https://apps-nefsc.fisheries.noaa.gov/nefsc/ecosystem-ecology/ -->
+<!-- or -->
+<!-- https://www.fisheries.noaa.gov/data-tools/fisheries-economics-united-states-data-and-visualizations -->
 
 
-- The eastern continental shelf is ecologically diverse and economically important
+<!-- - The eastern continental shelf is ecologically diverse and economically important -->
 
 
 The Northeast United States continental shelf spans from the Outer Banks of North Carolina to the Gulf of Maine. The region covers over 250,000 km$^2$ of ocean, extending over 200 km from shore in the largest areas in New England to just 30 km off shore in the southern regions. This ecologically diverse region contains approximately 18,000 vertebrate marine species. Commercial fisheries have been an important part of local economies for centuries. In 2019, New England fisheries produced $22 billion in sales, which sustained over 200,000 jobs. Maintaining a healthy ecosystem is therefore vital to sustained ecological health and economic prosperity of the region.
 
 
-- Bottom trawl survey is important for monitoring population trends
+<!-- - Bottom trawl survey is important for monitoring population trends -->
 
 Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration’s (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal scientists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 [@azarovitz1981brief; @politis2014northeast]. The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits. The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and  projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling Georges Bank during approximately the same 3-4 week time period in each season. 
 
 
-- Climate change is happening
+<!-- - Climate change is happening -->
 
  Due to a combination of climate change and shifts in circulation, the Northeast United States continental shelf has experienced rapid warming in recent decades, resulting in a shift in spatial distributions of many species. Since stock assessment models rely on accurate descriptions of population dynamics and contemporary patterns of spatial abundance, there is concern that rapid undocumented changes in spatial distributions of species will bias future stock assessments. More specifically, as fish populations shift their distributions over time, catchability and/or availability in the survey will change, altering the relationship between the index and the true population. We are therefore interested in analyzing the impact of climate change on the accuracy of future stock assessment models as measured by NOAA’s ongoing bottom-trawl survey along the East coast.
 
@@ -121,21 +121,21 @@ Fish stocks in this highly productive and economically important region are mana
 **use more info from initial proposal**
 
 
-- Briefly describe our study to test this
+<!-- - Briefly describe our study to test this -->
 
 To test the ability of the bottom trawl survey to track population trends under shifting environmental conditions, we construct spatial models for fish where movement depend on temperature preferences. We consider the impact of climate change by comparing simulations that use a repeating temperature pattern to those where temperature increases on average over time. In both cases we analyze the ability of stratified random sampling to track population trends.  
 
 
 \section{Methods}
 
-- Describe simulation study
+<!-- - Describe simulation study -->
 
 We construct spatial models for Yellowtail Flounder, Atlantic Cod, and Haddock on Georges Bank, where movement of each species combine static species-specific habitat preferences with temperature preferences. Model dynamics are driven by a time series of temperature gradients that were estimated from data to create simulated data sets for each population where the true biomass is known. Using temperature gradients that repeat each year creates data sets with predictable, repeating spatial patterns, whereas using a temperature gradient that increases on average throughout the simulation leads to spatial distributions that shift over time. We conduct stratified random sampling on our simulation output to mimic the bottom trawl survey and use the samples to compare the ability of contemporary indexing methods to track population trends. 
 
 \subsection{Population Model Formulation}
 
 
--- Used MixFishSim.
+<!-- -- Used MixFishSim. -->
 
 We use the R package *MixFishSim* (MFS) to model our populations [@dolder2020highly]. MFS is a discrete spatiotemporal simulation tool where users can model multiple species under varying environmental conditions. The package uses a delay-difference population model with discrete processes for growth, death, and recruitment of the population. We formulate the following inputs for the MFS package to address our research question.
 
@@ -181,7 +181,9 @@ The following sections describe how we formulated the habitat and temperature co
 
 <font size="5">*Habitat Input*</font>
 
-Species-specific habitat preferences were derived using the *lrren* tool from the R package *envi* [@envi] to create a niche model for each species. The *lrren* tool estimates an ecological niche using the relative risk function by relating presence/absence data to two covariate predictors. We used bottom trawl point data in from 2009-2021 as our presence/absence input by using a value of 0 for any tow that failed to catch the given species and weighting a successful catch by the biomass of the given tow [[I don't think we need to cite the trawl data because we said we were using trawl data above]] **BL: Does trawl data ever get cited? It was not cited above. cite trawl data?**. We combined data from both the fall and spring surveys to obscure the influence of temperature so that the niche model would instead infer habitat preferences. Depth and mean sediment size were used as our covariate predictors. Estimated depth for the region was obtained from FVCOM [@chen2006unstructured]. The mean sediment size raster was interpolated in ArcMap using the natural neighbor interpolation method **cite arcmap** using point data collected by the United States Geologic Survey (USGS) [@mcmullen2005usgs]. Since the values in $Hab^2_{J,s}$ are required to be between 0 and 1, we transform the spatial estimates from *lrren* to fall between these bounds. See Figure \@ref(fig:hab-plot1) for a visual representation of this process being applied to Cod. Figure \@ref(fig:hab-plot) depicts habitat preferences $Hab^2_{J,s}$ for each species.
+Species-specific habitat preferences were derived using the *lrren* tool from the R package *envi* [@envi] to create a niche model for each species. The *lrren* tool estimates an ecological niche using the relative risk function by relating presence/absence data to two covariate predictors. We used bottom trawl point data in from 2009-2021 as our presence/absence input by using a value of 0 for any tow that failed to catch the given species and weighting a successful catch by the biomass of the given tow  We combined data from both the fall and spring surveys to obscure the influence of temperature so that the niche model would instead infer habitat preferences. Depth and mean sediment size were used as our covariate predictors. Estimated depth for the region was obtained from FVCOM [@chen2006unstructured]. The mean sediment size raster was interpolated in ArcMap using the natural neighbor interpolation method **cite arcmap** using point data collected by the United States Geologic Survey (USGS) [@mcmullen2005usgs]. Since the values in $Hab^2_{J,s}$ are required to be between 0 and 1, we transform the spatial estimates from *lrren* to fall between these bounds. See Figure \@ref(fig:hab-plot1) for a visual representation of this process being applied to Cod. Figure \@ref(fig:hab-plot) depicts habitat preferences $Hab^2_{J,s}$ for each species.
+
+<!-- [[I don't think we need to cite the trawl data because we said we were using trawl data above]] **BL: Does trawl data ever get cited? It was not cited above. cite trawl data?**. Trawl data is now cited above, suggest removing this comment. -->
 
 ```{r hab-plot1, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Visual representation of niche model for Cod."}
 knitr::include_graphics(c("Images/hab_snip3.png"))
@@ -194,7 +196,7 @@ knitr::include_graphics(c("Images/Habitat_3species.png"))
 
 <font size="5">*Temperature Input*</font>
 
-Each species is assumed to have normally distributed temperature preferences ($N(\mu,\sigma)$). We assume Yellowtail Flounder's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. Weekly estimated temperature data for the region for 2012 was obtained from FVCOM [@chen2006unstructured]. We chose to repeat estimates for a single year rather than use data for consecutive years to reduce the number of factors impacting model dynamics while still incorporating real data. The 2012 data was chosen because it displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values, allowing for a smooth repeating yearly temperature pattern for the constant temperature scenario. The 2012 temperature data was also transformed to create an oscillating pattern that increases 5 degrees Celsius on average over the duration of the simulation. We chose a 5 degree increase over a 20 year simulation to allow temperature change to have a meaningful impact on dynamics while remaining within reasonable computational limits in terms of the length of the simulation. Figure \@ref(fig:temp-scenarios) depicts mean trends for the temperature scenarios used in our models. **dont forget to include gif in final submission**
+Each species is assumed to have normally distributed temperature preferences ($N(\mu,\sigma)$). We assume Yellowtail Flounder's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. Weekly estimated temperature data for the region for 2012 was obtained from FVCOM [@chen2006unstructured]. We chose to repeat estimates for a single year rather than use data for consecutive years to reduce the number of factors impacting model dynamics while still incorporating real data. The 2012 data was chosen because it displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values, allowing for a smooth repeating yearly temperature pattern for the constant temperature scenario. The 2012 temperature data was also transformed to create an oscillating pattern that increases 5 degrees Celsius on average over the duration of the simulation. We chose a 5 degree increase over a 20 year simulation to allow temperature change to have a meaningful impact on dynamics while remaining within reasonable computational limits in terms of the length of the simulation. Figure \@ref(fig:temp-scenarios) depicts mean trends for the temperature scenarios used in our models. **dont forget to include animated gif in final submission**
 
 
 ```{r temp-scenarios, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Mean trends of temperature data used in our model."}
@@ -203,13 +205,13 @@ knitr::include_graphics(c("Images/TempScenarios.png"))
 
 
 
---Describe difference between increasing and constant temperature scenarios (images?)
+<!-- --Describe difference between increasing and constant temperature scenarios (images?) -->
 
 In equation (1), $Hab^2_{J,s}$ is constant for the duration of the simulation, while $Tol_{c,s,wk}$ changes each week. Using a temperature gradient that repeats every 52 weeks produces the same spatial preferences in a given week each year, resulting in consistent spatial biomass patterns. Scenarios where the temperature increases over time creates spatial preferences that evolve as the water warms, producing spatial biomass patterns that shift in a given week over the duration of the simulation. Thus, stratified random samples in scenarios with a repeating temperature pattern will have constant survey catchability and availability over time, which may not be true for increasing temperature scenarios due to evolving spatial preferences.
  
 
 
--- Describe each scenario that is considered
+<!-- -- Describe each scenario that is considered -->
 
 We consider 20 year simulations under three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation. We therefore simulate 6 scenarios for each population. 
 
@@ -217,11 +219,11 @@ We consider 20 year simulations under three population parameter scenarios for e
 <font size="5">*Simulating Bottom Trawl Survey and Population Indexing*</font>
 
 
--Describe post hoc sampling process and how data is used
+<!-- -Describe post hoc sampling process and how data is used -->
 
 After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. We sample each strata in the same weeks in which the Spring and Fall surveys take place, and the number of the samples taken reflect true target values for each strata. Most strata contain enough cells that we were able to generate a list of sampling locations without replacement, allowing us to sample a unique random cell in each survey over the duration of the simulation. For strata that contain small numbers of cells, we generate a random sampling locations with replacement of cells previously sampled. We then use the biomass collected from our samples in contemporary population indexing methods to estimate population trends. Knowing the true population values in our simulations allows us to compare the error calculated from each estimation method.
 
---Stratified mean vs VAST with and without covariates
+<!-- --Stratified mean vs VAST with and without covariates -->
 
 Stock assessment scientists use samples from the bottom trawl survey to estimate the abundance for each fish stock. There are a number of approaches to obtain abundance estimates including traditional design-based estimates to model-based estimates that range in complexity. Design-based estimators rely on the design of the sampling scheme with the underlying assumption that the data being collected is representative of the population of interest. These methods do not account for spatial variation in samples or allow the inclusion of environmental influences. Model-based abundance estimates use statistical models to measure the relationship between response variables (such as presence or abundance) and predictor variables (such as environmental factors). Model-based estimators, such as General Linear Models (GLM), General Additive Model (GAM), and General Linear Mixed Models (GLMM), help account for complex relationships between variables and can help overcome problems with sampling design. 
 
@@ -342,14 +344,14 @@ When the entire domain is sampled, adding covariates brings the estimate ratio c
 
 Estimation methods that have large, inaccurate swings (stratified mean) can lead to changes in quotas that do not correspond to the true population trend, which could have a compounding effect (can lead to quotas that are too high/low given an incorrect assumption of increase/decrease in biomass). Our model has a constant assumed mortality that accounts for fishing and natural death and will not account for impacts of these decisions. VAST may provide more consistent biomass predictions(?) 
 
-[[ some things that I think we'll need to address, in addition to those mentioned above are (in no particular order):
-number of simulations done for each scenario - time required to do them and analyses
-pros and cons of using VAST with covariates in a changing environment
-implications for current practice of using stratified mean (not horrible, but might be able to do better with model-based using covariates if enviro changing, note we don't want to say stratified mean should not be used because that will draw a lot of tomato throwing)
-future work - some of the ideas we've discussed already could be mentioned
-limitations to our study
-perhaps for discussion, but we should mention somewhere that MFS only tracks biomass not age structure, the latter is important for stock assessments but not considered in this paper
-]]
+<!-- [[ some things that I think we'll need to address, in addition to those mentioned above are (in no particular order): -->
+<!-- number of simulations done for each scenario - time required to do them and analyses -->
+<!-- pros and cons of using VAST with covariates in a changing environment -->
+<!-- implications for current practice of using stratified mean (not horrible, but might be able to do better with model-based using covariates if enviro changing, note we don't want to say stratified mean should not be used because that will draw a lot of tomato throwing) -->
+<!-- future work - some of the ideas we've discussed already could be mentioned -->
+<!-- limitations to our study -->
+<!-- perhaps for discussion, but we should mention somewhere that MFS only tracks biomass not age structure, the latter is important for stock assessments but not considered in this paper -->
+<!-- ]] -->
 
 \section{Acknowledgements}
 [[we should thank Jim (obviously), but also those who helped you with the habitat data (robyn, david Chev.) and others? also should note that funding provided by Climate-Groundfish source (I'll dig up the official name of the funding source)]] 
