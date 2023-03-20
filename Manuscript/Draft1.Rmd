@@ -112,6 +112,7 @@ The Northeast United States continental shelf spans from the Outer Banks of Nort
 
 Fish stocks in this highly productive and economically important region are managed by the National Oceanic and Atmospheric Administration’s (NOAA) Northeast Fisheries Science Center (NEFSC) in Woods Hole, Massachusetts. Federal scientists assess the health and abundance of each commercial fish stock using fishery-independent bottom trawl survey data that has been collected by NOAA throughout the region since 1963 [@azarovitz1981brief; @politis2014northeast]. The survey uses a stratified random design where bottom trawl sampling takes place in predefined strata along the eastern continental shelf. The survey has created a rich time series data set with many uses including species-specific habitat identification, analysis of how environmental conditions influence species abundance, and estimating yearly species abundance trends to help inform stock assessments and ultimately quota limits. The survey takes place twice each year- once in the spring and again in the fall. Since most spatial analyses and  projections of future distributions typically assume a constant survey catchability and/or availability over time, NOAA's survey design includes sampling Georges Bank during approximately the same 3-4 week time period in each season. 
 
+<!-- Paragraph above: Stocks in this region are not managed by NEFSC, they are assessed by us. The management is done by the Councils and GARFO. NEFSC actually only assesses the federally managed stocks (not the state managed stocks like tautog). We also assess some of the invertebrate stocks, such as squid, scallops, ocean quahogs, etc., in addition to fish stocks. Perhaps easier to focus on the bottom trawl itself and replace the first two sentences with something like The NEFSC has conducted a bottom trawl survey since 1963 to support assessment and management of the fish and invertebrate populations in the region (azaorivitz and politis refs).  -->
 
 <!-- - Climate change is happening -->
 
@@ -120,11 +121,13 @@ Fish stocks in this highly productive and economically important region are mana
 
 **use more info from initial proposal**
 
+<!-- Agree that could bulk up the above paragraph with references from the initial proposal, along with more recent refs like https://doi.org/10.1016/j.fishres.2023.106652, DOI 10.1007/s11160-016-9444-z, https://doi.org/10.1093/icesjms/fsac140, etc. Don't want to lose connection with the next paragraph, so don't get lost in the weeds. -->
 
 <!-- - Briefly describe our study to test this -->
 
 To test the ability of the bottom trawl survey to track population trends under shifting environmental conditions, we construct spatial models for fish where movement depend on temperature preferences. We consider the impact of climate change by comparing simulations that use a repeating temperature pattern to those where temperature increases on average over time. In both cases we analyze the ability of stratified random sampling to track population trends.  
 
+<!-- General note: we should do a sweep through entire document and change everything to past tense. This is the typical verb tense in fisheries papers (I know present tense is used in other fields). In above paragraph, need to add VAST and VAST with covariates. -->
 
 \section{Methods}
 
@@ -144,6 +147,8 @@ We use the R package *MixFishSim* (MFS) to model our populations [@dolder2020hig
 
 We obtained a shapefile for the 15 strata that comprise Georges Bank, where strata were partitioned based primarily on depth and secondarily by latitude [@politis2014northeast]. The region was discritized into a raster with 88 rows and 144 columns to use as our modeling environment. A fish stock is considered to be a subpopulation of a species that has similar intrinsic parameters. Each of the species being modeled has multiple distinct stocks along the Atlantic coast resulting from local environmental conditions. Biological differences between species results in each stock inhabiting a different number of strata on Georges Bank. Haddock inhabit all 15 strata in the domain, Cod inhabit 13 strata, and Yellowtail exist in 9 strata. Figure \@ref(fig:strata-plot) shows the regions used in our models. 
 
+<!-- In the second sentence above, can we give a general size of the space occupied by each cell in our study? I know it varies by latitude, but I think an approximate size would be useful for readers to demonstrate that we are dealing with relatively small scale phenomena in the simulations. I stumbled over inhabit, inhabit, exist in the final sentence. I don't have a good suggestion for fixing it, just noting that the different final term caught my eye and made me ask if yellowtail were different from cod and haddock somehow. -->
+
 ```{r strata-plot, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Strata inhabited by each species in our population models."}
 #knitr::include_graphics(c("Images/Strata.png"))
 #knitr::include_graphics(c("Images/Excluded_strata.png"))
@@ -155,7 +160,7 @@ knitr::include_graphics(c("Images/Excluded_strata2.png"))
 
 The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass in each cell in our study area [@dolder2020highly]. Individual terms in the formulation account for growth of mature adults, natural and fishing mortality, and the addition of new recruits. We chose to represent recruitment in the model using a Beverton-Holt formulation **cite**. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \@ref(paramsALL) and \@ref(tab:paramsSCENARIOS). 
 
-
+<!-- I think we can delete the sentence about using Beverton-Holt recruitment because it appear in the table.  -->
 
 <font size="5">*Movement*</font>
 
@@ -197,7 +202,6 @@ knitr::include_graphics(c("Images/Habitat_3species.png"))
 
 Each species is assumed to have normally distributed temperature preferences ($N(\mu,\sigma)$). We assume Yellowtail Flounder's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. We chose these values by combining information in the literature with temperatures recorded in the bottom trawl survey. Weekly estimated temperature data for the region for 2012 was obtained from FVCOM [@chen2006unstructured]. We chose to repeat estimates for a single year rather than use data for consecutive years to reduce the number of factors impacting model dynamics while still incorporating real data. The 2012 data was chosen because it displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values, allowing for a smooth repeating yearly temperature pattern for the constant temperature scenario. The 2012 temperature data was also transformed to create an oscillating pattern that increases 5 degrees Celsius on average over the duration of the simulation. We chose a 5 degree increase over a 20 year simulation to allow temperature change to have a meaningful impact on dynamics while remaining within reasonable computational limits in terms of the length of the simulation. Figure \@ref(fig:temp-scenarios) depicts mean trends for the temperature scenarios used in our models. **dont forget to include animated gif in final submission**
 
-
 ```{r temp-scenarios, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Mean trends of temperature data used in our model."}
 knitr::include_graphics(c("Images/TempScenarios.png"))
 ```
@@ -214,6 +218,7 @@ In equation (1), $Hab^2_{J,s}$ is constant for the duration of the simulation, w
 
 We consider 20 year simulations under three population parameter scenarios for each of our three species- a scenario where parameters result in each population increasing over time, one where the populations are relatively constant over time, and a scenario where the parameter combination results in each population decreasing over time. Each of these three scenarios is paired with a temperature gradient that repeats as well as one that increasing roughly 5 degrees Celsius over the duration of the 20 year simulation. We therefore simulate 6 scenarios for each population. 
 
+<!-- I don't think this paragraph accurately represents what we did because we did the full factorial for yellowtail, but only some for cod and haddock. Need to think about how to restructure this paragraph to better reflect what we did. -->
 
 <font size="5">*Simulating Bottom Trawl Survey and Population Indexing*</font>
 
@@ -222,18 +227,19 @@ We consider 20 year simulations under three population parameter scenarios for e
 
 After each simulation is complete, we mimic the bottom trawl survey by conducting stratified random sampling in each inhabited strata twice each year. We sample each strata in the same weeks in which the Spring and Fall surveys take place, and the number of the samples taken reflect true target values for each strata. Most strata contain enough cells that we were able to generate a list of sampling locations without replacement, allowing us to sample a unique random cell in each survey over the duration of the simulation. For strata that contain small numbers of cells, we generate a random sampling locations with replacement of cells previously sampled. We then use the biomass collected from our samples in contemporary population indexing methods to estimate population trends. Knowing the true population values in our simulations allows us to compare the error calculated from each estimation method.
 
+<!-- Can we simplify the third and fourth sentences to say something like "Randomly selected cells were sampled each year."? I realize the current text is more accurate, but worry that we may be losing the readers in the details. -->
+
 <!-- --Stratified mean vs VAST with and without covariates -->
 
 Stock assessment scientists use samples from the bottom trawl survey to estimate the abundance for each fish stock. There are a number of approaches to obtain abundance estimates including traditional design-based estimates to model-based estimates that range in complexity. Design-based estimators rely on the design of the sampling scheme with the underlying assumption that the data being collected is representative of the population of interest. These methods do not account for spatial variation in samples or allow the inclusion of environmental influences. Model-based abundance estimates use statistical models to measure the relationship between response variables (such as presence or abundance) and predictor variables (such as environmental factors). Model-based estimators, such as General Linear Models (GLM), General Additive Model (GAM), and General Linear Mixed Models (GLMM), help account for complex relationships between variables and can help overcome problems with sampling design. 
 
 We compare yearly abundance estimates obtained from the stratified mean to estimates obtained from the Vector-Autoregressive Spatio-temporal (VAST) model. The stratified mean is a design-based approach that calculates the geometric mean catch per tow and has traditionally been used with stratified random sample designs. VAST is a spatial delta-generalized linear mixed model that estimates both abundance (biomass) and probability of occurrence (presence/absence) [@thorson2019guidance]. If desired, VAST also allows users to include covariate data to better inform the model. Covariates can be static (eg. habitat preferences) or dynamics (eg. temperature). We explore whether including environmental predictors can help inform models and provide better abundance estimates, which is particularly relevant as climate change progresses. The stratified mean calculations are straightforward and quick, while VAST models require numerous user inputs and can take on the order of hours to complete.  
 
-
 We follow the advice given in [@thorson2019guidance] to build VAST models to estimate biomass on Georges Bank using stratified random samples from our model output. In addition to exploring different link functions and assumed distributions, our VAST model-building process involved testing the impact of including spatial and/or spatio-temporal variation in our models, considering varying number of knots in our mesh, and testing different forms of temporal correlation. We also carried out the same process running models without covariate information as well as including covariates in our model. We considered covariates in the form of dynamic temperature values and/or static habitat values ($Hab_{J.s}$) from our population model. When using covariates we ultimately decided to provide the most information to the model by including both temperature and habitat covariates for both linear predictors. Knowing the true population values in our models allowed us to calculate the absolute error of each VAST estimate to compare between potential settings. Through this process, and in consultation with the VAST package creator, we ultimately compared the performance of two sets of settings in our VAST models, which can be seen in Table\@ref(tab:VASTsettings).
 
 Our goal is to determine indexing approaches and settings that are robust to future environmental conditions and resulting spatial biomass patterns. An underlying assumption in all indexing methods is that individual random samples combine to accurately represent true abundance by a) containing a low enough noise level in the samples to allow for a discernible pattern and b) sampling all strata in which the population exists. These assumptions can be questioned given enough noise in the sampling process **cite?** and/or climate change causing a population to move into previously uninhabited strata. To simulate the impact of noise, we compare indexing estimates after adding noise to our samples versus those using the true sampling values. **BL: Help with correct notation for adding noise**. We simulate the effect of populations moving into new habitat by comparing indexing estimates using samples from all strata inhabited by each species on Georges Bank to those that only include a subset of the full spatial domain for each species. We chose strata to exclude for each species by reviewing how spatial preferences evolved in our increasing temperature scenarios and removing strata that each species either shifted into, or away from. Tabl XXX [[needs to be added]] lists all strata inhabited by each species, those that are removed from certain calculations, and the explanation of why these strata were removed.
 
-
+<!-- Note the Table XXX needs to be added comment above. -->
 When combining population trends for each species, differing temperature scenarios, altering seasons, and sampling possibilities (noise, strata, covariates) there are a large number of scenario combinations to consider. The columns in Table \@ref(tab:scenarios) show the choices that define each scenario.
 
 
@@ -283,7 +289,7 @@ For Haddock (IncPop), 18/32 ~ 57% of VAST runs better with new settings. 24/32 =
 
 For Cod (DecPop), only 11/32 ~ 34% of VAST runs were better with new settings. 28/32~ 88% of scenarios had a VAST run with a better estimate than the stratified mean. All 16/16 = 100% of VAST runs with a covariate were better than the stratified mean. 12/16 VAST were better without covariates. The 4 runs without covariates that were worse were all extremely large errors and all from increasing temp in the fall (with and without all strata and noise). In the fall the population is moving out of strata 16 (large eastern strata) and 21 (north large) and into a number of strata (22 (tiny north), 24 (large north), 18 (tiny north)). Might be having trouble tracking in to smaller strata again.
 
-[[We'll want to expand the results section to focus on the impact of each factor one at at time within each species. This will be a bit dull, but it is important to walk through the results in words to ensure that readers get the message. They can of course examine the tables in detail and draw their own conclusions, but we should put our interpretation down on paper.]]
+<!-- [[We'll want to expand the results section to focus on the impact of each factor one at at time within each species. This will be a bit dull, but it is important to walk through the results in words to ensure that readers get the message. They can of course examine the tables in detail and draw their own conclusions, but we should put our interpretation down on paper.]] I think the above paragraphs are addressing this comment, but wanted to be sure they are not just "notes to self" before providing comments on them. -->
 
 <!-- # ```{r} -->
 <!-- # -->
@@ -354,6 +360,8 @@ Estimation methods that have large, inaccurate swings (stratified mean) can lead
 
 \section{Acknowledgements}
 [[we should thank Jim (obviously), but also those who helped you with the habitat data (robyn, david Chev.) and others? also should note that funding provided by Climate-Groundfish source (I'll dig up the official name of the funding source)]] 
+
+<!-- Funding source is "Northeast Fisheries and Climate program at the NEFSC" -->
 
 ## Data and Code Availability
 All data and code used in this work are available at https://github.com/Blevy2/READ-PDB-blevy2-MFS2. 
@@ -723,7 +731,7 @@ Fig_5b
 ```{r CodERROR,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 
 #param_table1 = read_csv("CSVs/Cod_results.csv")
-param_table1 = read_csv("CSVs/Cod_results_newsettings_forpaper.csv")
+param_table1 = read_csv("CSVs/Cod_results_newsettings_forpaper.csv") # not in repo
 
 summary_tab1 <- param_table1 %>% 
 # Group the table according to Parameter, Scenario
@@ -751,8 +759,8 @@ Fig_3a
 
 ```{r HadERROR,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 
-#param_table1 = read_csv("CSVs/Cod_results.csv")
-param_table1 = read_csv("CSVs/Haddock_results_newsettings_forpaper.csv")
+#param_table1 = read_csv("CSVs/Haddock_results.csv")
+param_table1 = read_csv("CSVs/Haddock_results_newsettings_forpaper.csv") # not in repo
 
 summary_tab1 <- param_table1 %>% 
 # Group the table according to Parameter, Scenario
