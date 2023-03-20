@@ -6,14 +6,15 @@ orig.dir <- getwd()
 
 
 
+setwd(orig.dir)
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario1 <- "DecPop_IncTemp" #the folder name
+scenario1 <- "ConPop_ConTemp" #the folder name
 
 #spp1 spp2 spp3
 #short_names <- c("YT","Cod","Had")   #fixed above
-short_names <- c("YT","Cod")
+short_names <- c("YT")#,"Had")
 
 exclude_strata <- FALSE
 
@@ -576,10 +577,12 @@ year_min <- 2 #in case you dont want to plot all of the years
 VAST_data <- list()
 SRS_data <- list()
 Obsmodel_plot <- list()
+Obsmodel_plot_log <- list()
 
 Est_ratio <- list()
 SRS_ratio <- list()
 Est_ratio_plot <- list()
+Est_ratio_plot_log <- list()
 
 Ratio_summary_info <- matrix(nrow=8*length(short_names),ncol=13)
 ratio_idx <- 1
@@ -821,6 +824,93 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
     print(Obsmodel_plot[[s]][[cov_direct]][[noise]][[folder]])
     
     
+    
+    
+    
+    #NEW WAY PLOTTING 3 TOGETHER ON SAME PAGE  ON LOGARITHMIC SCALE
+    
+    # #field config settings for plotting
+    # FC_fall = c(FC_settings[[s]]$fall[folder,1],FC_settings[[s]]$fall[folder,2],FC_settings[[s]]$fall[folder,3],FC_settings[[s]]$fall[folder,4])
+    # FC_spring = c(FC_settings[[s]]$spring[folder,1],FC_settings[[s]]$spring[folder,2],FC_settings[[s]]$spring[folder,3],FC_settings[[s]]$spring[folder,4])
+    # 
+    #store each obsmodel plot
+    
+    Obsmodel_plot_log[[s]][[cov_direct]][[noise]][[folder]] <- ggplot() +
+      
+      #this way plots data by season
+      geom_point(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=log(biomass), group = season, color = "Model"),size=3) +
+      geom_line(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=log(biomass), group =season, color = "Model"),size=1) +
+      
+      #plot VAST estimate without covariates with NO noise
+      geom_errorbar(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season,ymin=log(Estimate)-(1.96*Std..Error.for.ln.Estimate.), ymax=log(Estimate)+(1.96*Std..Error.for.ln.Estimate.), color = "VAST No Cov No Noise"),width=.3) +
+      #geom_linerange(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season,ymin=Estimate-(1.96*Std..Error.for.ln.Estimate.), ymax=Estimate+(1.96*Std..Error.for.ln.Estimate.), color = "VAST Estimate")) +
+      geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST No Cov No Noise"),size=2)+
+      geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST No Cov No Noise"))+
+      
+      #plot VAST estimate without covariates with WITH noise
+      geom_errorbar(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season,ymin=log(Estimate)-(1.96*Std..Error.for.ln.Estimate.), ymax=log(Estimate)+(1.96*Std..Error.for.ln.Estimate.), color = "VAST No Cov W Noise"),width=.3) +
+      #geom_linerange(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season,ymin=Estimate-(1.96*Std..Error.for.ln.Estimate.), ymax=Estimate+(1.96*Std..Error.for.ln.Estimate.), color = "VAST Estimate")) +
+      geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST No Cov W Noise"),size=2)+
+      geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST No Cov W Noise"))+
+      
+      #plot VAST estimate with covariates with NO noise
+      geom_errorbar(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season,ymin=log(Estimate)-(1.96*Std..Error.for.ln.Estimate.), ymax=log(Estimate)+(1.96*Std..Error.for.ln.Estimate.), color = "VAST w Cov No Noise"),width=.3) +
+      #geom_linerange(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season,ymin=Estimate-(1.96*Std..Error.for.ln.Estimate.), ymax=Estimate+(1.96*Std..Error.for.ln.Estimate.), color = "VAST Estimate")) +
+      geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST w Cov No Noise"))+
+      geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST w Cov No Noise"))+
+      
+      #plot VAST estimate with covariates WITH noise
+      geom_errorbar(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season,ymin=log(Estimate)-(1.96*Std..Error.for.ln.Estimate.), ymax=log(Estimate)+(1.96*Std..Error.for.ln.Estimate.), color = "VAST w Cov w Noise"),width=.3) +
+      #geom_linerange(data=subset(VAST_data[[s]][[folder]],Year>=year_min),aes(x=Year,y=Estimate,group=season,ymin=Estimate-(1.96*Std..Error.for.ln.Estimate.), ymax=Estimate+(1.96*Std..Error.for.ln.Estimate.), color = "VAST Estimate")) +
+      geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST w Cov w Noise"))+
+      geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Estimate),group=season, color = "VAST w Cov w Noise"))+
+      
+      
+      #plot stratified calculation data with NO noise
+      # geom_errorbar(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]]),aes(x=year,y=log(mean.yr.absolute),group=season,ymin=log(mean.yr.absolute)-(1.96*log(sd.mean.yr.absolute)), ymax=log(mean.yr.absolute)+(1.96*log(sd.mean.yr.absolute)), color = "Strat Mean No Noise"),width=.3) +
+      # geom_linerange(data=as.data.frame(SRS_data[[s]][[folder]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean")) +
+      geom_point(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]]),aes(x=year,y=log(mean.yr.absolute),group=season, color = "Strat Mean No Noise"))+
+      geom_line(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]]),aes(x=year,y=log(mean.yr.absolute),group=season, color = "Strat Mean No Noise"))+
+      
+      #plot stratified calculation data with NO nois
+      # geom_errorbar(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]]),aes(x=year,y=log(mean.yr.absolute),group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Strat Mean W Noise"),width=.3) +
+      # geom_linerange(data=as.data.frame(SRS_data[[s]][[folder]]),aes(x=year,y=mean.yr.absolute,group=season,ymin=mean.yr.absolute-(1.96*sd.mean.yr.absolute), ymax=mean.yr.absolute+(1.96*sd.mean.yr.absolute), color = "Stratified Mean")) +
+      geom_point(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]]),aes(x=year,y=log(mean.yr.absolute),group=season, color = "Strat Mean W Noise"))+
+      geom_line(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]]),aes(x=year,y=log(mean.yr.absolute),group=season, color = "Strat Mean W Noise"))+
+      
+      
+      facet_wrap(~ season, ncol =1) +
+      # labs(x="year",y="Biomass", title = paste(folder,"  SeV=",round(VAST_Model_error[[s]][[folder]][["spring"]],digits=2),
+      #                                          "  FC=", toString(FC_spring), 
+      #                                          "  SeSM=",round(SRS_Model_error[[s]][[folder]][["spring"]],digits=2),
+      #                                          "  FeV=",round(VAST_Model_error[[s]][[folder]][["fall"]],digits=2),
+      #                                          "  FC=", toString(FC_fall),
+      #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
+      
+      labs(x="year",y="log(Biomass)", title = paste(paste(s," ",folder,sep=""), "\n", #new line
+                                               paste(" V.NC.NN=",round(VAST_Model_error[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]][["spring"]],digits=2),
+                                                     "   V.NC.YN=",round(VAST_Model_error[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]][["spring"]],digits=2),
+                                                     " V.YC.NN=",round(VAST_Model_error[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][["spring"]],digits=2),
+                                                     "   V.YC.YN=",round(VAST_Model_error[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][["spring"]],digits=2),
+                                                     "  SM.NN=",round(SRS_Model_error[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]][["spring"]],digits=2),
+                                                     "  SM.YN=",round(SRS_Model_error[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]][["spring"]],digits=2),sep=""), "\n", #new line
+                                               paste(" V.NC.NN=",round(VAST_Model_error[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]][["fall"]],digits=2),
+                                                     "   V.NC.YN=",round(VAST_Model_error[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]][["fall"]],digits=2),
+                                                     " V.YC.NN=",round(VAST_Model_error[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][["fall"]],digits=2),
+                                                     "   V.YC.YN=",round(VAST_Model_error[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][["fall"]],digits=2),
+                                                     "  SM.NN=",round(SRS_Model_error[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]][["fall"]],digits=2),
+                                                     "  SM.YN=",round(SRS_Model_error[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]][["fall"]],digits=2),sep=""),sep=""), color ="" )+
+      
+      theme(axis.text=element_text(size=12),
+            axis.title=element_text(size=12),
+            title=element_text(size=8))
+    
+    #one plot per page
+    print(Obsmodel_plot_log[[s]][[cov_direct]][[noise]][[folder]])
+    
+    
+    
+    
     # for more than one plot per page
       # gridExtra::grid.arrange(Obsmodel_plot[[1]],Obsmodel_plot[[2]],Obsmodel_plot[[3]],nrow=3)
       # gridExtra::grid.arrange(Obsmodel_plot[[4]],Obsmodel_plot[[5]],Obsmodel_plot[[6]],nrow=3)
@@ -830,7 +920,7 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
     
     
     
-    
+    #plot estimate ratios by season
     
     Est_ratio_plot[[s]][[cov_direct]][[noise]][[folder]] <- ggplot() +
       
@@ -882,6 +972,60 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
     #one plot per page
     print(Est_ratio_plot[[s]][[cov_direct]][[noise]][[folder]])
     
+    
+    
+    
+    #plot estimate ratio by season ON LOG SCALE 
+    
+    Est_ratio_plot_log[[s]][[cov_direct]][[noise]][[folder]] <- ggplot() +
+      
+      
+      #this way plots data by season divided by itself so it equals 1
+      geom_point(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=log(Est_ratio), group = season, color = "Model"),size=3) +
+      geom_line(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=log(Est_ratio), group =season, color = "Model"),size=1) +
+      
+      #plot VAST estimate without covariates with NO noise
+      geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov No Noise"))+
+      geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov No Noise"))+
+      
+      #plot VAST estimate without covariates with WITH noise
+      geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov W Noise"))+
+      geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov W Noise"))+
+      
+      #plot VAST estimate with covariates with NO noise
+      geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov No Noise"))+
+      geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov No Noise"))+
+      
+      #plot VAST estimate with covariates WITH noise
+      geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov w Noise"))+
+      geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],Year>=year_min),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov w Noise"))+
+      
+      
+      #plot stratified calculation data with NO noise
+      geom_point(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][,1:5]),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean No Noise"))+
+      geom_line(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][,1:5]),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean No Noise"))+
+      
+      #plot stratified calculation data with NO noise
+      geom_point(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][,1:5]),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean W Noise"))+
+      geom_line(data=as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][,1:5]),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean W Noise"))+
+      
+      
+      facet_wrap(~ season, ncol =1) +
+      # labs(x="year",y="Biomass", title = paste(folder,"  SeV=",round(VAST_Model_error[[s]][[folder]][["spring"]],digits=2),
+      #                                          "  FC=", toString(FC_spring), 
+      #                                          "  SeSM=",round(SRS_Model_error[[s]][[folder]][["spring"]],digits=2),
+      #                                          "  FeV=",round(VAST_Model_error[[s]][[folder]][["fall"]],digits=2),
+      #                                          "  FC=", toString(FC_fall),
+      #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
+      
+      labs(x="year",y="log(Model/Estimate)", title = paste(paste(s," ",folder,sep=""),sep=""), color ="" )+
+      
+      theme(axis.text=element_text(size=12),
+            axis.title=element_text(size=12),
+            title=element_text(size=8))
+    
+    #one plot per page
+    print(Est_ratio_plot_log[[s]][[cov_direct]][[noise]][[folder]])
 
 }
 }
@@ -983,7 +1127,7 @@ s_idx=s_idx+1
 #name columns
 colnames(Ratio_summary_info) <- c("Scenario","Estimate", "N_Spring >1", "N_Fall >1","Pct_Spring >1", "Pct_Fall >1", "Total>1", "Pct_Total>1", "Mean_Spring", "Mean_Fall", "Mean_overall", "Mean_overall_finite","SD_overall")
 #save as csv
-write.csv(Ratio_summary_info,file = paste(getwd(),"/",scenario1,"_",str_dir,"_Ratio_summary_info_new.csv",sep=""))
+#write.csv(Ratio_summary_info,file = paste(getwd(),"/",scenario1,"_",str_dir,"_Ratio_summary_info_new.csv",sep=""))
 
 
 

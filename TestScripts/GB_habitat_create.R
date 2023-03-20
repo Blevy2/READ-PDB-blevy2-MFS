@@ -1383,6 +1383,18 @@ dev.off()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 ######################################################################################
 
 
@@ -1397,6 +1409,8 @@ spp_names_short <- c("YT","Cod","Had")
 
 month_nm <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
+color_max <- list()
+
 #strata that each species occupies. Used to calculate stratified random mean of each
 strata_species <- list()
 strata_species[["YT"]] <-  c(13,14,15,16,17,18,19,20,21)
@@ -1408,13 +1422,13 @@ strata_species[["Had"]] <- c(13,14,15,16,17,18,19,20,21,22,23,24,25,29,30)
 scenario <- "IncPop_ConTemp"
 
 ######################################################################################
-#choose which simulation iteration to use (chosen in different file)
-good_iter <- c(1,13,6) #ConPop_ConTemp
-good_iter <- c(1,1,3) #ConPop_IncTemp
-good_iter <- c(77,63,98) #IncPop_ConTemp
-good_iter <- c(77,44,100) #IncPop_IncTemp
-good_iter <- c(25,18,6) #DecPop_ConTemp
-good_iter <- c(13,44,9) #DecPop_IncTemp
+#choose which simulation iteration to use based on above
+if(scenario=="ConPop_ConTemp"){good_iter <- c(1,13,6)}
+if(scenario=="ConPop_IncTemp"){good_iter <- c(1,1,3)}
+if(scenario=="IncPop_ConTemp"){good_iter <- c(77,63,98)}
+if(scenario=="IncPop_IncTemp"){good_iter <- c(77,44,100)}
+if(scenario=="DecPop_ConTemp"){good_iter <- c(25,18,6)}
+if(scenario=="DecPop_IncTemp"){good_iter <- c(13,44,9)}
 ######################################################################################
 
 ######################################################################################
@@ -1468,8 +1482,90 @@ color_max[["Had"]][[10]] <-1199  #fall survey
 ######################################################################################
 
 
+library(rgdal)
+library(gridExtra)
+library(raster)
+#haddock contains all stratas used
+Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Had_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(Had_ras)
+#load others to extract covariate values
+#Yellowtail
+YT_ras <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/Yell_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(YT_ras)
+#Cod
+Cod_ras <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_RASTER_res2.RDS")
+plot(Cod_ras)
+
+hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
+names(hab$hab) <- c("YT","Cod","Had")
+
+
+#load stratas for clipping etc
+strata.dir <- "C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\" # strata shape files in this directory
+
+# get the shapefiles
+strata.areas <- readOGR(paste(strata.dir,"Survey_strata", sep="")) #readShapePoly is deprecated; use rgdal::readOGR or sf::st_read 
+
+#define georges bank for YELLOWTAIL
+GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210")
+#pull out indices corresponding to GB strata
+GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+#plot them
+#plot(strata.areas[GB_strata_idx,])
+#define GB strata as own object
+GB_strata_YT <- strata.areas[GB_strata_idx,]
+
+YT_strata_ras <- raster::rasterize(GB_strata_YT,YT_ras,'STR2')
+
+#GB_strata_YT2 <- fortify(GB_strata_YT,region='STR2')
+# ggplot(GB_strata_YT2, aes(x = long, y = lat, group = id)) + 
+#   geom_polygon(colour='black', fill='white')
+
+
+#define georges bank for COD  
+GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250")
+#pull out indices corresponding to GB strata
+GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+#plot them
+#plot(strata.areas[GB_strata_idx,])
+#define GB strata as own object
+GB_strata_Cod <- strata.areas[GB_strata_idx,]
+
+Cod_strata_ras <- raster::rasterize(GB_strata_Cod,Cod_ras,'STR2')
+# GB_strata_Cod2 <- fortify(GB_strata_Cod,region='STR2')
+# 
+# ggplot(GB_strata_Cod2, aes(x = long, y = lat, group = id)) + 
+#   geom_polygon(colour='black', fill='white')
+
+
+#define georges bank for HADDOCK  
+GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300")
+#pull out indices corresponding to GB strata
+GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+#plot them
+#plot(strata.areas[GB_strata_idx,])
+#define GB strata as own object
+GB_strata_Had <- strata.areas[GB_strata_idx,]
+
+Had_strata_ras <- raster::rasterize(GB_strata_Had,Had_ras,'STR2')
+
+# GB_strata_Had2 <- fortify(GB_strata_Had,region='STR2')
+# 
+# ggplot(GB_strata_Had2, aes(x = long, y = lat, group = id)) + 
+#   geom_polygon(colour='black', fill='white')
+
+
+GB_strata_ras <- list(YT_strata_ras,Cod_strata_ras,Had_strata_ras)
+names(GB_strata_ras) <- spp_names_short
+
+
+
+
+
+
+
 #survey results without noise
-list_all_temp <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\list_all_",scenario,".RDS",sep=""))
+list_all_temp2 <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario,"\\list_all_more_",scenario,".RDS",sep=""))
 
 list_all <- list()
 list_all[["YT"]] <- list_all_temp[[good_iter[1]]]
@@ -1480,10 +1576,10 @@ list_all[["Had"]] <- list_all_temp[[good_iter[3]]]
 #memory.limit(45000) #this one for all results
 #result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
 #load existing result_goodones, if it exists
-result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_goodones_",scenario,".RDS",sep=""))
+result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario,"\\result_goodones_",scenario,".RDS",sep=""))
 
 #load random survey locations used in this scenario
-surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
+surv_random <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario,"\\surv_random_",scenario,".RDS",sep=""))
 
 
 
@@ -1516,6 +1612,8 @@ for(i in seq(length(list_all[[s]][,1]))){
   survey_points[[s]][[yr]][[wk]][idx,"x"] <- as.numeric(list_all[[s]][i,"x"])
   survey_points[[s]][[yr]][[wk]][idx,"y"] <- as.numeric(list_all[[s]][i,"y"])
   survey_points[[s]][[yr]][[wk]][idx,"survey"] <- as.numeric(list_all[[s]][i,"stratum"])
+  survey_points[[s]][[yr]][[wk]][idx,"lon"] <- xFromCol(hab_ras, col = as.numeric(list_all[[s]][i,"y"]))
+  survey_points[[s]][[yr]][[wk]][idx,"lat"] <- yFromRow(hab_ras, row = as.numeric(list_all[[s]][i,"x"]))
   idx=idx+1
   }
   }
@@ -1559,25 +1657,13 @@ moveCov[["spp_tol"]] <- list("YT" = list("mu" = 9, "va" = 4),  #Yellowtail
                              "Had" = list("mu" = 9, "va" = 4) )    #Haddock
 
 
-library(raster)
-#haddock contains all stratas used
-Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Had_Weighted_AdaptFalse_RASTER_res2.RDS")
-plot(Had_ras)
-#load others to extract covariate values
-#Yellowtail
-YT_ras <- readRDS(file="TestScripts/Habitat_plots/YellowtailFlounder/Yell_Weighted_AdaptFalse_RASTER_res2.RDS")
-plot(YT_ras)
-#Cod
-Cod_ras <- readRDS(file="TestScripts/Habitat_plots/Cod/Cod_Weighted_AdaptFalse_RASTER_res2.RDS")
-plot(Cod_ras)
-
-hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
-names(hab$hab) <- c("YT","Cod","Had")
-fields::image.plot(rotate(hab$hab$Had))
-
 library(ggplot2)
 library(gridExtra)
 library(plotly)
+library(ggnewscale)
+loadedPackages <- c("rgdal", "data.table", "maptools","envi", "raster", "RStoolbox", "spatstat.data", "spatstat.geom", "spatstat.core")
+invisible(lapply(loadedPackages, library, character.only = TRUE))
+
 
 # 
 # temp_ <- reshape2::melt(temp_rotate, c("x", "y"), value.name = "biomass")
@@ -1610,7 +1696,7 @@ temp_max <- matrix(nrow=40,ncol=3)
 temp_color_min <- 0 
 
 
-
+geom_pt_shp <- 11
 
 
 for(s in seq_len(n_spp)) {
@@ -1650,21 +1736,60 @@ for(s in seq_len(n_spp)) {
         #STORING PLOTS FOR SURVEYS POINTS OVER POPULATION VALUES   
         temp_rotate <- result[[good_iter[[s]]]]$pop_bios[[i+month_shift]][[s]]
         
+        #survey points as ppp
+        sur_ppp <-as.ppp(cbind(survey_points[["YT"]][[3]][[13]]$lon,survey_points[["YT"]][[3]][[13]]$lat,survey_points[["YT"]][[3]][[13]]$survey),W=c(bbox(hab_ras)[1],bbox(hab_ras)[3],bbox(hab_ras)[2],bbox(hab_ras)[4]))
+        
         temp_ <- reshape2::melt(temp_rotate, c("x", "y"), value.name = "Biomass") #population biomass
-        temp_2 <- survey_points[[s]][[ceiling(i/52)]][[month_shift+1]] #survey locations
+        temp_2 <- as.matrix(survey_points[[s]][[ceiling(i/52)]][[month_shift+1]]) #survey locations
+        
+        temp_3 <- as.data.frame(GB_strata_ras[[s]]) #species specific strata
         
         pop_max[all_idx,s] <- max(temp_[,3],na.rm=T)
         
-    
-     surv_temp1[[yr_idx]] <- ggplot() +
-          geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Biomass)) + #plot biomass
-          geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
-          scale_fill_distiller(palette = "Spectral",limits = range(0.000000000000000000000000000000000000000000000000000000001, color_max[[spp_names_short[[s]]]][[k]])) + #set the color pallet and color limits
-          theme_void()+ #remove x and y axis ticks and labels
-          #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
-         theme(legend.position="none" ) #remove legend
+        
+        r <- raster(extent(GB_strata_ras[[s]]), nrow = nrow(GB_strata_ras[[s]]), ncol =ncol(GB_strata_ras[[s]]) , crs = crs(GB_strata_ras[[s]]))
+        values(r) <- temp_rotate
+        
+        r2 <- matrix(nrow = nrow(GB_strata_ras[[s]]), ncol =ncol(GB_strata_ras[[s]]))
+        for(i in seq(length(temp_2[,1]))){
+          x=temp_2[i,1]
+          y=temp_2[i,2]
+          r2[x,y]<-temp_2[i,3]}
+        
+        r3<-raster(extent(GB_strata_ras[[s]]), nrow = nrow(GB_strata_ras[[s]]), ncol =ncol(GB_strata_ras[[s]]) , crs = crs(GB_strata_ras[[s]]))
+        values(r3) <- r2
+        
+    #old way
+     # surv_temp1[[yr_idx]] <- ggplot() +
+     #      geom_raster(data=temp_,aes(x=y,y=rev(x),fill=Biomass)) + #plot biomass
+     #      geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
+     #      scale_fill_distiller(palette = "Spectral",limits = range(0.000000000000000000000000000000000000000000000000000000001, color_max[[spp_names_short[[s]]]][[k]])) + #set the color pallet and color limits
+     # 
+     # theme_void()+ #remove x and y axis ticks and labels
+     #      #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
+     #     theme(legend.position="none" ) #remove legend
+
+     #new way
+     surv_temp1[[yr_idx]] <- ggplot()+
+       
+       geom_raster(data=r,aes(x=x,y=y,fill=layer))+
+       
+       scale_fill_distiller(palette = "Spectral") +
+       geom_polygon(data=tt,aes(x=long,y=lat,group=group),fill=NA,color='red') +
+       new_scale_color()+
+       geom_point(data=as.data.frame(sur_ppp),aes(x=x,y=y,color=marks),shape=geom_pt_shp)+
+       
+       scale_colour_distiller(palette = "Greys")+
+       
+       new_scale_fill()+
+       scale_fill_continuous(na.value =NA )+
+       theme_void()+ #remove x and y axis ticks and labels
+       #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
+       theme(legend.position="none" ) #remove legend
      
-          
+     
+     
+     
      #STORING PLOTS FOR SURVEYS POINTS OVER HABITAT COVARIATES 
      #set habitat
      if(s==1){hab_ras = YT_ras}
@@ -1673,11 +1798,26 @@ for(s in seq_len(n_spp)) {
      
      temp_ras <- reshape2::melt(as.matrix(hab_ras), c("x", "y"), value.name = "Habitat") #population biomass
     
+     #old way
+     # surv_temp2[[yr_idx]] <- ggplot() +
+     #   geom_raster(data=temp_ras,aes(x=y,y=rev(x),fill=Habitat)) + #plot biomass
+     #   geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
+     #   scale_fill_distiller(palette = "Spectral") + #set the color pallet and color limits
+     #   theme_void()+ #remove x and y axis ticks and labels
+     #   #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
+     #   theme(legend.position="none" ) #remove legend
+     
+     #new way
+    
      surv_temp2[[yr_idx]] <- ggplot() +
-       geom_raster(data=temp_ras,aes(x=y,y=rev(x),fill=Habitat)) + #plot biomass
-       geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
+       geom_raster(data=hab_ras,aes(x=x,y=y,fill=layer)) + #plot biomass
        scale_fill_distiller(palette = "Spectral") + #set the color pallet and color limits
-       theme_void()+ #remove x and y axis ticks and labels
+       new_scale_color()+
+       
+       geom_point(data=as.data.frame(sur_ppp),aes(x=x,y=y,color=marks),shape=geom_pt_shp)+  #add survey points
+       scale_colour_distiller(palette = "Greys")+
+       new_scale_fill()+
+      theme_void()+ #remove x and y axis ticks and labels
        #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
        theme(legend.position="none" ) #remove legend
      
@@ -1687,25 +1827,41 @@ for(s in seq_len(n_spp)) {
      #STORING PLOTS FOR SURVEYS POINTS OVER TEMPERATURE COVARIATES
      move_cov_wk <- moveCov[["cov.matrix"]][[i+month_shift]]
      
-     # move_cov_wk_spp <- matrix(nc = ncol(move_cov_wk),
-     #                           nr = nrow(move_cov_wk), 
-     #                           sapply(move_cov_wk, norm_fun, 
-     #                                  mu = moveCov[["spp_tol"]][[s]][["mu"]], 
-     #                                  va = moveCov[["spp_tol"]][[s]][["va"]]))
+     move_cov_wk_spp <- matrix(nc = ncol(move_cov_wk),
+                               nr = nrow(move_cov_wk),
+                               sapply(move_cov_wk, MixFishSim::norm_fun,
+                                      mu = moveCov[["spp_tol"]][[s]][["mu"]],
+                                      va = moveCov[["spp_tol"]][[s]][["va"]]))
      
-     temp_temp <- reshape2::melt(move_cov_wk, c("x", "y"), value.name = "Temperature") #temperature
+     move_cov_ras <- raster(extent(GB_strata_ras[["Had"]]), nrow = nrow(GB_strata_ras[["Had"]]), ncol =ncol(GB_strata_ras[["Had"]]) , crs = crs(GB_strata_ras[["Had"]]))
+     values(move_cov_ras) <- move_cov_wk_spp
      
-     temp_max[all_idx,s] <- max(temp_temp[,3],na.rm=T)
+     #temp_temp <- reshape2::melt(move_cov_wk, c("x", "y"), value.name = "Temperature") #temperature
+     #temp_max[all_idx,s] <- max(temp_temp[,3],na.rm=T)
 
+     #old way
+     # surv_temp3[[yr_idx]] <- ggplot() +
+     #   geom_raster(data=temp_temp,aes(x=y,y=rev(x),fill=Temperature)) + #plot biomass
+     #   geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
+     #   scale_fill_distiller(palette = "Spectral",limits = range(0, temp_color_max[k])) + #set the color pallet and color limits
+     #   theme_void()+ #remove x and y axis ticks and labels
+     #   #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
+     #   theme(legend.position="none" ) #remove legend
+     
+     #new way
      surv_temp3[[yr_idx]] <- ggplot() +
-       geom_raster(data=temp_temp,aes(x=y,y=rev(x),fill=Temperature)) + #plot biomass
-       geom_point(data=temp_2,aes(x=y,y=88-x), shape = 19, size = .25, color="black") + #add survey points
-       scale_fill_distiller(palette = "Spectral",limits = range(0, temp_color_max[k])) + #set the color pallet and color limits
+       geom_raster(data=move_cov_ras,aes(x=x,y=y,fill=layer)) + #plot biomass
+       scale_fill_distiller(palette = "Spectral") + #set the color pallet and color limits
+       new_scale_color()+
+       
+       geom_point(data=as.data.frame(sur_ppp),aes(x=x,y=y,color=marks),shape=geom_pt_shp)+  #add survey points
+       scale_colour_distiller(palette = "Greys")+
+       new_scale_fill()+
        theme_void()+ #remove x and y axis ticks and labels
        #labs(x="lat", y="lon",title=paste(spp_names_short[s],  'Week', (i+month_shift)%%52,'Year', ceiling((i+month_shift)/52))) +
        theme(legend.position="none" ) #remove legend
      
-       
+     
       #print(p)
       
       #SECOND WEEK in SURVEY MONTH
