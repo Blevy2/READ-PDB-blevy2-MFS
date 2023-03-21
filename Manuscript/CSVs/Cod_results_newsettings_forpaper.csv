@@ -1,0 +1,17 @@
+Temp,Strata,Noise,Season,VAST NC  A,VAST NC  B,VAST WC A,VAST WC B,Stratified Mean
+Constant Temp.,all,no ,spring,0.11,0.11,0.13,0.12,0.36
+Constant Temp.,all,yes,spring,0.14,0.12,0.09,0.15,0.35
+Constant Temp.,all,no ,fall,0.23,0.19,0.09,0.05,0.49
+Constant Temp.,all,yes,fall,0.34,0.3,0.2,0.23,0.41
+Constant Temp.,reduced,no ,spring,0.25,0.17,0.22,0.24,0.41
+Constant Temp.,reduced,yes,spring,0.25,0.2,0.14,0.23,0.46
+Constant Temp.,reduced,no ,fall,0.16,0.21,0.26,0.33,0.6
+Constant Temp.,reduced,yes,fall,0.16,0.18,0.26,0.31,0.58
+Increasing Temp.,all,no ,spring,0.12,0.12,0.16,0.15,0.25
+Increasing Temp.,all,yes,spring,0.16,0.19,0.23,0.19,0.27
+Increasing Temp.,all,no ,fall,0.86,0.76,0.47,0.13,0.45
+Increasing Temp.,all,yes,fall,1.13,0.89,0.55,0.33,0.44
+Increasing Temp.,reduced,no ,spring,0.29,0.26,0.22,0.21,0.34
+Increasing Temp.,reduced,yes,spring,0.32,0.19,0.19,0.11,0.33
+Increasing Temp.,reduced,no ,fall,1.41,0.79,0.37,0.26,0.62
+Increasing Temp.,reduced,yes,fall,2.09,1.37,0.4,0.26,0.57
