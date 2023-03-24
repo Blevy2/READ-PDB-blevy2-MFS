@@ -10,11 +10,11 @@ setwd(orig.dir)
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario1 <- "ConPop_ConTemp" #the folder name
+scenario1 <- "IncPop_IncTemp" #the folder name
 
 #spp1 spp2 spp3
 #short_names <- c("YT","Cod","Had")   #fixed above
-short_names <- c("YT")#,"Had")
+short_names <- c("YT","Had")
 
 exclude_strata <- FALSE
 
@@ -565,7 +565,7 @@ for(folder in model_types[[s]]){
 
 #All (potentially) species
 
-pdf(file=paste(getwd(),"/",scenario1,"_",str_dir,"_new.pdf",sep=""))
+pdf(file=paste(getwd(),"/",scenario1,"_",str_dir,"_newTEST.pdf",sep=""))
 
 #Just YT
 #pdf(file=paste(getwd(),"/YT/",scenario1,"_",str_dir,"_YT.pdf",sep=""))
@@ -582,7 +582,9 @@ Obsmodel_plot_log <- list()
 Est_ratio <- list()
 SRS_ratio <- list()
 Est_ratio_plot <- list()
+Est_ratio_plot2 <- list()
 Est_ratio_plot_log <- list()
+SRS_VAST_ratio <- list()
 
 Ratio_summary_info <- matrix(nrow=8*length(short_names),ncol=13)
 ratio_idx <- 1
@@ -644,12 +646,17 @@ for(folder in model_types[[s]]){
   
   oldnames = names(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
   #add Est_ratio to VAST_est to plot later
-  VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- cbind(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]],Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
-  names(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]]) <- c(oldnames,"Est_ratio") 
+  VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- cbind(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
+                                                                      Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
+                                                                      rep(mean(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"Std..Error.for.Estimate"]),years_sim-years_cut)
+                                                                      )
+  names(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]]) <- c(oldnames,"Est_ratio","mean_sd") 
   
   oldnames = names(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]])
-  VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- cbind(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]],Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]])
-  names(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]]) <- c(oldnames,"Est_ratio") 
+  VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- cbind(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
+                                                                    Est_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
+                                                                    rep(mean(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"Std..Error.for.Estimate"]),years_sim-years_cut))
+  names(VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]]) <- c(oldnames,"Est_ratio","mean_sd") 
   
   #calculate SPRING SRS error from each iteration
   SRS_Model_error[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- sum(abs(model_spring- SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"mean.yr.absolute"] )) / sum(abs(model_spring ))
@@ -676,22 +683,37 @@ for(folder in model_types[[s]]){
   SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"mean.yr.absolute"]/model_fall
   SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"mean.yr.absolute"]/model_spring
   
+  #srs/vast ratio
+ SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- VAST_est[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"Estimate"]/SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"mean.yr.absolute"]
+ SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"Estimate"]/SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"mean.yr.absolute"]
+  
+ 
   namesorig=colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
-  SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- cbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]],SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
-  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]]) <- c(namesorig,"Est_ratio")
+  SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- cbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
+                                                                       SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
+                                                                       SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
+                                                                       rep(mean(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]]),years_sim-years_cut),
+                                                                       rep(mean(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"sd.mean.yr.absolute"]),years_sim-years_cut)
+                                                                       )
+  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]]) <- c(namesorig,"Est_ratio","SRS_VAST_ratio","SRS_VAST_mean","mean_sd")
   
   namesorig=colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]])
-  SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- cbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]],SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]])
-  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]]) <- c(namesorig,"Est_ratio")
+  SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- cbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
+                                                                     SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
+                                                                     SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
+                                                                     rep(mean(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]]),years_sim-years_cut),
+                                                                     rep(mean(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"sd.mean.yr.absolute"]),years_sim-years_cut)
+                                                                     )
+  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]]) <- c(namesorig,"Est_ratio","SRS_VAST_ratio","SRS_VAST_mean","mean_sd")
   
   
   SRS_data[[s]][[cov_direct]][[noise]][[folder]] <- rbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]],SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]])
     
-  
-  
-  
-  
-  
+ 
+ 
+ 
+ 
+ 
   ######################################################
   # GO THROUGH SRS_DATA AND VAST_DATA IN CURRENT FOLDER TO
   # 1) COUNT NUMBER OF OVER/UNDER ESTIMATE
@@ -963,7 +985,7 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
       #                                          "  FC=", toString(FC_fall),
       #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
       
-      labs(x="year",y="Model/Estimate", title = paste(paste(s," ",folder,sep=""),sep=""), color ="" )+
+      labs(x="year",y="Estimate/Model", title = paste(paste(s," ",folder,sep=""),sep=""), color ="" )+
       
       theme(axis.text=element_text(size=12),
             axis.title=element_text(size=12),
@@ -1018,7 +1040,7 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
       #                                          "  FC=", toString(FC_fall),
       #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
       
-      labs(x="year",y="log(Model/Estimate)", title = paste(paste(s," ",folder,sep=""),sep=""), color ="" )+
+      labs(x="year",y="log(Estimate/Model)", title = paste(paste(s," ",folder,sep=""),sep=""), color ="" )+
       
       theme(axis.text=element_text(size=12),
             axis.title=element_text(size=12),
@@ -1027,6 +1049,10 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
     #one plot per page
     print(Est_ratio_plot_log[[s]][[cov_direct]][[noise]][[folder]])
 
+    
+
+    
+    
 }
 }
 
@@ -1040,6 +1066,10 @@ long_names <- c("Yellowtail Flounder", "Atlantic Cod", "Haddock")
 
 plotss_VAST <- list()
 plotss_SRS <- list()
+plotss_SRS_VAST <- list()
+plotss_SRS_sd <- list()
+plotss_VAST_sd <- list()
+
 
 for(s in short_names){ #LIST_ALL WILL BE LENGTH 3 FROM ABOVE
    s_idx <- 1
@@ -1058,14 +1088,24 @@ for(s in short_names){ #LIST_ALL WILL BE LENGTH 3 FROM ABOVE
         
 
 
-
+  dd= as.data.frame(subset(VAST_data[[s]][[cov_direct]][[noise]][[folder]],Year>=year_min))
+        
+  #extract slope of trend line by season
+  intercepts <- dd %>% 
+          group_by(season) %>% 
+          do({
+            mod = lm(Est_ratio ~ Year, data = .)
+            data.frame(Intercept = coef(mod)[1],
+                       Slope = coef(mod)[2])
+          })
+        
 plotss_VAST[[s_idx]] <- ggplot() +
   
   #this way plots data by season divided by itself so it equals 1
   geom_point(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=Est_ratio, group = season, color = "Model"),size=3) +
   geom_line(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=Est_ratio, group =season, color = "Model"),size=1) +
   
-
+  
   # labs(x="year",y="Biomass", title = paste(folder,"  SeV=",round(VAST_Model_error[[s]][[folder]][["spring"]],digits=2),
   #                                          "  FC=", toString(FC_spring), 
   #                                          "  SeSM=",round(SRS_Model_error[[s]][[folder]][["spring"]],digits=2),
@@ -1076,23 +1116,121 @@ plotss_VAST[[s_idx]] <- ggplot() +
   geom_point(data=subset(VAST_data[[s]][[cov_direct]][[noise]][[folder]],Year>=year_min),aes(x=Year,y=Est_ratio,group=season))+
   geom_line(data=subset(VAST_data[[s]][[cov_direct]][[noise]][[folder]],Year>=year_min),aes(x=Year,y=Est_ratio,group=season))+
   
-  labs(x="year",y="Model/Estimate", title = paste(paste(s," ",folder," VAST",cov_direct,noise,sep=""),sep=""), color ="" )+
+  
+  geom_smooth(data=subset(VAST_data[[s]][[cov_direct]][[noise]][[folder]],Year>=year_min),method=lm, level=0.95, aes(x=Year,y=Est_ratio,group=season))+
+  
+  labs(x="year",y="Estimate/Model", title = paste(paste(s," ",folder," VAST",cov_direct,noise,
+                                                        " S_M=",round(intercepts$Slope[[1]],2),
+                                                        " F_M=",round(intercepts$Slope[[2]],2),sep=""),sep=""), color ="" )+
 
   facet_wrap(~ season, ncol =1) +
   
 theme(axis.text=element_text(size=12),
       axis.title=element_text(size=12),
       title=element_text(size=8))
+
+
+
+
+
+#plot VAST/SRS estimate ratios by season
+
+ll = length(SRS_data[[s]][[cov_direct]][[noise]][[folder]][1,])
+dd= as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]])
+
+#extract slope of trend line by season
+intercepts <- dd %>% 
+  group_by(season) %>% 
+  do({
+    mod = lm(SRS_VAST_ratio ~ Year, data = .)
+    data.frame(Intercept = coef(mod)[1],
+               Slope = coef(mod)[2])
+  })
+
+plotss_SRS_VAST[[s_idx]]  <- ggplot(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min)) +
+  
+  
+  geom_point(aes(x=year,y=SRS_VAST_ratio,group=season))+
+  geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=SRS_VAST_ratio,group=season))+
+  
+  #geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]) %>% filter(season==2 & !(year%in%c(7,11,23,10))),aes(x=year,y=SRS_VAST_mean,group=season,ymin=SRS_VAST_mean-(1.6*sd(SRS_VAST_ratio)), ymax=SRS_VAST_mean+(1.6*sd(SRS_VAST_ratio))),width=.3) +
+  
+  
+  geom_smooth(method=lm, level=0.95, aes(x=year,y=SRS_VAST_ratio,group=season))+
+  
+  #plot mean values
+  geom_line(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=SRS_VAST_mean,group=season))+
+  
+  labs(x="year",y="VAST/SRS", title = paste(paste(s," ",folder," VAST/SRS",cov_direct,noise,
+                                                  " S_M=",round(intercepts$Slope[[1]],2),
+                                                  " F_M=",round(intercepts$Slope[[2]],2),sep=""),sep=""), color ="" )+
+  
+  facet_wrap(~ season, ncol =1) +
+  
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12),
+        title=element_text(size=8))
+
+
+
+#plot VAST variance
+
+dd=subset(as.data.frame(VAST_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min)
+  
+#extract slope of trend line by season
+intercepts <- dd %>% 
+  group_by(season) %>% 
+  do({
+    mod = lm(Std..Error.for.Estimate ~ Year, data = .)
+    data.frame(Intercept = coef(mod)[1],
+               Slope = coef(mod)[2])
+  })
+
+plotss_VAST_sd[[s_idx]]  <- ggplot(data=subset(as.data.frame(VAST_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min)) +
+  
+  
+  geom_point(aes(x=Year,y=Std..Error.for.Estimate,group=season))+
+  geom_line(aes(x=Year,y=Std..Error.for.Estimate,group=season))+
+  
+  #plot mean values
+  geom_line(aes(x=Year,y=mean_sd,group=season))+
+ 
+  geom_smooth(method=lm, level=0.95, aes(x=Year,y=Std..Error.for.Estimate,group=season))+
+  
+  #geom_errorbar(data=as.data.frame(VAST_data[[s]][[cov_direct]][[noise]][[folder]]) %>% filter(season==2 & !(Year%in%c(22,23))),aes(x=Year,y=mean_sd,group=season,ymin=mean_sd-(1.96*sd(Std..Error.for.Estimate)), ymax=mean_sd+(1.96*sd(Std..Error.for.Estimate))),width=.3) +
+  
+  labs(x="year",y="VAST SE", title = paste(paste(s," ",folder," VAST SE",cov_direct,noise,
+                                                 " S_M=",round(intercepts$Slope[[1]],1),
+                                                 " F_M=",round(intercepts$Slope[[2]],1),sep=""),sep=""), color ="" )+
+  
+  facet_wrap(~ season, ncol =1) +
+  
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12),
+        title=element_text(size=8))
+
 s_idx=s_idx+1
 
     }
-    
+   
+   
+   dd=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min)
+   
+   #extract slope of trend line by season
+   intercepts <- dd %>% 
+     group_by(season) %>% 
+     do({
+       mod = lm(Est_ratio ~ Year, data = .)
+       data.frame(Intercept = coef(mod)[1],
+                  Slope = coef(mod)[2])
+     })
+   
     plotss_SRS[[s_idx2]] <- ggplot() +
       
       #this way plots data by season divided by itself so it equals 1
       geom_point(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=Est_ratio, group = season, color = "Model"),size=3) +
       geom_line(data = subset(as.data.frame(pop_by_season[[s]]),year>=year_min), aes(x=as.numeric(year),y=Est_ratio, group =season, color = "Model"),size=1) +
-      
+     
       
       # labs(x="year",y="Biomass", title = paste(folder,"  SeV=",round(VAST_Model_error[[s]][[folder]][["spring"]],digits=2),
       #                                          "  FC=", toString(FC_spring), 
@@ -1104,7 +1242,13 @@ s_idx=s_idx+1
       geom_point(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=Est_ratio,group=season))+
       geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=Est_ratio,group=season))+
       
-      labs(x="year",y="Model/Estimate", title = paste(paste(s," ",folder," SRS",noise,sep=""),sep=""), color ="" )+
+      labs(x="year",y="Estimate/Model", title = paste(paste(s," ",folder," SRS",noise,
+                                                            " S_M=",round(intercepts$Slope[[1]],3),
+                                                            " F_M=",round(intercepts$Slope[[2]],3),sep=""),sep=""), color ="" )+
+       
+      geom_smooth(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),
+                  method=lm, level=0.95, aes(x=year,y=Est_ratio,group=season))+
+      
       
       facet_wrap(~ season, ncol =1) +
       
@@ -1112,13 +1256,61 @@ s_idx=s_idx+1
             axis.title=element_text(size=12),
             title=element_text(size=8))
     
+    
+    
+    
+    
+    dd=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min)
+    #extract slope of trend line by season
+    intercepts <- dd %>% 
+      group_by(season) %>% 
+      do({
+        mod = lm(sd.mean.yr.absolute ~ Year, data = .)
+        data.frame(Intercept = coef(mod)[1],
+                   Slope = coef(mod)[2])
+      })
+    
+    plotss_SRS_sd[[s_idx2]]  <- ggplot(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min)) +
+      
+      
+      geom_point(aes(x=year,y=sd.mean.yr.absolute,group=season))+
+      geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=sd.mean.yr.absolute,group=season))+
+      
+     # geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season,ymin=mean_sd-(1.96*sd(sd.mean.yr.absolute)), ymax=mean_sd+(1.96*sd(sd.mean.yr.absolute))),width=.3) +
+      
+      geom_smooth(method=lm, level=0.95, aes(x=year,y=sd.mean.yr.absolute,group=season))+
+      
+      annotate("text",x=5,y=max(dd$sd.mean.yr.absolute),label=(paste0("slope==",coef(lm(dd$sd.mean.yr.absolute~dd$year))[2])),parse=TRUE)+
+      
+      #plot mean values
+      geom_line(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season))+
+      
+      labs(x="year",y="SRS SD", title = paste(paste(s," ",folder," SRS SD",cov_direct,noise,
+                                                    " S_M=",round(intercepts$Slope[[1]],1),
+                                                    " F_M=",round(intercepts$Slope[[2]],1),sep=""),sep=""), color ="" )+
+      
+      facet_wrap(~ season, ncol =1) +
+      
+      theme(axis.text=element_text(size=12),
+            axis.title=element_text(size=12),
+            title=element_text(size=8))
+
+    
+    
     s_idx2=s_idx2+1
     
     
     }}
    
+   #plot estimate ratios on one page
    gridExtra::grid.arrange(plotss_VAST[[1]],plotss_VAST[[2]],plotss_VAST[[3]],plotss_VAST[[4]],plotss_SRS[[1]],plotss_SRS[[2]],ncol=2)
    # gridExtra::grid.arrange(Obsmodel_plot[[4]],Obsmodel_plot[[5]],Obsmodel_plot[[6]],nrow=3)
+   
+   #plot SR/VAST ratios on another page
+   gridExtra::grid.arrange(plotss_SRS_VAST[[1]],plotss_SRS_VAST[[2]],plotss_SRS_VAST[[3]],plotss_SRS_VAST[[4]],ncol=2)
+   
+   #plot SR/VAST sd on another page
+   gridExtra::grid.arrange(plotss_VAST_sd[[1]],plotss_VAST_sd[[2]],plotss_VAST_sd[[3]],plotss_VAST_sd[[4]],plotss_SRS_sd[[1]],plotss_SRS_sd[[2]],ncol=2)
    
    }
 
@@ -1142,6 +1334,44 @@ dev.off()
 
 
 
+
+
+#PLOT SOME STUFF FROM SURVEYS
+
+
+for(s in short_names){
+
+
+for(season in c("SPRING","FALL")){
+
+list_all[[s]] <- as.data.frame(list_all[[s]])%>%filter(stratum %in% strata_species[[s]])
+
+
+
+ppp<-ggplot(data=as.data.frame(list_all[[s]])%>%filter(Season==season ))+
+  
+  
+  
+  geom_point(aes(x=as.numeric(year),y=as.numeric(YT_samp),group=stratum,color=year))+
+  # geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=sd.mean.yr.absolute,group=season))+
+  # 
+  # geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season,ymin=mean_sd-(1.96*sd(sd.mean.yr.absolute)), ymax=mean_sd+(1.96*sd(sd.mean.yr.absolute))),width=.3) +
+  # 
+  # #plot mean values
+  # geom_line(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season))+
+  # 
+   labs(x="year",y="Tow Biomass", title = paste(paste(s," ",folder," Survey Biomass ",season,cov_direct,noise,sep=""),sep=""), color ="" )+
+  # 
+  facet_wrap(~ stratum, ncol =3) +
+  
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12),
+        title=element_text(size=8))
+
+print(ppp)
+
+}
+}
 
 
 
