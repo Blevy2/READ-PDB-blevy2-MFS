@@ -10,7 +10,7 @@ setwd(orig.dir)
 ##################################################################################################
 #THINGS WE NEED
 ##################################################################################################
-scenario1 <- "IncPop_IncTemp" #the folder name
+scenario1 <- "IncPop_ConTemp" #the folder name
 
 #spp1 spp2 spp3
 #short_names <- c("YT","Cod","Had")   #fixed above
@@ -127,6 +127,7 @@ library(TMB)
 library(VAST)
 library(dplyr)
 library(ggplot2)
+library(rgdal)
 
 #read in habitat matrix
 hab <- readRDS(file="hab_GB_3species.RDS") #courser resolution
@@ -139,7 +140,36 @@ Had_ras <- readRDS(file="TestScripts/Habitat_plots/Haddock/Had_Weighted_AdaptFal
 #translate habitat matrix back into raster
 hab_ras <-raster(hab$hab$spp3)
 extent(hab_ras) <- extent(Had_ras)
+crs(hab_ras) <- crs(Had_ras)
 #plot(hab_ras)
+
+#read in species-specific polygons
+#load stratas for clipping etc
+strata.dir <- "C:\\Users\\benjamin.levy\\Desktop\\NOAA\\GIS_Stuff\\" # strata shape files in this directory
+# get the shapefiles
+strata.areas <- readOGR(paste(strata.dir,"Survey_strata", sep="")) #readShapePoly is deprecated; use rgdal::readOGR or sf::st_read 
+#define georges bank for YELLOWTAIL
+GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210")
+#pull out indices corresponding to GB strata
+GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+GB_strata_YT <- strata.areas[GB_strata_idx,]
+#define georges bank for COD  
+GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250")
+#pull out indices corresponding to GB strata
+GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+GB_strata_Cod <- strata.areas[GB_strata_idx,]
+#define georges bank for HADDOCK  
+GB_strata_num <- c("01130","01140","01150","01160","01170","01180","01190","01200","01210","01220","01230","01240","01250", "01290", "01300")
+#pull out indices corresponding to GB strata
+GB_strata_idx <- match(GB_strata_num,strata.areas@data[["STRATUMA"]])
+GB_strata_Had <- strata.areas[GB_strata_idx,]
+GB_strata <- list(GB_strata_YT,GB_strata_Cod,GB_strata_Had)
+names(GB_strata) <- c("YT","Cod","Had")
+r1 <- raster(extent(hab_ras), nrow = nrow(hab_ras), ncol =ncol(hab_ras) , crs = crs(GB_strata_YT))
+r2 <- raster(extent(hab_ras), nrow = nrow(hab_ras), ncol =ncol(hab_ras) , crs = crs(GB_strata_Cod))
+r3 <- raster(extent(hab_ras), nrow = nrow(hab_ras), ncol =ncol(hab_ras) , crs = crs(GB_strata_Had))
+rr <- list(r1,r2,r3)
+names(rr)<-short_names
 
 for(iter in seq(length(list_all))){
   print(iter)
@@ -165,6 +195,8 @@ for(iter in seq(length(list_all))){
     
     lon[samp] <- xFromCol(hab_ras, col = cl)
     lat[samp] <- yFromRow(hab_ras, row = rw)
+    
+    
   
   }
   temp <- cbind(temp,lat,lon)
@@ -175,6 +207,80 @@ for(iter in seq(length(list_all))){
 
 #SAVE INDIVIDUAL LIST_ALL AS THEY COME OUT SO DONT HAVE TO REDO THEM
 #saveRDS(list_all,paste("list_all_more_",scenario,".RDS",sep=""))
+
+
+
+#EXTRACT POPULATION BY STRATA FOR STRATA-SPECIFIC COMPARISON ALREADY DID THIS AND SAVED OUTPUT
+
+# pop_by_strata <- list()
+# pop_by_strata[["YT"]]<- data.frame()
+# pop_by_strata[["Cod"]]<- data.frame()
+# pop_by_strata[["Had"]]<- data.frame()
+# 
+# 
+# for(s in short_names){
+# for(yr in seq(3,22)){
+#   for(wk in c(13,37)){
+# 
+#     if(s=="YT"){iter=1}
+#     if(s=="Cod"){iter=2}
+#     if(s=="Had"){iter=3}
+#     
+#     #extract population by strata
+#     #average the two survey weeks
+#     values(rr[[iter]]) <- (result[[good_iter[iter]]]$pop_bios[[(wk+(52*(yr-1)))]][[paste("spp",iter,sep="")]] + result[[good_iter[iter]]]$pop_bios[[((wk+1)+(52*(yr-1)))]][[paste("spp",iter,sep="")]])/2
+#   #old way
+#     #values(r1) <- (result[[good_iter[iter]]]$pop_bios[[(wk+(52*(yr-1)))]][["spp1"]] + result[[good_iter[iter]]]$pop_bios[[((wk+1)+(52*(yr-1)))]][["spp1"]])/2
+#     #values(r2) <- (result[[good_iter[iter]]]$pop_bios[[(wk+(52*(yr-1)))]][["spp2"]] + result[[good_iter[iter]]]$pop_bios[[((wk+1)+(52*(yr-1)))]][["spp2"]])/2
+#     #values(r3) <- (result[[good_iter[iter]]]$pop_bios[[(wk+(52*(yr-1)))]][["spp3"]] + result[[good_iter[iter]]]$pop_bios[[((wk+1)+(52*(yr-1)))]][["spp3"]])/2
+# 
+#     vv <- raster::extract(rr[[iter]],GB_strata[[iter]])
+#     names(vv) <- GB_strata[[iter]]$STR2
+#     #old way
+#     #v1 <- raster::extract(r1,GB_strata_YT)
+#     #names(v1) <- GB_strata_YT$STR2
+#     #v2 <- raster::extract(r2,GB_strata_Cod)
+#     #names(v2) <- GB_strata_Cod$STR2
+#     #v3 <- raster::extract(r3,GB_strata_Had)
+#     #names(v3) <- GB_strata_Had$STR2
+# 
+#     ifelse(wk==13, sn<-1, sn<-2)
+#     nroww = nrow(pop_by_strata[[s]])
+#     #old way
+#     #nrow_YT = nrow(pop_by_strata[["YT"]])
+#     #nrow_Cod = nrow(pop_by_strata[["Cod"]])
+#     #nrow_Had = nrow(pop_by_strata[["Had"]])
+# 
+#     
+#     pop_by_strata[[s]][(nroww+1):(nroww+length(GB_strata[[s]])),"year"] <- rep(yr,length(GB_strata[[s]]))
+#     pop_by_strata[[s]][(nroww+1):(nroww+length(GB_strata[[s]])),"season"] <- rep(sn,length(GB_strata[[s]]))
+#     pop_by_strata[[s]][(nroww+1):(nroww+length(GB_strata[[s]])),"stratum"] <- GB_strata[[s]]$STR2
+#     pop_by_strata[[s]][(nroww+1):(nroww+length(GB_strata[[s]])),"biomass"] <- unlist(lapply(vv , function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA ))
+#     # #old way
+#     # pop_by_strata[["YT"]][(nrow_YT+1):(nrow_YT+length(GB_strata_YT)),"year"] <- rep(yr,length(GB_strata_YT))
+#     # pop_by_strata[["YT"]][(nrow_YT+1):(nrow_YT+length(GB_strata_YT)),"season"] <- rep(sn,length(GB_strata_YT))
+#     # pop_by_strata[["YT"]][(nrow_YT+1):(nrow_YT+length(GB_strata_YT)),"stratum"] <- GB_strata_YT$STR2
+#     # pop_by_strata[["YT"]][(nrow_YT+1):(nrow_YT+length(GB_strata_YT)),"biomass"] <- unlist(lapply(v1 , function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA ))
+#     # pop_by_strata[["Cod"]][(nrow_Cod+1):(nrow_Cod+length(GB_strata_Cod)),"year"] <- rep(yr,length(GB_strata_Cod))
+#     # pop_by_strata[["Cod"]][(nrow_Cod+1):(nrow_Cod+length(GB_strata_Cod)),"season"] <- rep(sn,length(GB_strata_Cod))
+#     # pop_by_strata[["Cod"]][(nrow_Cod+1):(nrow_Cod+length(GB_strata_Cod)),"statum"] <- GB_strata_Cod$STR2
+#     # pop_by_strata[["Cod"]][(nrow_Cod+1):(nrow_Cod+length(GB_strata_Cod)),"biomass"] <- unlist(lapply(v2 , function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA ))
+#     # pop_by_strata[["Had"]][(nrow_Had+1):(nrow_Had+length(GB_strata_Had)),"year"] <- rep(yr,length(GB_strata_Had))
+#     # pop_by_strata[["Had"]][(nrow_Had+1):(nrow_Had+length(GB_strata_Had)),"season"] <- rep(sn,length(GB_strata_Had))
+#     # pop_by_strata[["Had"]][(nrow_Had+1):(nrow_Had+length(GB_strata_Had)),"stratum"] <- GB_strata_Had$STR2
+#     # pop_by_strata[["Had"]][(nrow_Had+1):(nrow_Had+length(GB_strata_Had)),"biomass"] <- unlist(lapply(v3 , function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA ))
+# 
+# 
+#   }
+# }
+# }
+# #save for later use
+# saveRDS(pop_by_strata,paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario1,"\\pop_by_strata_",scenario1,".RDS",sep=""))
+
+
+
+
+
 
 
 
@@ -266,7 +372,6 @@ options(dplyr.summarise.inform = FALSE)
 source("TestScripts/Calc_strat_mean/fn_srs_survey_BENS.R")
 
 
-
 #setup dimensions for each species- 1 for each strata
 strat_mean_all <- vector("list",length(seq(n_spp)))
 
@@ -275,6 +380,7 @@ for(s in short_names){
   strat_mean_all[[s]] <- vector("list",length(list_all)) 
 }
 
+strat_mean_by_strat <- list()
 
 #go through each strata survey, iteration, sample
   
@@ -354,9 +460,11 @@ for(iter in seq(length(list_all))){
     
     spp.area <- sum(sv.area$STRATUM_AREA[sv.area$stratum %in% spp.strata]) #TOTAL AREA OF ALL STRATA
     
+    temp_temp =  srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = paste0(s,"_samp", sep="")  )
     
+    strat_mean_by_strat[[s]][[noise]][[iter]] <- temp_temp$mean.yr.strrr #record stratum-specific estimate
     
-    temp <- srs_survey(df=spp, sa=sv.area, str=NULL, ta=1, sppname = paste0(s,"_samp", sep="")  )   # if strata=NULL, the function will use the unique strata set found in df
+    temp <- temp_temp$surv.ind.yr   # if strata=NULL, the function will use the unique strata set found in df
     # View(temp)
     strat_mean_all[[s]][[noise]][[iter]] <- temp %>%
       mutate(mean.yr.absolute=mean.yr*spp.area, sd.mean.yr.absolute=sd.mean.yr*spp.area,
@@ -364,12 +472,10 @@ for(iter in seq(length(list_all))){
     
     strat_mean_all[[s]][[noise]][[iter]] <- data.matrix(strat_mean_all[[s]][[noise]][[iter]])
     
+    colnames(strat_mean_all[[s]][[noise]][[iter]]) <- c("year","mean.yr","var.mean.yr","sd.mean.yr","CV","season","mean.yr.absolute","sd.mean.yr.absolute","CV.absolute")
+  
+  
     
-    
-  
-  
-  colnames(strat_mean_all[[s]][[noise]][[iter]]) <- c("year","mean.yr","var.mean.yr","sd.mean.yr","CV","season","mean.yr.absolute","sd.mean.yr.absolute","CV.absolute")
-  
   }
      
   }
@@ -379,6 +485,9 @@ strat_mean_all[["YT"]][[noise]] <- strat_mean_all[["YT"]][[noise]][[1]]  #YT sho
 strat_mean_all[["Cod"]][[noise]] <- strat_mean_all[["Cod"]][[noise]][[2]] #Cod should be second in list_all
 strat_mean_all[["Had"]][[noise]] <- strat_mean_all[["Had"]][[noise]][[3]] #Had should be third in list_all
  
+strat_mean_by_strat[["YT"]][[noise]] <- strat_mean_by_strat[["YT"]][[noise]][[1]]
+strat_mean_by_strat[["Cod"]][[noise]] <- strat_mean_by_strat[["Cod"]][[noise]][[2]]
+strat_mean_by_strat[["Had"]][[noise]] <- strat_mean_by_strat[["Had"]][[noise]][[3]]
   
 }
 
@@ -394,10 +503,44 @@ ifelse(exclude_strata==TRUE, strat_ex <- "excludestrata", strat_ex <- "allstrata
 
 
 
+#EXTRACT VAST ESTIMATE BY STRATA FOR STRATA-SPECIFIC COMPARISON
+source("TestScripts/vast_by_strat.R") #for vast by strata
+
+vast_by_str <- list()
+   
+    #DEFINE INDIVIDUAL STRATUM AREAS 
+    stratum <- sort(unique(surv_random$log.mat[,4]))
+    
+    STRATUM_AREA <- na.omit(surv_random$cells_per_strata) # old way: rep(10000/nstrata,nstrata) #100x100 grid so each corner has area 2500
+    
+    sv.area <- as_tibble(data.frame(stratum,STRATUM_AREA))
+    
+    
+for(cov_directory in c("_NoCovs_", "_WithCov_")){
+for(noise in c("NoNoise_", "WithNoise_")){
+  
+  for(s in short_names){
+
+ 
+    
+    #remove stratum that species does not occupy
+    sv.area <- sv.area[(sv.area$stratum %in% strata_species[[s]]),]#sv.area %>% slice(-exclude)
+    
+    #remove strata to exclude from stratified mean calculation
+    sv.area <- sv.area[!(sv.area$stratum %in% exclude[[s]]),]#sv.area %>% slice(-exclude)
+    
+
+#get stratum-specific estimates
+
+#spp_VAST <-  vast_by_strat(s,str_dir,cov_directory,noise,scenario1=scenario1, r1=r1, GB_strata_Had=GB_strata_Had, strata_species_s = strata_species[[s]] )
+#ttt <- srs_survey(df=spp_VAST, sa=sv.area, str=NULL, ta=1, sppname = paste0("biomass_",s, sep=""))
+#vast_by_str[[s]][[cov_directory]][[noise]] <- ttt$surv.ind.str
+vast_by_str[[s]][[cov_directory]][[noise]] <- vast_by_strat(s,str_dir,cov_directory,noise,scenario1=scenario1, r1=r1, GB_strata_Had=GB_strata_Had, strata_species_s = strata_species[[s]] )
 
 
-
-
+  }
+}
+}
 
 
 
@@ -565,7 +708,7 @@ for(folder in model_types[[s]]){
 
 #All (potentially) species
 
-pdf(file=paste(getwd(),"/",scenario1,"_",str_dir,"_newTEST.pdf",sep=""))
+#pdf(file=paste(getwd(),"/",scenario1,"_",str_dir,"_97CI.pdf",sep=""))
 
 #Just YT
 #pdf(file=paste(getwd(),"/YT/",scenario1,"_",str_dir,"_YT.pdf",sep=""))
@@ -585,6 +728,7 @@ Est_ratio_plot <- list()
 Est_ratio_plot2 <- list()
 Est_ratio_plot_log <- list()
 SRS_VAST_ratio <- list()
+id_remove_all <- list()
 
 Ratio_summary_info <- matrix(nrow=8*length(short_names),ncol=13)
 ratio_idx <- 1
@@ -688,23 +832,57 @@ for(folder in model_types[[s]]){
  SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- VAST_est[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"Estimate"]/SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"mean.yr.absolute"]
   
  
+ #calculate Standard deviation of VAST/SRS ratio after removing elements outside of 95% confidence interval
+ratios=SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]]
+sd1 = sd(ratios)
+CI=2.17
+id_remove = which(ratios >= (1+CI*sd1))
+
+while(length(id_remove)>0){
+  ratios <- ratios[-id_remove] #remove entries outisde of 95% interval
+  sd1 = sd(ratios) #recalculate sd without large values
+  id_remove = which(ratios >= (1+CI*sd1))
+}
+
+#remove and infinities
+ratios = ratios[is.finite(ratios)]
+id_remove_all[[s]][[cov_direct]][[noise]][[folder]][["spring"]] = which(!(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]]%in%ratios)) + 2
+
+
   namesorig=colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]])
   SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]] <- cbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
                                                                        SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
                                                                        SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]],
-                                                                       rep(mean(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]]),years_sim-years_cut),
-                                                                       rep(mean(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"sd.mean.yr.absolute"]),years_sim-years_cut)
+                                                                       rep(mean(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]][is.finite(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["spring"]])],na.rm=T),years_sim-years_cut),
+                                                                       rep(sd(ratios),years_sim-years_cut),
+                                                                       rep(mean(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]][,"sd.mean.yr.absolute"],na.rm=T),years_sim-years_cut)
                                                                        )
-  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]]) <- c(namesorig,"Est_ratio","SRS_VAST_ratio","SRS_VAST_mean","mean_sd")
+  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]]) <- c(namesorig,"Est_ratio","SRS_VAST_ratio","SRS_VAST_mean","SRS_VAST_sd","mean_sd")
+  
+  #calculate Standard deviation of VAST/SRS ratio after removing elements outside of 95% confidence interval
+  ratios=SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]]
+  sd1 = sd(ratios)
+  id_remove = which(ratios >= (1+CI*sd1))
+  
+  while(length(id_remove)>0){
+    ratios <- ratios[-id_remove] #remove entries outisde of 95% interval
+    sd1 = sd(ratios) #recalculate sd without large values
+    id_remove = which(ratios >= (1+CI*sd1))
+  }
+  #remove and infinities
+  ratios = ratios[is.finite(ratios)]
+  id_remove_all[[s]][[cov_direct]][[noise]][[folder]][["fall"]] = which(!(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]]%in%ratios)) + 2
+  
   
   namesorig=colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]])
   SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]] <- cbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
                                                                      SRS_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
                                                                      SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]],
-                                                                     rep(mean(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]]),years_sim-years_cut),
-                                                                     rep(mean(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"sd.mean.yr.absolute"]),years_sim-years_cut)
+                                                                     rep(mean(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]][is.finite(SRS_VAST_ratio[[s]][[cov_direct]][[noise]][[folder]][["fall"]])],na.rm=T),years_sim-years_cut),
+                                                                     rep(sd(ratios,na.rm=T),years_sim-years_cut),
+                                                                     rep(mean(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]][,"sd.mean.yr.absolute"],na.rm=T),years_sim-years_cut)
                                                                      )
-  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]]) <- c(namesorig,"Est_ratio","SRS_VAST_ratio","SRS_VAST_mean","mean_sd")
+  colnames(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]]) <- c(namesorig,"Est_ratio","SRS_VAST_ratio","SRS_VAST_mean","SRS_VAST_sd","mean_sd")
   
   
   SRS_data[[s]][[cov_direct]][[noise]][[folder]] <- rbind(SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["spring"]],SRS_data1[[s]][[cov_direct]][[noise]][[folder]][["fall"]])
@@ -1117,11 +1295,14 @@ plotss_VAST[[s_idx]] <- ggplot() +
   geom_line(data=subset(VAST_data[[s]][[cov_direct]][[noise]][[folder]],Year>=year_min),aes(x=Year,y=Est_ratio,group=season))+
   
   
-  geom_smooth(data=subset(VAST_data[[s]][[cov_direct]][[noise]][[folder]],Year>=year_min),method=lm, level=0.95, aes(x=Year,y=Est_ratio,group=season))+
+#  geom_smooth(data=subset(VAST_data[[s]][[cov_direct]][[noise]][[folder]],Year>=year_min),method=lm, level=0.95, aes(x=Year,y=Est_ratio,group=season))+
+  
+#  annotate("text",x=5,y=max(dd$Est_ratio)*.75,label=paste("M=",as.character(round(intercepts$Slope[[1]],3))," ",as.character(round(intercepts$Slope[[2]],3)),sep=""))+
+  
   
   labs(x="year",y="Estimate/Model", title = paste(paste(s," ",folder," VAST",cov_direct,noise,
-                                                        " S_M=",round(intercepts$Slope[[1]],2),
-                                                        " F_M=",round(intercepts$Slope[[2]],2),sep=""),sep=""), color ="" )+
+                                                        " S_M=",round(intercepts$Slope[[1]],3),
+                                                        " F_M=",round(intercepts$Slope[[2]],3),sep=""),sep=""), color ="" )+
 
   facet_wrap(~ season, ncol =1) +
   
@@ -1137,7 +1318,7 @@ theme(axis.text=element_text(size=12),
 
 ll = length(SRS_data[[s]][[cov_direct]][[noise]][[folder]][1,])
 dd= as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]])
-
+dd$SRS_VAST_ratio[is.na(dd$SRS_VAST_ratio) | dd$SRS_VAST_ratio == "Inf"] <- NA 
 #extract slope of trend line by season
 intercepts <- dd %>% 
   group_by(season) %>% 
@@ -1147,23 +1328,25 @@ intercepts <- dd %>%
                Slope = coef(mod)[2])
   })
 
-plotss_SRS_VAST[[s_idx]]  <- ggplot(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min)) +
+plotss_SRS_VAST[[s_idx]]  <- ggplot(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),SRS_VAST_ratio>=0)) +
   
   
   geom_point(aes(x=year,y=SRS_VAST_ratio,group=season))+
-  geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=SRS_VAST_ratio,group=season))+
+  geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),SRS_VAST_ratio>=0),aes(x=year,y=SRS_VAST_ratio,group=season))+
   
-  #geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]) %>% filter(season==2 & !(year%in%c(7,11,23,10))),aes(x=year,y=SRS_VAST_mean,group=season,ymin=SRS_VAST_mean-(1.6*sd(SRS_VAST_ratio)), ymax=SRS_VAST_mean+(1.6*sd(SRS_VAST_ratio))),width=.3) +
+  geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]) %>% filter(season%in%c(1,2) & !(year%in%c())),aes(x=year,y=SRS_VAST_sd,group=season,ymin=1-(CI*SRS_VAST_sd), ymax=1+(CI*SRS_VAST_sd)),width=.3) +
+  annotate("text",x=10,y=max(dd$SRS_VAST_ratio)*.75,label=paste(paste(as.character(id_remove_all[[s]][[cov_direct]][[noise]][[folder]][["spring"]]),collapse=","), "\n",
+                                                               paste(as.character(id_remove_all[[s]][[cov_direct]][[noise]][[folder]][["fall"]]),collapse=",")))+
   
-  
-  geom_smooth(method=lm, level=0.95, aes(x=year,y=SRS_VAST_ratio,group=season))+
+  #geom_smooth(method=lm, level=0.95, aes(x=year,y=SRS_VAST_ratio,group=season))+
+  # annotate("text",x=5,y=max(dd$SRS_VAST_ratio)*.75,label=paste("M=",as.character(round(intercepts$Slope[[1]],3))," ",as.character(round(intercepts$Slope[[2]],3)),sep=""))+
   
   #plot mean values
-  geom_line(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=SRS_VAST_mean,group=season))+
+  geom_line(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=1,group=season))+
   
-  labs(x="year",y="VAST/SRS", title = paste(paste(s," ",folder," VAST/SRS",cov_direct,noise,
-                                                  " S_M=",round(intercepts$Slope[[1]],2),
-                                                  " F_M=",round(intercepts$Slope[[2]],2),sep=""),sep=""), color ="" )+
+  labs(x="year",y="VAST/SRS", title = paste(paste(s," ",folder," VAST/SRS 97% CI",cov_direct,noise,
+                                                  " S_M=",round(intercepts$Slope[[1]],3),
+                                                  " F_M=",round(intercepts$Slope[[2]],3),sep=""),sep=""), color ="" )+
   
   facet_wrap(~ season, ncol =1) +
   
@@ -1195,9 +1378,11 @@ plotss_VAST_sd[[s_idx]]  <- ggplot(data=subset(as.data.frame(VAST_data[[s]][[cov
   #plot mean values
   geom_line(aes(x=Year,y=mean_sd,group=season))+
  
-  geom_smooth(method=lm, level=0.95, aes(x=Year,y=Std..Error.for.Estimate,group=season))+
+ # geom_smooth(method=lm, level=0.95, aes(x=Year,y=Std..Error.for.Estimate,group=season))+
   
-  #geom_errorbar(data=as.data.frame(VAST_data[[s]][[cov_direct]][[noise]][[folder]]) %>% filter(season==2 & !(Year%in%c(22,23))),aes(x=Year,y=mean_sd,group=season,ymin=mean_sd-(1.96*sd(Std..Error.for.Estimate)), ymax=mean_sd+(1.96*sd(Std..Error.for.Estimate))),width=.3) +
+  geom_errorbar(data=as.data.frame(VAST_data[[s]][[cov_direct]][[noise]][[folder]]) %>% filter(season%in%c(1,2) & !(Year%in%c())),aes(x=Year,y=mean_sd,group=season,ymin=mean_sd-(1.96*sd(Std..Error.for.Estimate)), ymax=mean_sd+(1.96*sd(Std..Error.for.Estimate))),width=.3) +
+  
+ # annotate("text",x=5,y=max(dd$Std..Error.for.Estimate)*.75,label=paste("M=",as.character(round(intercepts$Slope[[1]],0))," ",as.character(round(intercepts$Slope[[2]],0)),sep=""))+
   
   labs(x="year",y="VAST SE", title = paste(paste(s," ",folder," VAST SE",cov_direct,noise,
                                                  " S_M=",round(intercepts$Slope[[1]],1),
@@ -1242,12 +1427,17 @@ s_idx=s_idx+1
       geom_point(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=Est_ratio,group=season))+
       geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=Est_ratio,group=season))+
       
+      geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=Est_ratio,group=season,ymin=Est_ratio-(1.96*sd(Est_ratio)), ymax=Est_ratio+(1.96*sd(Est_ratio))),width=.3) +
+     
+       
       labs(x="year",y="Estimate/Model", title = paste(paste(s," ",folder," SRS",noise,
                                                             " S_M=",round(intercepts$Slope[[1]],3),
                                                             " F_M=",round(intercepts$Slope[[2]],3),sep=""),sep=""), color ="" )+
        
-      geom_smooth(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),
-                  method=lm, level=0.95, aes(x=year,y=Est_ratio,group=season))+
+    #  geom_smooth(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),
+     #             method=lm, level=0.95, aes(x=year,y=Est_ratio,group=season))+
+      
+    #  annotate("text",x=5,y=max(dd$Est_ratio)*.75,label=paste("M=",as.character(round(intercepts$Slope[[1]],3))," ",as.character(round(intercepts$Slope[[2]],3)),sep=""))+
       
       
       facet_wrap(~ season, ncol =1) +
@@ -1276,11 +1466,10 @@ s_idx=s_idx+1
       geom_point(aes(x=year,y=sd.mean.yr.absolute,group=season))+
       geom_line(data=subset(as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),Year>=year_min),aes(x=year,y=sd.mean.yr.absolute,group=season))+
       
-     # geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season,ymin=mean_sd-(1.96*sd(sd.mean.yr.absolute)), ymax=mean_sd+(1.96*sd(sd.mean.yr.absolute))),width=.3) +
+      geom_errorbar(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season,ymin=mean_sd-(1.96*sd(sd.mean.yr.absolute)), ymax=mean_sd+(1.96*sd(sd.mean.yr.absolute))),width=.3) +
       
-      geom_smooth(method=lm, level=0.95, aes(x=year,y=sd.mean.yr.absolute,group=season))+
-      
-      annotate("text",x=5,y=max(dd$sd.mean.yr.absolute),label=(paste0("slope==",coef(lm(dd$sd.mean.yr.absolute~dd$year))[2])),parse=TRUE)+
+    #  geom_smooth(method=lm, level=0.95, aes(x=year,y=sd.mean.yr.absolute,group=season))+
+    #  annotate("text",x=5,y=max(dd$sd.mean.yr.absolute)*.75,label=paste("M=",as.character(round(intercepts$Slope[[1]],0))," ",as.character(round(intercepts$Slope[[2]],0)),sep=""))+
       
       #plot mean values
       geom_line(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season))+
@@ -1323,18 +1512,6 @@ colnames(Ratio_summary_info) <- c("Scenario","Estimate", "N_Spring >1", "N_Fall 
 
 
 
-dev.off()
-
-
-
-
-
-
-
-
-
-
-
 
 #PLOT SOME STUFF FROM SURVEYS
 
@@ -1360,7 +1537,7 @@ ppp<-ggplot(data=as.data.frame(list_all[[s]])%>%filter(Season==season ))+
   # #plot mean values
   # geom_line(data=as.data.frame(SRS_data[[s]][[cov_direct]][[noise]][[folder]]),aes(x=year,y=mean_sd,group=season))+
   # 
-   labs(x="year",y="Tow Biomass", title = paste(paste(s," ",folder," Survey Biomass ",season,cov_direct,noise,sep=""),sep=""), color ="" )+
+   labs(x="year",y="Tow Biomass", title = paste(paste(s," ",folder," Survey Biomass ",season,sep=""),sep=""), color ="" )+
   # 
   facet_wrap(~ stratum, ncol =3) +
   
@@ -1375,6 +1552,22 @@ print(ppp)
 
 
 
+
+dev.off()
+
+
+
+
+##PLOT ESTIMATES BY STRATA
+source(paste(orig.dir,"/TestScripts/plot_estimates_by_strat.R",sep=""))
+detach(package:plyr)
+library(dplyr)
+library(ggplot2)
+
+plot_estimates_by_strat()
+
+
+#
 
 
 

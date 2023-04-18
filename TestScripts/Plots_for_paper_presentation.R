@@ -10,9 +10,11 @@ model_point_size = 3.5
 estimate_line_size = 1.25
 estimate_point_size = 3
 
-season_ = 2
+for(season_ in c(1,2)){
 
-ggplot() +
+ ssnn = ifelse(season_==1, "Spring Estimate", "Fall Estimate")
+  
+print(ggplot() +
   
   
   #this way plots data by season
@@ -70,20 +72,20 @@ ggplot() +
   #                                          "  FC=", toString(FC_fall),
   #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
   
-  labs(x="year",y="Biomass", title ="Yellowtail Flounder", color ="" )+
+  labs(x="year",y="Biomass", title =paste("Yellowtail Flounder ",ssnn,sep=""), color ="" )+
   
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=12),
         title=element_text(size=14))
+)
+
+}
 
 
 
 
 
-
-
-
-
+#
 
 
 
@@ -219,40 +221,42 @@ model_point_size = 3.5
 estimate_line_size = 1.25
 estimate_point_size = 3
 
-season_ = 2
+for(season_ in c(1,2)){
+  
+  ssnn = ifelse(season_==1, "Spring", "Fall")
 
-
+print(
 ggplot() +
   
   
   #this way plots data by season divided by itself so it equals 1
-  geom_point(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=Est_ratio, group = season, color = "Model"),size=estimate_point_size) +
-  geom_line(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=Est_ratio, group =season, color = "Model"),size=estimate_line_size ) +
+  geom_point(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=log(Est_ratio), group = season, color = "Model"),size=estimate_point_size) +
+  geom_line(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=log(Est_ratio), group =season, color = "Model"),size=estimate_line_size ) +
   
   #plot VAST estimate without covariates with NO noise
-  geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST No Cov No Noise"),size=model_point_size)+
-  geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST No Cov No Noise"),size=model_line_size)+
+  geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov No Noise"),size=model_point_size)+
+  geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov No Noise"),size=model_line_size)+
   
   # #plot VAST estimate without covariates with WITH noise
-  # geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST No Cov W Noise"))+
-  # geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST No Cov W Noise"))+
+  # geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov W Noise"))+
+  # geom_line(data=subset(VAST_data[[s]][["_NoCovs_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov W Noise"))+
   # 
   #plot VAST estimate with covariates with NO noise
-  geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST w Cov No Noise"),size=model_point_size)+
-  geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST w Cov No Noise"),size=model_line_size)+
+  geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov No Noise"),size=model_point_size)+
+  geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov No Noise"),size=model_line_size)+
   
   # #plot VAST estimate with covariates WITH noise
-  # geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST w Cov w Noise"))+
-  # geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=Est_ratio,group=season, color = "VAST w Cov w Noise"))+
+  # geom_point(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov w Noise"))+
+  # geom_line(data=subset(VAST_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST w Cov w Noise"))+
   # 
   
   #plot stratified calculation data with NO noise
-  geom_point(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=Est_ratio,group=season, color = "Strat Mean No Noise"),size=model_point_size)+
-  geom_line(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=Est_ratio,group=season, color = "Strat Mean No Noise"),size=model_line_size)+
+  geom_point(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean No Noise"),size=model_point_size)+
+  geom_line(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["NoNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean No Noise"),size=model_line_size)+
   # 
   # #plot stratified calculation data with NO noise
-  # geom_point(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=Est_ratio,group=season, color = "Strat Mean W Noise"),size=)+
-  # geom_line(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=Est_ratio,group=season, color = "Strat Mean W Noise"),size=)+
+  # geom_point(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean W Noise"),size=)+
+  # geom_line(data=subset(as.data.frame(SRS_data[[s]][["_WithCov_"]][["WithNoise_"]][[folder]][,1:5]),season==season_),aes(x=year,y=log(Est_ratio),group=season, color = "Strat Mean W Noise"),size=)+
   # 
   # 
   #facet_wrap(~ season, ncol =1) +
@@ -263,12 +267,12 @@ ggplot() +
   #                                          "  FC=", toString(FC_fall),
   #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
   
-  labs(x="year",y="Model / Estimate", title = "Cod Ratio Trend (Fall)", color ="" )+
+  labs(x="year",y="log(Estimate / Model)", title = paste("Cod Ratio Trend- ", ssnn,sep=""), color ="" )+
   
   theme(axis.text=element_text(size=18),
         axis.title=element_text(size=16),
         title=element_text(size=16))
-
-
+)
+}
 
 

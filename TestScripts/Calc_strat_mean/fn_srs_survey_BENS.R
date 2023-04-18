@@ -43,7 +43,7 @@ srs_survey <- function(df, sa, str, ta=1, sppname = NULL  )  {
     dplyr::summarise(Total=sum(STRATUM_AREA))
   
   #DAY COLUMN IN DF IS CAUSING ISSUES AND NOT NEEDED
-  df <- subset(df,select = -c(day))
+  if(!is.null(df$day)){df <- subset(df,select = -c(day))}
 
   tmp.tibble <- df %>%
   #  filter(substr(SURVEY, 1, 4) =="NMFS") %>% #STILL DONT THINK I NEED THIS
@@ -72,7 +72,17 @@ surv.ind.yr <- surv.ind.str %>%
   #remove chracter Season so we can summarize with Reduce
   surv.ind.yr <- subset(surv.ind.yr,select = -c(Season))
 
-return(surv.ind.yr)
+  #calculate estimate by strata
+  mean.yr.strrr <- surv.ind.str %>%
+    left_join(sa,by="stratum") %>%
+    left_join(tmp.total.area,by="Season") %>%
+    mutate(mean.yr.str = (mean.str*STRATUM_AREA) ) %>%
+    group_by(year, Season) %>% #INDEX GOING DOWN TO YEAR?
+    dplyr::summarise(mean.yr.strr = mean.yr.str, stratum=stratum,season = ifelse(Season=="SPRING",1,2))
+  
+  out_put <- list(surv.ind.yr,surv.ind.str, mean.yr.strrr)
+  names(out_put) <- c("surv.ind.yr","surv.ind.str", "mean.yr.strrr")
+return(out_put)
 
 } # end function srs_nefsc
 
