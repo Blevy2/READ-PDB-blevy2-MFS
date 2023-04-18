@@ -36,3 +36,7 @@
 *.RDS
 *.RData
 *.csv
+
+#images
+*.png
+*.pdf
