@@ -31,3 +31,8 @@
 *.out
 *.app
 .Rproj.user
+
+# data files and csvs
+*.RDS
+*.RData
+*.csv
