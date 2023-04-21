@@ -1,97 +1,97 @@
 Temperature Scenario,Covariate,Strata,Noise,Season,Scenario,VAST A,VAST B,Stratified Mean
 Constant,no cov,all,no ,spring,Constant Population,0.13,0.11,0.21
 Constant,no cov,all,yes,spring,Constant Population,0.14,0.16,0.25
-Constant,w/ cov,all,no ,spring,Constant Population,0.07,0.07,0.21
-Constant,w/ cov,all,yes,spring,Constant Population,0.08,0.08,0.25
 Constant,no cov,all,no ,fall,Constant Population,0.63,0.68,0.32
 Constant,no cov,all,yes,fall,Constant Population,0.8,0.77,0.31
-Constant,w/ cov,all,no ,fall,Constant Population,0.14,0.08,0.32
-Constant,w/ cov,all,yes,fall,Constant Population,0.17,0.11,0.31
 Constant,no cov,reduced,no ,spring,Constant Population,0.24,0.19,0.27
 Constant,no cov,reduced,yes,spring,Constant Population,0.16,0.15,0.22
-Constant,w/ cov,reduced,no ,spring,Constant Population,0.19,0.19,0.27
-Constant,w/ cov,reduced,yes,spring,Constant Population,0.12,0.14,0.22
 Constant,no cov,reduced,no ,fall,Constant Population,0.3,0.25,0.47
 Constant,no cov,reduced,yes,fall,Constant Population,0.78,0.36,0.44
-Constant,w/ cov,reduced,no ,fall,Constant Population,0.22,0.19,0.47
-Constant,w/ cov,reduced,yes,fall,Constant Population,0.24,0.17,0.44
 Increasing,no cov,all,no ,spring,Constant Population,0.14,0.11,0.28
 Increasing,no cov,all,yes,spring,Constant Population,0.18,0.15,0.28
-Increasing,w/ cov,all,no ,spring,Constant Population,0.05,0.06,0.28
-Increasing,w/ cov,all,yes,spring,Constant Population,0.1,0.12,0.28
 Increasing,no cov,all,no ,fall,Constant Population,1.46,1.26,0.51
 Increasing,no cov,all,yes,fall,Constant Population,1.4,1.38,0.5
-Increasing,w/ cov,all,no ,fall,Constant Population,0.21,0.23,0.51
-Increasing,w/ cov,all,yes,fall,Constant Population,0.3,0.28,0.5
 Increasing,no cov,reduced,no ,spring,Constant Population,0.23,0.17,0.31
 Increasing,no cov,reduced,yes,spring,Constant Population,0.25,0.19,0.29
-Increasing,w/ cov,reduced,no ,spring,Constant Population,0.17,0.17,0.31
-Increasing,w/ cov,reduced,yes,spring,Constant Population,0.62,0.15,0.29
 Increasing,no cov,reduced,no ,fall,Constant Population,2.22,0.75,0.64
 Increasing,no cov,reduced,yes,fall,Constant Population,1.75,0.89,0.59
-Increasing,w/ cov,reduced,no ,fall,Constant Population,0.24,0.2,0.64
-Increasing,w/ cov,reduced,yes,fall,Constant Population,0.59,0.13,0.59
 Constant,no cov,all,no ,spring,Decreasing Population,0.11,0.08,0.23
 Constant,no cov,all,yes,spring,Decreasing Population,0.12,0.11,0.27
-Constant,w/ cov,all,no ,spring,Decreasing Population,0.07,0.06,0.23
-Constant,w/ cov,all,yes,spring,Decreasing Population,0.11,0.07,0.27
 Constant,no cov,all,no ,fall,Decreasing Population,0.97,0.81,0.41
 Constant,no cov,all,yes,fall,Decreasing Population,0.99,1.09,0.37
-Constant,w/ cov,all,no ,fall,Decreasing Population,0.16,0.08,0.41
-Constant,w/ cov,all,yes,fall,Decreasing Population,0.29,0.18,0.37
 Constant,no cov,reduced,no ,spring,Decreasing Population,0.31,0.19,0.25
 Constant,no cov,reduced,yes,spring,Decreasing Population,0.27,0.16,0.27
-Constant,w/ cov,reduced,no ,spring,Decreasing Population,0.19,0.19,0.25
-Constant,w/ cov,reduced,yes,spring,Decreasing Population,0.15,0.16,0.27
 Constant,no cov,reduced,no ,fall,Decreasing Population,0.53,0.24,0.55
 Constant,no cov,reduced,yes,fall,Decreasing Population,0.53,0.36,0.53
-Constant,w/ cov,reduced,no ,fall,Decreasing Population,0.18,0.23,0.55
-Constant,w/ cov,reduced,yes,fall,Decreasing Population,0.16,0.24,0.53
 Increasing,no cov,all,no ,spring,Decreasing Population,0.17,0.15,0.22
 Increasing,no cov,all,yes,spring,Decreasing Population,0.15,0.17,0.26
-Increasing,w/ cov,all,no ,spring,Decreasing Population,0.08,0.07,0.22
-Increasing,w/ cov,all,yes,spring,Decreasing Population,0.16,0.1,0.26
 Increasing,no cov,all,no ,fall,Decreasing Population,1.17,1.06,0.28
 Increasing,no cov,all,yes,fall,Decreasing Population,1.14,1.1,0.25
-Increasing,w/ cov,all,no ,fall,Decreasing Population,0.4,0.15,0.28
-Increasing,w/ cov,all,yes,fall,Decreasing Population,0.4,0.2,0.25
 Increasing,no cov,reduced,no ,spring,Decreasing Population,0.18,0.14,0.32
 Increasing,no cov,reduced,yes,spring,Decreasing Population,0.37,0.15,0.29
-Increasing,w/ cov,reduced,no ,spring,Decreasing Population,0.21,0.22,0.32
-Increasing,w/ cov,reduced,yes,spring,Decreasing Population,0.16,0.21,0.29
 Increasing,no cov,reduced,no ,fall,Decreasing Population,0.9,0.6,0.54
 Increasing,no cov,reduced,yes,fall,Decreasing Population,0.84,0.62,0.48
-Increasing,w/ cov,reduced,no ,fall,Decreasing Population,0.32,0.31,0.54
-Increasing,w/ cov,reduced,yes,fall,Decreasing Population,0.36,0.32,0.48
 Constant,no cov,all,no ,spring,Increasing Population,0.46,0.13,0.16
 Constant,no cov,all,yes,spring,Increasing Population,0.43,0.21,0.22
-Constant,w/ cov,all,no ,spring,Increasing Population,0.06,0.06,0.16
-Constant,w/ cov,all,yes,spring,Increasing Population,0.08,0.07,0.22
 Constant,no cov,all,no ,fall,Increasing Population,0.4,0.36,0.34
 Constant,no cov,all,yes,fall,Increasing Population,0.38,0.44,0.46
-Constant,w/ cov,all,no ,fall,Increasing Population,0.11,0.08,0.34
-Constant,w/ cov,all,yes,fall,Increasing Population,0.24,0.17,0.46
 Constant,no cov,reduced,no ,spring,Increasing Population,0.22,0.15,0.2
 Constant,no cov,reduced,yes,spring,Increasing Population,0.19,0.11,0.22
-Constant,w/ cov,reduced,no ,spring,Increasing Population,0.17,0.17,0.2
-Constant,w/ cov,reduced,yes,spring,Increasing Population,0.11,0.13,0.22
 Constant,no cov,reduced,no ,fall,Increasing Population,0.19,0.11,0.41
 Constant,no cov,reduced,yes,fall,Increasing Population,0.26,0.21,0.46
-Constant,w/ cov,reduced,no ,fall,Increasing Population,0.21,0.22,0.41
-Constant,w/ cov,reduced,yes,fall,Increasing Population,0.17,0.19,0.46
 Increasing,no cov,all,no ,spring,Increasing Population,0.16,0.13,0.32
 Increasing,no cov,all,yes,spring,Increasing Population,0.21,0.16,0.32
-Increasing,w/ cov,all,no ,spring,Increasing Population,0.06,0.07,0.32
-Increasing,w/ cov,all,yes,spring,Increasing Population,0.12,0.1,0.32
 Increasing,no cov,all,no ,fall,Increasing Population,0.71,0.66,0.3
 Increasing,no cov,all,yes,fall,Increasing Population,1.03,0.71,0.39
-Increasing,w/ cov,all,no ,fall,Increasing Population,0.43,0.21,0.3
-Increasing,w/ cov,all,yes,fall,Increasing Population,0.51,0.37,0.3
 Increasing,no cov,reduced,no ,spring,Increasing Population,0.31,0.33,0.4
 Increasing,no cov,reduced,yes,spring,Increasing Population,0.3,0.26,0.38
-Increasing,w/ cov,reduced,no ,spring,Increasing Population,0.3,0.3,0.4
-Increasing,w/ cov,reduced,yes,spring,Increasing Population,0.31,0.25,0.38
 Increasing,no cov,reduced,no ,fall,Increasing Population,0.56,0.49,0.7
 Increasing,no cov,reduced,yes,fall,Increasing Population,0.58,0.48,0.69
+Constant,w/ cov,all,no ,spring,Constant Population,0.07,0.07,0.21
+Constant,w/ cov,all,yes,spring,Constant Population,0.08,0.08,0.25
+Constant,w/ cov,all,no ,fall,Constant Population,0.14,0.08,0.32
+Constant,w/ cov,all,yes,fall,Constant Population,0.17,0.11,0.31
+Constant,w/ cov,reduced,no ,spring,Constant Population,0.19,0.19,0.27
+Constant,w/ cov,reduced,yes,spring,Constant Population,0.12,0.14,0.22
+Constant,w/ cov,reduced,no ,fall,Constant Population,0.22,0.19,0.47
+Constant,w/ cov,reduced,yes,fall,Constant Population,0.24,0.17,0.44
+Increasing,w/ cov,all,no ,spring,Constant Population,0.05,0.06,0.28
+Increasing,w/ cov,all,yes,spring,Constant Population,0.1,0.12,0.28
+Increasing,w/ cov,all,no ,fall,Constant Population,0.21,0.23,0.51
+Increasing,w/ cov,all,yes,fall,Constant Population,0.3,0.28,0.5
+Increasing,w/ cov,reduced,no ,spring,Constant Population,0.17,0.17,0.31
+Increasing,w/ cov,reduced,yes,spring,Constant Population,0.62,0.15,0.29
+Increasing,w/ cov,reduced,no ,fall,Constant Population,0.24,0.2,0.64
+Increasing,w/ cov,reduced,yes,fall,Constant Population,0.59,0.13,0.59
+Constant,w/ cov,all,no ,spring,Decreasing Population,0.07,0.06,0.23
+Constant,w/ cov,all,yes,spring,Decreasing Population,0.11,0.07,0.27
+Constant,w/ cov,all,no ,fall,Decreasing Population,0.16,0.08,0.41
+Constant,w/ cov,all,yes,fall,Decreasing Population,0.29,0.18,0.37
+Constant,w/ cov,reduced,no ,spring,Decreasing Population,0.19,0.19,0.25
+Constant,w/ cov,reduced,yes,spring,Decreasing Population,0.15,0.16,0.27
+Constant,w/ cov,reduced,no ,fall,Decreasing Population,0.18,0.23,0.55
+Constant,w/ cov,reduced,yes,fall,Decreasing Population,0.16,0.24,0.53
+Increasing,w/ cov,all,no ,spring,Decreasing Population,0.08,0.07,0.22
+Increasing,w/ cov,all,yes,spring,Decreasing Population,0.16,0.1,0.26
+Increasing,w/ cov,all,no ,fall,Decreasing Population,0.4,0.15,0.28
+Increasing,w/ cov,all,yes,fall,Decreasing Population,0.4,0.2,0.25
+Increasing,w/ cov,reduced,no ,spring,Decreasing Population,0.21,0.22,0.32
+Increasing,w/ cov,reduced,yes,spring,Decreasing Population,0.16,0.21,0.29
+Increasing,w/ cov,reduced,no ,fall,Decreasing Population,0.32,0.31,0.54
+Increasing,w/ cov,reduced,yes,fall,Decreasing Population,0.36,0.32,0.48
+Constant,w/ cov,all,no ,spring,Increasing Population,0.06,0.06,0.16
+Constant,w/ cov,all,yes,spring,Increasing Population,0.08,0.07,0.22
+Constant,w/ cov,all,no ,fall,Increasing Population,0.11,0.08,0.34
+Constant,w/ cov,all,yes,fall,Increasing Population,0.24,0.17,0.46
+Constant,w/ cov,reduced,no ,spring,Increasing Population,0.17,0.17,0.2
+Constant,w/ cov,reduced,yes,spring,Increasing Population,0.11,0.13,0.22
+Constant,w/ cov,reduced,no ,fall,Increasing Population,0.21,0.22,0.41
+Constant,w/ cov,reduced,yes,fall,Increasing Population,0.17,0.19,0.46
+Increasing,w/ cov,all,no ,spring,Increasing Population,0.06,0.07,0.32
+Increasing,w/ cov,all,yes,spring,Increasing Population,0.12,0.1,0.32
+Increasing,w/ cov,all,no ,fall,Increasing Population,0.43,0.21,0.3
+Increasing,w/ cov,all,yes,fall,Increasing Population,0.51,0.37,0.39
+Increasing,w/ cov,reduced,no ,spring,Increasing Population,0.3,0.3,0.4
+Increasing,w/ cov,reduced,yes,spring,Increasing Population,0.31,0.25,0.38
 Increasing,w/ cov,reduced,no ,fall,Increasing Population,0.48,0.53,0.7
 Increasing,w/ cov,reduced,yes,fall,Increasing Population,0.47,0.5,0.69
