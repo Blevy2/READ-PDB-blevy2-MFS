@@ -320,7 +320,7 @@ Of the scenarios without covariates, \(10/16\approx63\)\% had a VAST fit with a 
 
 \emph{Model / Estimate Ratio Results}
 
-A simple visual analysis of all error plots for each species reveals that VAST estimates tend to provide abundance estimates that are above the true model value, while the stratified mean estimates are, on average, too low. This can be further examined by viewing estimate/ratio ratio plots, where we divide the yearly abundance estimates by the true model value. In doing so we see that VAST estimates tend to remain closer to the desired value of 1 compared to stratified mean estimates, which can range as low as 0 and exhibit large yearly changes.
+A simple visual analysis of all error plots for each species reveals that VAST estimates tend to provide abundance estimates that are above the true model value, while the stratified mean estimates are, on average, too low. This can be further examined by viewing estimate/model ratio plots, where we divide the yearly abundance estimates by the true model value and plot them on the log scale. In doing so we see that VAST estimates tend to remain closer to the desired value of 1 compared to stratified mean estimates, which can range as low as 0 and exhibit large yearly changes. A representative example of this trend is shown in Figure \ref{fig:RatioTrend}
 
 A more careful analysis of individual yearly model/estimate ratios when all strata are included revealed that about 73\% of all VAST ratios were above 1 (27\% less than 1), with an average of 1.29 and a standard deviation of 0.21. On the other hand, 33\% of stratified mean estimates were above 1 with an average of 0.874 and a standard deviation of 0.12. There were seasonal differences in estimate ratios with spring VAST ratios producing (1.08,0.12), fall VAST ratios being (1.50,0.38), stratified mean spring ratios resulting in (0.91,0.10), and fall values of (0.84,0.16). The breakdown for individual species followed a similar pattern.
 
@@ -341,10 +341,11 @@ For Cod (DecPop), only 11/32 \textasciitilde{} 34\% of VAST runs were better wit
 As see in Table \textbf{cite VAST setting table}, VAST models that included covariates used a linear combination of second degree polynomials for habitat and temperature to approximate species-specific covariate responses. While using the exact habitat and temperature covariate information from our population models typically resulted in improved estimates with \(77/80\approx 96\%\) of VAST models with covariates providing lower absolute error than the corresponding stratified mean estimate, there is a great deal more to explore with respect to the impact of covariates. For example, by including just one of the covariates individually, one could test which had a larger impact on abundance estimates. Adding noise to our covariate input would test how robust the model-based estimates are to uncertainty in the covariate information. One could also test the impact of assuming the wrong covarite response function (linear vs normally distributed etc).
 \textbf{For discussion: clearly our perfect covariate information made a big difference for yellowtail flounder (and others), but the question is could we achieve similar results without ``perfect'' information? Which covariate is best? Good question for future research}
 
-As noted in results second, adding covariate information to our Yellowtail Flounder VAST models always decreased the error in our abundance estimates, while covariate information sometimes lead to an increase in the absolute error between the abundance estimate and true model abundance for Cod and Haddock. More specifically, when a reduced number of strata are sampled adding covariate information leads to a decrease in performance for fall estimates of Haddock and Cod. The decline in performance can be explained by a failure to sample the full spectrum of temperature values where the species exists, which leads to an incomplete estimation of the covariate response.
+As noted in results second, adding covariate information to our Yellowtail Flounder VAST models always decreased the absolute error in the resulting abundance estimates, while adding covariate information leads to a decrease in performance for fall estimates of Haddock and Cod when a reduced number of strata are sampled. The decline in performance can be explained by a failure to sample the full spectrum of temperature values where the species exists, leading to an incomplete estimation of the covariate response. Figure \ref{fig:strata-plot} shows the strata excluded from sampling and Figure \ref{fig:CovResponse} depicts the resulting covariate response for Yellowtail Flounder and Haddock for the same population scenario. Although strata were excluded for both species, the samples for Yellowtail Flounder ranged across the species preferred values and thus fully formed the covariate response, while the Haddock covariate response did not contain enough samples from the lower temperature range due to the specific strata that were excluded from sampling (ie, northern strata). As a result, when projecting into those strata as seen in the lower portion of Figure \ref{fig:CovResponse}, Yellowtail estimates with covariate information approximate the correct trend despite these strata being excluded from sampling, while the Haddock estimates that include strata provide that wrong trend at the wrong magnitude.
+
 Generally help, but dependent on appropriate covariate response. Yellowtail cases always had appropriate response and thus adding covariates always improved estimates. VAST showed decreased performance with Cod and Haddock when covariates added in fall because covariate response was not fully developed. (show plot comparing good vs bad response)
 
-increasing temperature scenarios resulted in a larger increase in average error for VAST estimates compared to stratified mean estimates. When including covarites the increase is less than not including them, but stratified mean saw a lower increase in the average error seen in constand an dincreasing temperature. Shouldnt model based be more stable with respect to increasing temperature?
+increasing temperature scenarios resulted in a larger increase in average error for VAST estimates compared to stratified mean estimates. When including covariates the increase is less than not including them, but stratified mean saw a lower increase in the average error seen in constant an decreasing temperature. Shouldn't model based be more stable with respect to increasing temperature?
 
 Estimation methods that have large, inaccurate swings (stratified mean) can lead to changes in quotas that do not correspond to the true population trend, which could have a compounding effect (can lead to quotas that are too high/low given an incorrect assumption of increase/decrease in biomass). Our model has a constant assumed mortality that accounts for fishing and natural death and will not account for impacts of these decisions. VAST may provide more consistent biomass predictions(?)
 
@@ -408,6 +409,24 @@ Thorson, J.T. 2020. Predicting recruitment density dependence and intrinsic grow
 }
 
 \caption{Percent of each species in each strata for during survey weeks in our spatial simulations. All constant temperature scenarios follow the patterns on the left while increasing temperature scenarios follow the patterns on the right.}\label{fig:PopPct}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.9\linewidth]{Images/covariate_plot} 
+
+}
+
+\caption{Temperature covariate response plots and resulting population estimate for Yellowtail Flounder on the left and Haddock on the right. In both cases the spatial simulations that were surveyed had an increasing population over time, increasing average temperature, and certain strata excluded from sampling, as shown in Figure 1**check**.}\label{fig:CovResponse}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.9\linewidth]{Images/ratio_trend} 
+
+}
+
+\caption{Representative example of typical ratio trend as shown on a log scale.}\label{fig:RatioTrend}
 \end{figure}
 
 Table 1. Parameters used in all population models. SAW 1: (NEFSC 2012), SAW 2: (NEFSC 2013), SAW 3: not out yet???
