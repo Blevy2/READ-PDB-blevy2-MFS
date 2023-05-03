@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  27 APR 2023 15:58
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  2 MAY 2023 20:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -951,8 +951,12 @@ LaTeX Warning: Float too large for page by 9.55096pt on input line 425.
 
 File: Images/covariate_plot.png Graphic file (type bmp)
 <Images/covariate_plot.png>
-File: Images/ratio_trend.png Graphic file (type bmp)
-<Images/ratio_trend.png>
+File: Images/ratio_trend_YTF.png Graphic file (type bmp)
+<Images/ratio_trend_YTF.png>
+File: Images/ratio_trend_cod.png Graphic file (type bmp)
+<Images/ratio_trend_cod.png>
+File: Images/ratio_trend_had.png Graphic file (type bmp)
+<Images/ratio_trend_had.png>
 
 Overfull \hbox (53.11583pt too wide) in alignment at lines 447--451
  [] [] [] [] [] [] [] 
@@ -1030,10 +1034,10 @@ Package rerunfilecheck Info: File `Draft1.out' has not changed.
 (rerunfilecheck)             Checksum: 173EEE9F6C000E43D2D35DD68FAD9768;1831.
  ) 
 Here is how much of TeX's memory you used:
- 23149 strings out of 478683
- 468915 string characters out of 5846747
+ 23185 strings out of 478683
+ 470075 string characters out of 5846747
  1958012 words of memory out of 5000000
- 42933 multiletter control sequences out of 15000+600000
+ 42967 multiletter control sequences out of 15000+600000
  518836 words of font info for 85 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  86i,10n,121p,1937b,916s stack positions out of 10000i,1000n,20000p,200000b,200000s
