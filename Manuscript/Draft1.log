@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  2 MAY 2023 20:54
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  4 MAY 2023 13:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -947,7 +947,7 @@ File: Images/PercentPlots_IncPopConTemp_Had.png Graphic file (type bmp)
 File: Images/PercentPlots_IncPopIncTemp_Had.png Graphic file (type bmp)
 <Images/PercentPlots_IncPopIncTemp_Had.png>
 
-LaTeX Warning: Float too large for page by 9.55096pt on input line 425.
+LaTeX Warning: Float too large for page by 9.55096pt on input line 427.
 
 File: Images/covariate_plot.png Graphic file (type bmp)
 <Images/covariate_plot.png>
@@ -958,71 +958,71 @@ File: Images/ratio_trend_cod.png Graphic file (type bmp)
 File: Images/ratio_trend_had.png Graphic file (type bmp)
 <Images/ratio_trend_had.png>
 
-Overfull \hbox (53.11583pt too wide) in alignment at lines 447--451
+Overfull \hbox (53.11583pt too wide) in alignment at lines 449--453
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (53.11583pt too wide) in alignment at lines 451--462
+Overfull \hbox (53.11583pt too wide) in alignment at lines 453--464
  [] [] [] [] [] [] [] 
  []
 
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 10.0pt on input line 469.
+(Font)              scaled to size 10.0pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 7.0pt on input line 469.
+(Font)              scaled to size 7.0pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 5.0pt on input line 469.
+(Font)              scaled to size 5.0pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.00092pt on input line 469.
+(Font)              scaled to size 10.00092pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 7.00064pt on input line 469.
+(Font)              scaled to size 7.00064pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 5.00046pt on input line 469.
+(Font)              scaled to size 5.00046pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.99893pt on input line 469.
+(Font)              scaled to size 9.99893pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.99925pt on input line 469.
+(Font)              scaled to size 6.99925pt on input line 471.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 4.99947pt on input line 469.
+(Font)              scaled to size 4.99947pt on input line 471.
 
-Overfull \hbox (36.29501pt too wide) in paragraph at lines 491--515
+Overfull \hbox (36.29501pt too wide) in paragraph at lines 493--517
  [][] 
  []
 
 
-Overfull \hbox (1.95056pt too wide) in paragraph at lines 539--539
+Overfull \hbox (1.95056pt too wide) in paragraph at lines 541--541
 []|\TU/lmr/m/n/12 X1_formula|  
  []
 
 
-Overfull \hbox (1.95056pt too wide) in paragraph at lines 540--540
+Overfull \hbox (1.95056pt too wide) in paragraph at lines 542--542
 []|\TU/lmr/m/n/12 X2_formula|  
  []
 
 [28]
-Overfull \hbox (3.505pt too wide) in paragraph at lines 549--656
+Overfull \hbox (3.505pt too wide) in paragraph at lines 551--658
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 23.76965pt on input line 656.
+LaTeX Warning: Float too large for page by 23.76965pt on input line 658.
 
 
-Overfull \hbox (3.505pt too wide) in paragraph at lines 662--769
+Overfull \hbox (3.505pt too wide) in paragraph at lines 664--771
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 23.76965pt on input line 769.
+LaTeX Warning: Float too large for page by 23.76965pt on input line 771.
 
 
-Overfull \hbox (60.49501pt too wide) in paragraph at lines 776--802
+Overfull \hbox (60.49501pt too wide) in paragraph at lines 778--804
  [][] 
  []
 
 
-Overfull \hbox (60.49501pt too wide) in paragraph at lines 809--835
+Overfull \hbox (60.49501pt too wide) in paragraph at lines 811--837
  [][] 
  []
 
@@ -1036,7 +1036,7 @@ Package rerunfilecheck Info: File `Draft1.out' has not changed.
 Here is how much of TeX's memory you used:
  23185 strings out of 478683
  470075 string characters out of 5846747
- 1958012 words of memory out of 5000000
+ 1957012 words of memory out of 5000000
  42967 multiletter control sequences out of 15000+600000
  518836 words of font info for 85 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
