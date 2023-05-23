@@ -1575,7 +1575,7 @@ list_all[["Had"]] <- list_all_temp[[good_iter[3]]]
 
 #simulation results (LOAD JUST ONE OF THE FOLLOWING)
 #memory.limit(45000) #this one for all results
-#result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
+#result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario,"\\result_",scenario,".RDS",sep=""))
 #load existing result_goodones, if it exists
 result <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario,"\\result_goodones_",scenario,".RDS",sep=""))
 
@@ -2262,8 +2262,8 @@ spplot(GB_strata[[s]],zcol="Exclude", col.regions = c("yellow","green"), par.set
       
       scenario1 <- paste(PopScen,"_",TempScen,sep="")
       
-      result1[[PopScen]][[TempScen]] <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\result_goodones_",scenario1,".RDS",sep=""))
-      list_all_temp[[PopScen]][[TempScen]] <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
+      result1[[PopScen]][[TempScen]] <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario1,"\\result_goodones_",scenario1,".RDS",sep=""))
+      list_all_temp[[PopScen]][[TempScen]] <- readRDS(paste("E:\\READ-PDB-blevy2-MFS2\\GB_Simulation_Results\\",scenario1,"\\list_all_",scenario1,".RDS",sep=""))
       
       
       
@@ -2419,6 +2419,9 @@ spplot(GB_strata[[s]],zcol="Exclude", col.regions = c("yellow","green"), par.set
         
         labs(x=NULL,y=NULL, title = "Yellowtail Flounder") + #
         
+        #start y axis at 0
+        #expand_limits(y=0) +
+        
         theme(legend.position="bottom")  +
         
         theme(axis.text=element_text(size=12),
@@ -2450,6 +2453,9 @@ spplot(GB_strata[[s]],zcol="Exclude", col.regions = c("yellow","green"), par.set
           
           labs(x=NULL,y=NULL, title = "Atlantic Cod")+ #x="year",y="Total Spring Biomass",
           
+          #start y axis at 0
+          #expand_limits(y=0) +
+          
           scale_color_manual(values=c('#00BA38')) + #make same color as yellowtail plot
           
           theme(axis.text=element_text(size=12),
@@ -2480,7 +2486,9 @@ spplot(GB_strata[[s]],zcol="Exclude", col.regions = c("yellow","green"), par.set
           labs(x=NULL,y=NULL, title = "Haddock")+ #x="year",y="Total Spring Biomass",
           
           scale_color_manual(values=c('#619CFF')) + #make same color as yellowtail plot
-        
+         
+          #start y axis at 0
+          #expand_limits(y=0) +
           
           theme(axis.text=element_text(size=12),
                 axis.title=element_text(size=12),

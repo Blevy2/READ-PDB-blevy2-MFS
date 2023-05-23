@@ -212,9 +212,10 @@ labs(x="year",y="Biomass", title ="Haddock Fall Estimate", color ="" )+
 
 
 
-
-#COD DECPOP_CONTEMP ESTIMATE RATIO
-
+# ESTIMATE RATIO PLOTS
+#Yellowtail estimates are for the constant population, constant temperature, all strata
+#COD DECPOP_CONTEMP
+#Haddock are IncPop_IncTemp_all strata_
 
 model_line_size = 1.5
 model_point_size = 3.5
@@ -267,7 +268,7 @@ ggplot() +
   #                                          "  FC=", toString(FC_fall),
   #                                          "  FeSM=",round(SRS_Model_error[[s]][[folder]][["fall"]],digits=2),sep=""), color ="" )
   
-  labs(x="year",y="log(Estimate / Model)", title = paste("Cod Ratio Trend- ", ssnn,sep=""), color ="" )+
+  labs(x="year",y="log(Estimate / Model)", title = paste("Haddock Ratio Trend- ", ssnn,sep=""), color ="" )+
   
   theme(axis.text=element_text(size=18),
         axis.title=element_text(size=16),
