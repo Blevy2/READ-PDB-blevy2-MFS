@@ -156,7 +156,7 @@ knitr::include_graphics(c("Images/Excluded_strata2.png"))
 
 <font size="5">*Population Dynamics and Recruitment*</font>
 
-The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass in each cell in our study area [@dolder2020highly]. Individual terms in the formulation account for growth of mature adults, mortality (natural and fishing), and the addition of new recruits. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables \@ref(paramsALL) and \@ref(tab:paramsSCENARIOS). 
+The time step for our models is one week. MFS uses a modified two-stage Deriso-Schnute delay difference equation that models the biomass in each cell in our study area [@dolder2020highly]. Individual terms in the formulation account for growth of mature adults, mortality (natural and fishing), and the addition of new recruits. Recruitment is a function of the adult biomass that existed in the previous year and is added to the population incrementally throughout each species' predefined spawning period. Parameter inputs were either obtained from the literature or chosen to produce desired model dynamics. A full list of parameters used in our model can be seen below in Tables 1 and \@ref(tab:paramsSCENARIOS). 
 
 
 
@@ -240,17 +240,23 @@ The design-based method we used is the stratified mean, which divides the inhabi
 
 where $W_i=\frac{S_i}{\sum_{j=1}^N S_j}$ and $y_{k,i}$ represents the biomass in sample $k$ of stratum $i$ in season $s$ and year $y$. These tow-dependent calculations are quick and easy to calculate, especially relative to the model-based VAST estimates. 
 
-We compare stratified mean estimates to those derived from the model-based VAST approach. VAST models both biomass $p_1(i)$ and presence/absence $p_2(i)$ for each observation $i$ as linear predictors using a spatial delta-generalized linear mixed model. The equation representing the biomass predictor can be represented by
+We compare stratified mean estimates to those derived from the model-based VAST approach. VAST models both biomass $p_1(i)$ and presence/absence $p_2(i)$ for each observation $i$ as linear predictors using a spatial delta-generalized linear mixed model that can be represented by
 
 
 \[
-  \makebox[\linewidth]{$p_1(i)=\text{temporal variation} + \text{spatial variation} + \text{spatio-temporal variation} + \text{vessel effects} + \text{habitat covariates} + \text{catchability covariates}$},
+  \makebox[\linewidth]{$p_1(i)=\text{temporal variation} + \text{spatial variation} + \text{spatio-temporal variation}  + \text{habitat covariates} + \text{catchability covariates}$},
 \]
+
+
+\[
+  \makebox[\linewidth]{$p_*(i)= \beta_*(t_i) + L_{\omega_*}\omega_*(s_i) + L_* \epsilon_*(c_i,t_i) + \upsilon(s_i,t_i) + \xi(i)$},
+\]
+
 
 where more specific functional forms of each component are further described in [@thorson2019guidance]. $p_2(i)$ takes on a similar form as $p_1(i)$. VAST models require numerous user inputs to determine how the linear predictors will be conditioned and solved. As a result, VAST models take on the order of hours to complete.
 
 
-We follow the advice given in [@thorson2019guidance] to build VAST models that estimate biomass in our Georges Bank population models using stratified random samples from our model output. In addition to exploring different link functions and assumed distributions, our VAST model-building process involved testing the impact of including spatial and/or spatio-temporal variation in our models, considering varying number of knots in our mesh, and testing different forms of temporal correlation. We carried out the same model-building process using covariate information to inform our models as well as without covariates in our models. The covariates we considered were the dynamic temperature values and static habitat values ($Hab_{J.s}$) from our population models. When using covariates we ultimately decided to consider a best-case scenario by including both temperature and habitat covariates for both linear predictors in order to provide the most information to the model. Knowing the true population values in our models allowed us to calculate the absolute error of each VAST estimate to compare between potential settings. Through this process, and in consultation with the VAST package creator, we compared the performance of two sets of settings in our VAST models, which can be seen in Table\@ref(tab:VASTsettings). VAST Settings B were chosen after reviewing the information provided in the "Seasonal Model" section of VAST's online Github tutorial [@ThorsonSeasonal]. After running models for each of our scenarios using these settings, we shared some of our results with the VAST package creator, James (Jim) Thorson. Jim reviewed our VAST model results and suggested we also consider the options shown in Settings A. Both settings use a Tweedie model and turn off the first linear predictor $p_1$ so that only biomass is being modeled. The difference between the two settings can be seen in the Rho Configuration, where RhoBeta2 = 0 in Settings B while RhoBeta2 = 3 in Settings A. The difference amounts to intercepts for the biomass predictor being a fixed effect (RhoBeta2=0) versus intercepts being constant among years as a fixed effect (RhoBeta2=3). According to Jim, the Settings A values are representative of what stock assessment scientists typically use in their analyses. As a result we will focus our analysis on VAST results obtained using Settings A.
+We follow the advice given in [@thorson2019guidance] to build VAST models that estimate biomass in our Georges Bank population models using stratified random samples from our model output. In addition to exploring different link functions and assumed distributions, our VAST model-building process involved testing the impact of including spatial and/or spatio-temporal variation in our models, considering varying number of knots in our mesh, and testing different forms of temporal correlation. We carried out the same model-building process using covariate information to inform our models as well as without covariates in our models. The covariates we considered were the dynamic temperature values and static habitat values ($Hab_{J.s}$) from our population models. When using covariates we ultimately decided to consider a best-case scenario by including both temperature and habitat covariates for both linear predictors in order to provide the most information to the model. Knowing the true population values in our models allowed us to calculate the absolute error of each VAST estimate to compare between potential settings. Through this process, and in consultation with the VAST package creator, we compared the performance of two sets of settings in our VAST models, which can be seen in Table 3. VAST Settings B were chosen after reviewing the information provided in the "Seasonal Model" section of VAST's online Github tutorial [@ThorsonSeasonal]. After running models for each of our scenarios using these settings, we shared some of our results with the VAST package creator, James (Jim) Thorson. Jim reviewed our VAST model results and suggested we also consider the options shown in Settings A. Both settings use a Tweedie model and turn off the first linear predictor $p_1$ so that only biomass is being modeled. The difference between the two settings can be seen in the Rho Configuration, where RhoBeta2 = 0 in Settings B while RhoBeta2 = 3 in Settings A. The difference amounts to intercepts for the biomass predictor being a fixed effect (RhoBeta2=0) versus intercepts being constant among years as a fixed effect (RhoBeta2=3). According to Jim, the Settings A values are representative of what stock assessment scientists typically use in their analyses. As a result we will focus our analysis on VAST results obtained using Settings A.
 
 Our goal is to determine indexing approaches and settings that are robust to changing environmental conditions and resulting spatial biomass patterns. An underlying assumption in all indexing methods is that individual random samples combine to accurately represent true abundance by a) containing a low enough noise level in the samples to allow for a discernible pattern and b) sampling all strata in which the population exists. These assumptions can be questioned given enough noise in the sampling process and/or climate change causing a population to move into previously uninhabited strata. To simulate the impact of noise, we compare indexing estimates after adding noise to our samples versus those using the true sampling values. Annual survey observations were simulated as log-normal deviations from the underlying “true” survey catches with a CV of 0.3 in the spring. The implication of a given population shifting its distribution into new habitat outside of the normal survey area is that stratified random sampling will fail to sample the entire geographic extend of the population. We therefore simulate the effect of populations moving into new habitat by comparing indexing estimates using samples from all strata inhabited by each species on Georges Bank to those that only include a subset of the full spatial domain for each species. We chose strata to exclude for each species by reviewing how spatial preferences evolved in our increasing temperature scenarios and removing strata that each species either shifted into, or away from. Figure \@ref(fig:strata-plot) shows all strata inhabited by each species as well as those that are removed from certain calculations using the spatial shifting trends shown in Figure \@ref(fig:PopPct). The yellow regions in Figure \@ref(fig:strata-plot) depict the strata that were removed from certain stratified random surveys for each species.
 
@@ -259,30 +265,12 @@ Each scenario we consider is a combination of specific population trends for eac
 
 
 
-```{r scenarios,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-
-options(knitr.kable.NA = '')
-
-
-combos_table = read_csv("CSVs/scenario_combos.csv")
-
-summary_tab <- combos_table %>% 
-   mutate_if(grepl('5deg',.), ~replace(., grepl('5deg', .), paste("Increasing 5","\U00B0","C",sep=""))) 
-
-
-# Create table to present the data]
- kable(summary_tab, "simple",
-                     caption = "Each index estimate chooses one condition from each of the following 7 columns.",
-          format = "latex", booktabs = TRUE) %>%
-          kable_styling(latex_options = "scale_down")
-```
-
 
 \section{Results}
 
 <!-- The goal of our project was to analyze the ability of contemporary population indexing methods to track population trends under the variety of conditions shown in Table \@ref(tab:scenarios). and Figure \@ref(fig:hab-plot) for the static habitat preferences for each species ($Hab^2_{J,s}$) used in our population models.  -->
 
-Figure \@ref(fig:PopPct) depicts the spatial shifting that occurs in each stratum within our population models, specifically during the bottom trawl survey in the spring (weeks 13 and 14) and fall (weeks 37 and 28). The left column in Figure \@ref(fig:PopPct) depicts the percent of population that exists in each stratum for each species when the temperature is a constant repeating pattern. In these scenarios we notice a small amount of shifting between successive years as the population aggregates on especially suitable habitat in the domain. More exaggerated shifting takes place in a larger number of strata when the temperature is increasing over time, as seen right column of Figure \@ref(fig:PopPct). This demonstrates how we were able to model shifting distributions due to climate change by running simulations with a temperature gradient that increased on average over time. 
+Figure \@ref(fig:PopPct) depicts the spatial shifting that occurs in each stratum within our population models, specifically during the bottom trawl survey in the spring (weeks 13 and 14) and fall (weeks 37 and 38). The left column in Figure \@ref(fig:PopPct) depicts the percent of population that exists in each stratum for each species when the temperature is a constant repeating pattern. In these scenarios we notice a small amount of shifting between successive years as the population aggregates on especially suitable habitat in the domain. More exaggerated shifting takes place in a larger number of strata when the temperature is increasing over time, as seen right column of Figure \@ref(fig:PopPct). This demonstrates how we were able to model shifting distributions due to climate change by running simulations with a temperature gradient that increased on average over time. 
 
 Tables \@ref(tab:YTresultsallstrata), \@ref(tab:YTresultsreducedstrata), \@ref(tab:CodERROR), and \@ref(tab:HadERROR) contain the absolute error between abundance estimates and model output for each of our abundance estimates. While the model-based results provided a slightly lower mean absolute error (0.34) compared to the stratified mean (0.38), the variance of all VAST absolute errors (0.10) was much larger than the stratified mean (0.02) highlighting the sensitivity of model-based estimates to the settings being used. When considering individual scenarios, $77/80\approx 96\%$ had a VAST estimate with a lower relative error than the corresponding stratified mean estimate, with VAST models that include covariate information providing the lowest overall errors and standard deviations. Setting misspecification and/or a poor covariate response contribute to the large variance in VAST errors as illustrated by the fact that $\approx 63\%$ of individual scenarios contain a VAST estimate with a worst error than the corresponding stratified mean estimate. VAST models that included covariates had an average absolute error of 0.22, models that did not include covariate information had an average error of 0.46, and stratified mean estimates produces an average error of 0.39. When we reduce the number of strata that are included in indexing calculations to simulate species shifting into new territory, we typically see an increase in absolute error (as expected), though there are some scenarios where the impact is minimal. Furthermore, there are scenarios where including covariates in VAST models actually increases the absolute error, especially when we fail to sample the entire domain (e.g. in Table \@ref(tab:HadERROR) rows 8 and 9, VAST models without covariates show lower errors than when covariates are included). We analyze these results further in the sections that follow.
 
@@ -365,18 +353,20 @@ Of the scenarios without covariates, $10/16\approx63$\% had a VAST fit with a lo
 
 \section{Discussion}
 
-To test the impact of shifting populations on abundance estimates, we simulated known population data that included environmental forcing and compared biomass estimates derived from stratified random sampling to the true values. We carried out simulations for 3 species on Georges Bank that took into account different population trends, temperature scenarios, noise in survey samples, and seasonal variation. We compared a design-based estimation approach (stratified mean) with a model-based approach that allows for the inclusion of environmental covariates (VAST) when the entire domain was sampled as well as when a reduced number of strata were included. Our analysis included a comparison of absolute error values between 20-year estimates and consideration of the variation seen year-to-year displayed by each approach as well as the consistency between each 20-year estimate.
+To test the impact of shifting populations on abundance estimates, we simulated known population data that included environmental forcing and compared biomass estimates derived from stratified random sampling to the true values. We carried out simulations for 3 species on Georges Bank that took into account different population trends, temperature scenarios, noise in survey samples, and seasonal variation. We compared a design-based estimation approach (stratified mean) with a model-based approach that allows for the inclusion of environmental covariates (VAST) when the entire domain was sampled as well as when a reduced number of strata were included. Our analysis included a comparison of absolute error values between 20-year estimates and consideration of the year-to-year variation displayed by each approach as well as the variation between each 20-year estimate.
 
-Our analysis showed that both approaches are capable of providing abundance estimates that track the true abundance trend. While VAST estimates tended to provide lower relative error values compared to the stratified mean, especially when covariate information was included in the models, VAST Settings A and B combined to produce over 30 abundance estimates with larger error values than the largest stratified mean error. This fact highlights how sensitive VAST is to the choices made regarding settings and data used in analyses. This problem is compounded by the lack of clear guidance regarding how to build and analyze models with the correct inputs. Even more concerning, a recent simulation study showed that the existing diagnostic tools available in VAST sometimes guide users towards using the wrong settings **cite Chris C paper**. The value of model-based approaches such as VAST are clear- they allow users to tailor the model to overcome issues related to the input data by and to account for factors such as environmental change. However, the many consequential decisions that must be made in a given model and the lack of clear criteria for making these decisions makes it challenging to make these choices and even more difficult to determine whether the choices are correct.
+Our analysis showed that the design-based and model-based approaches are each capable of providing biomass estimates that track the true abundance trend. While VAST estimates tended to provide lower relative error values compared to the stratified mean, especially when covariate information was included in the models, VAST Settings A and B combined to produce over 30 abundance estimates with larger error values than the largest stratified mean error. This fact highlights how sensitive VAST is to the choices made regarding settings and data used in analyses. This problem is compounded by the lack of clear guidance regarding how to build and analyze models with the correct inputs. Even more concerning, a recent simulation study showed that the existing diagnostic tools available in VAST sometimes guide users towards using settings that decrease the accuracy of the model **cite Chris C paper**. The value of model-based approaches such as VAST are clear- they allow users to tailor the model to overcome issues related to the input data by and to account for factors such as environmental change. However, the many consequential decisions that must be made in a given model and the lack of clear criteria for making these decisions makes it challenging to make these choices and even more difficult to determine whether the choices are correct.
 
 
-Spatial factors contributed to many of the scenarios that produced larger error values seen in our estimates. Flow from the shallow centrally located strata into the more deeper, smaller, and less-sampled eastern strata contributed to VAST failing to accurately modeling the abundance of yellowtail flounder without the addition of covariate information, the impact of which was greatly exacerbated in the increasing temperature scenarios. While adding covariates can help inform the model and improve the estimate as seen with the yellowtail flounder simulation results, including covariates can hinder the model in certain instances. For example, including covariates for haddock when the northern most strata were removed from the survey meant that the population was not being sampled in the coldest part of its domain which ultimately increased the error.
+Spatial factors contributed to many of the scenarios that produced larger error values seen in our estimates. Flow from the shallow centrally located strata into the more deeper, smaller, and less-sampled eastern strata contributed to VAST failing to accurately modeling the abundance of yellowtail flounder without the addition of covariate information, the impact of which was greatly exacerbated in the increasing temperature scenarios. While adding covariates can help inform the model and improve the estimate as seen with the yellowtail flounder simulation results, including covariates can hinder the model in certain instances. For example, including covariates for haddock when the northern most strata were removed from the survey meant that the population was not being sampled in the coldest part of its domain which led to an incorrect covariate response that ultimately increased the error between the VAST estimate and the true model abundance.
 
+Seasonal differences in spatial abundance patterns in our population models led to seasonal differences in abundance estimates, with most estimates producing a higher error in the Fall 
+spawn weeks 9-14
 something about seasonal impact seen in all estimates with fall estimates typically noticeably worse. We explored this through the ratio plots. This was mostly a problem with VAST as SM showed more consistent estimates between seasons.
 
 
 
-<font size="5">*Impact of Covariates*</font>
+<!-- <font size="5">*Impact of Covariates*</font> -->
 
 As seen in Table **cite VAST setting table**, VAST models that included covariates used a linear combination of second degree polynomials for habitat and temperature to approximate species-specific covariate responses. Using the exact habitat and temperature covariate information from our population models typically resulted in improved estimates, with about 73% had a lower absolute error compared to the corresponding estimate without covariates ($117/160\approx 73\%$), and $77/80\approx 96\%$ of VAST models with covariates provided lower absolute error than the corresponding stratified mean estimate. There is more to explore with respect to the impact of covariates. For example, by including just one of the covariates individually, one could test which had a larger impact on abundance estimates. Adding noise to our covariate input would test how robust the model-based estimates are to uncertainty in the covariate information. One could also test the impact of assuming the wrong covariate response function (linear vs polynomial etc). 
 <!-- **For discussion: clearly our perfect covariate information made a big difference for yellowtail flounder (and others), but the question is could we achieve similar results without "perfect" information? Which covariate is best? Good question for future research** -->
@@ -421,33 +411,6 @@ All data and code used in this work are available at https://github.com/Blevy2/R
 \pagebreak
 
 
-```{r PopPct, echo=FALSE,fig.show='hold', fig.align='center', fig.cap="Percent of each species in each strata for during survey weeks in our spatial simulations. All constant temperature scenarios follow the patterns on the left while increasing temperature scenarios follow the patterns on the right. See Figure 1?? for a spatial reference of the Georges Bank strata.",out.width="47.5%"}
-knitr::include_graphics(c("Images/PercentPlots_ConPopConTemp_YT.png","Images/PercentPlots_ConPopIncTemp_YT.png"))
-knitr::include_graphics(c("Images/PercentPlots_DecPopConTemp_Cod.png","Images/PercentPlots_DecPopIncTemp_Cod.png"))
-knitr::include_graphics(c("Images/PercentPlots_IncPopConTemp_Had.png","Images/PercentPlots_IncPopIncTemp_Had.png"))
-```
-
-
-```{r CovResponse, echo=FALSE,out.width="105%",fig.show='hold', fig.align='center', fig.cap="Temperature covariate response plots and resulting population estimate for Yellowtail Flounder on the left and Haddock on the right. In both cases the spatial simulations that were surveyed had an increasing population over time, increasing average temperature, and certain strata excluded from sampling, as shown in Figure 1**check**.",out.width="90%"}
-# knitr::include_graphics(c("Images/covariate_good.png","Images/covariate_bad.png"))
-# knitr::include_graphics(c("Images/covariate_est.png"))
-
-knitr::include_graphics(c("Images/covariate_plot.png"))
-
-```
-
-```{r RatioTrend, echo=FALSE,out.width="105%",fig.show='hold', fig.align='center', fig.cap="Representative example of typical ratio trend for each species, as shown on a log scale.",out.width="90%"}
-# knitr::include_graphics(c("Images/covariate_good.png","Images/covariate_bad.png"))
-# knitr::include_graphics(c("Images/covariate_est.png"))
-#Yellowtail estimates are for the constant population, constant temperature, all strata used in estimates.
-#Cod are Decpop_ConTemp_allStrata_
-#Haddock are IncPop_IncTemp_all strata_
-
-knitr::include_graphics(c("Images/ratio_trend_YTF.PNG"))
-knitr::include_graphics(c("Images/ratio_trend_cod.PNG"))
-knitr::include_graphics(c("Images/ratio_trend_had.PNG"))
-```
-
 
 
 
@@ -475,36 +438,36 @@ cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 ```
 
 
-```{r paramsALL2,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+<!-- ```{r paramsALL2,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'} -->
 
-param_table1 = read_csv("CSVs/Parameters1.csv")
+<!-- param_table1 = read_csv("CSVs/Parameters1.csv") -->
 
-summary_tab1 <- param_table1 %>% 
- # dplyr::mutate_if(is.numeric, list(~as.character(signif(., 3))))%>%
-  
-  mutate_if(grepl('rrr',.), ~replace(., grepl('rrr', .), paste("\U03C1")))#should be replacing r with the rho symbol
- # mutate_if(grepl('W1',.), ~replace(., grepl('W1', .), "WW")) #should be replacing beta with the symbol
- #    mutate_if(grepl('wk',.), ~replace(., grepl('wk', .), "1/wk")) %>% #should be replacing beta with the symbol
- #  
+<!-- summary_tab1 <- param_table1 %>%  -->
+<!--  # dplyr::mutate_if(is.numeric, list(~as.character(signif(., 3))))%>% -->
 
-# Change the orientation of the table so that Species become the variable headings
+<!--   mutate_if(grepl('rrr',.), ~replace(., grepl('rrr', .), paste("\U03C1")))#should be replacing r with the rho symbol -->
+<!--  # mutate_if(grepl('W1',.), ~replace(., grepl('W1', .), "WW")) #should be replacing beta with the symbol -->
+<!--  #    mutate_if(grepl('wk',.), ~replace(., grepl('wk', .), "1/wk")) %>% #should be replacing beta with the symbol -->
+<!--  #   -->
 
-
-
-# Create table to present the data]
-Fig_1 <- kable(summary_tab1, 
-  caption = "Parameters used in all population models.",
-    format = "latex", booktabs = TRUE) %>%
-  kable_styling(font_size = 10)
- 
-```
+<!-- # Change the orientation of the table so that Species become the variable headings -->
 
 
- ```{r, results='asis'}
- 
- Fig_1
- 
- ```
+
+<!-- # Create table to present the data] -->
+<!-- Fig_1 <- kable(summary_tab1,  -->
+<!--   caption = "Parameters used in all population models.", -->
+<!--     format = "latex", booktabs = TRUE) %>% -->
+<!--   kable_styling(font_size = 10) -->
+
+<!-- ``` -->
+
+
+<!--  ```{r, results='asis'} -->
+
+<!--  Fig_1 -->
+
+<!--  ``` -->
 
 
 <!-- Table 2. Parameters used in models with relatively constant populations. -->
@@ -640,7 +603,7 @@ Fig_3
 
 
 
-<div align="center">Table XX. Settings for our two VAST models.</div>
+<div align="center">Table 3. Settings for our two VAST models.</div>
 
 ```{r VASTsettings, echo=FALSE, id="VASTsettings",message=FALSE, warnings=FALSE, results='asis'}
 
@@ -662,6 +625,56 @@ cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 
 ```
 
+
+
+```{r scenarios,echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+options(knitr.kable.NA = '')
+
+
+combos_table = read_csv("CSVs/scenario_combos.csv")
+
+summary_tab <- combos_table %>% 
+   mutate_if(grepl('5deg',.), ~replace(., grepl('5deg', .), paste("Increasing 5","\U00B0","C",sep=""))) 
+
+
+# Create table to present the data]
+ kable(summary_tab, "simple",
+                     caption = "Each index estimate chooses one condition from each of the following 7 columns.",
+          format = "latex", booktabs = TRUE) %>%
+          kable_styling(latex_options = "scale_down")
+```
+
+
+
+
+
+```{r PopPct, echo=FALSE,fig.show='hold', fig.align='center', fig.cap="Percent of each species in each strata for during survey weeks in our spatial simulations. All constant temperature scenarios follow the patterns on the left while increasing temperature scenarios follow the patterns on the right. See Figure 1 for a spatial reference of the Georges Bank strata.",out.width="47.5%"}
+knitr::include_graphics(c("Images/PercentPlots_ConPopConTemp_YT.png","Images/PercentPlots_ConPopIncTemp_YT.png"))
+knitr::include_graphics(c("Images/PercentPlots_DecPopConTemp_Cod.png","Images/PercentPlots_DecPopIncTemp_Cod.png"))
+knitr::include_graphics(c("Images/PercentPlots_IncPopConTemp_Had.png","Images/PercentPlots_IncPopIncTemp_Had.png"))
+```
+
+
+```{r CovResponse, echo=FALSE,out.width="105%",fig.show='hold', fig.align='center', fig.cap="Temperature covariate response plots and resulting population estimate for Yellowtail Flounder on the left and Haddock on the right. In both cases the spatial simulations that were surveyed had an increasing population over time, increasing average temperature, and certain strata excluded from sampling, as shown in Figure 1**check**.",out.width="90%"}
+# knitr::include_graphics(c("Images/covariate_good.png","Images/covariate_bad.png"))
+# knitr::include_graphics(c("Images/covariate_est.png"))
+
+knitr::include_graphics(c("Images/covariate_plot.png"))
+
+```
+
+```{r RatioTrend, echo=FALSE,out.width="105%",fig.show='hold', fig.align='center', fig.cap="Representative example of typical ratio trend for each species, as shown on a log scale.",out.width="90%"}
+# knitr::include_graphics(c("Images/covariate_good.png","Images/covariate_bad.png"))
+# knitr::include_graphics(c("Images/covariate_est.png"))
+#Yellowtail estimates are for the constant population, constant temperature, all strata used in estimates.
+#Cod are Decpop_ConTemp_allStrata_
+#Haddock are IncPop_IncTemp_all strata_
+
+knitr::include_graphics(c("Images/ratio_trend_YTF.PNG"))
+knitr::include_graphics(c("Images/ratio_trend_cod.PNG"))
+knitr::include_graphics(c("Images/ratio_trend_had.PNG"))
+```
 
 
 
