@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  30 MAY 2023 16:45
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  31 MAY 2023 15:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -928,23 +928,8 @@ File: Images/TempScenarios.png Graphic file (type bmp)
 [10]
 File: Images/Population_scenarios2.png Graphic file (type bmp)
 <Images/Population_scenarios2.png>
-[11]
-Overfull \hbox (3.336pt too wide) detected at line 262
-[][]
- []
-
-[12]
-Overfull \hbox (3.336pt too wide) detected at line 270
-[][]
- []
-
-
-Overfull \hbox (3.336pt too wide) detected at line 274
-[][]
- []
-
-[13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26]
-Underfull \hbox (badness 10000) in paragraph at lines 374--376
+[11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26]
+Underfull \hbox (badness 10000) in paragraph at lines 371--373
 [] [] [][][] [] [][][][][][][][][] [] [][][][] [] [][][] [] [][][][] [][] [][][][][] [] [][][][][][][][][] [][] [][][][][][][][][] [][] [][][][][][] [][] [][][][][][] [][] [][][][] [][] [][][] [][]
  []
 
@@ -1007,14 +992,14 @@ File: Images/PercentPlots_IncPopIncTemp_Had.png Graphic file (type bmp)
 
 LaTeX Warning: Float too large for page by 24.05096pt on input line 528.
 
-File: Images/covariate_plot.png Graphic file (type bmp)
-<Images/covariate_plot.png>
 File: Images/ratio_trend_YTF.png Graphic file (type bmp)
 <Images/ratio_trend_YTF.png>
 File: Images/ratio_trend_cod.png Graphic file (type bmp)
 <Images/ratio_trend_cod.png>
 File: Images/ratio_trend_had.png Graphic file (type bmp)
 <Images/ratio_trend_had.png>
+File: Images/covariate_plot.png Graphic file (type bmp)
+<Images/covariate_plot.png>
 
 Overfull \hbox (3.505pt too wide) in paragraph at lines 553--660
  [][] 
@@ -1052,6 +1037,6 @@ Here is how much of TeX's memory you used:
  42985 multiletter control sequences out of 15000+600000
  518836 words of font info for 85 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 86i,10n,121p,2398b,914s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 86i,10n,121p,2413b,914s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on Draft1.pdf (38 pages).
