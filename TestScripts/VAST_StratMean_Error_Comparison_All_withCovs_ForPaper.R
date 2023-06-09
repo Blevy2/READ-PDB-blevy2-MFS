@@ -14,9 +14,9 @@ scenario1 <- "IncPop_ConTemp" #the folder name
 
 #spp1 spp2 spp3
 #short_names <- c("YT","Cod","Had")   #fixed above
-short_names <- c("YT","Had")
+short_names <- c("Had")
 
-exclude_strata <- FALSE
+exclude_strata <- TRUE
 
 #for getting into correct subfolder
 ifelse(exclude_strata==TRUE, 
