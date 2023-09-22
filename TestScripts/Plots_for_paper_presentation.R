@@ -324,8 +324,8 @@ ggplot() +
   
   
   #this way plots data by season divided by itself so it equals 1
-  geom_point(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=log(Est_ratio), group = season, color = "Model"),size=estimate_point_size) +
-  geom_line(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=log(Est_ratio), group =season, color = "Model"),size=estimate_line_size ) +
+  geom_point(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=log(Est_ratio), group = season, color = "True Biomass"),size=estimate_point_size) +
+  geom_line(data = subset(as.data.frame(pop_by_season[[s]]),season==season_), aes(x=as.numeric(year),y=log(Est_ratio), group =season, color = "True Biomass"),size=estimate_line_size ) +
   
   #plot VAST estimate without covariates with NO noise
   geom_point(data=subset(VAST_data[[s]][["_NoCovs_"]][["NoNoise_"]][[folder]],season==season_),aes(x=Year,y=log(Est_ratio),group=season, color = "VAST No Cov No Noise"),size=model_point_size)+

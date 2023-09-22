@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  6 SEP 2023 11:36
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2023.3.14)  20 SEP 2023 14:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -929,50 +929,50 @@ File: Images/TempScenarios.png Graphic file (type bmp)
 File: Images/Population_scenarios2.png Graphic file (type bmp)
 <Images/Population_scenarios2.png>
 [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26]
-Underfull \hbox (badness 10000) in paragraph at lines 372--374
+Underfull \hbox (badness 10000) in paragraph at lines 371--373
 [] [] [][][] [] [][][][][][][][][] [] [][][][] [] [][][] [] [][][][] [][] [][][][][] [] [][][][][][][][][] [][] [][][][][][][][][] [][] [][][][][][] [][] [][][][][][] [][] [][][][] [][] [][][] [][]
  []
 
 [27] [28] [29] [30]
-Overfull \hbox (53.11583pt too wide) in alignment at lines 428--432
+Overfull \hbox (53.11583pt too wide) in alignment at lines 433--437
  [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (53.11583pt too wide) in alignment at lines 432--443
+Overfull \hbox (53.11583pt too wide) in alignment at lines 437--448
  [] [] [] [] [] [] [] 
  []
 
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 10.0pt on input line 450.
+(Font)              scaled to size 10.0pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 7.0pt on input line 450.
+(Font)              scaled to size 7.0pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 5.0pt on input line 450.
+(Font)              scaled to size 5.0pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.00092pt on input line 450.
+(Font)              scaled to size 10.00092pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 7.00064pt on input line 450.
+(Font)              scaled to size 7.00064pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 5.00046pt on input line 450.
+(Font)              scaled to size 5.00046pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.99893pt on input line 450.
+(Font)              scaled to size 9.99893pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.99925pt on input line 450.
+(Font)              scaled to size 6.99925pt on input line 455.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 4.99947pt on input line 450.
+(Font)              scaled to size 4.99947pt on input line 455.
 
-Overfull \hbox (36.29501pt too wide) in paragraph at lines 450--474
+Overfull \hbox (36.29501pt too wide) in paragraph at lines 455--479
  [][] 
  []
 
 
-Overfull \hbox (1.95056pt too wide) in paragraph at lines 498--498
+Overfull \hbox (1.95056pt too wide) in paragraph at lines 503--503
 []|\TU/lmr/m/n/12 X1_formula|  
  []
 
 
-Overfull \hbox (1.95056pt too wide) in paragraph at lines 499--499
+Overfull \hbox (1.95056pt too wide) in paragraph at lines 504--504
 []|\TU/lmr/m/n/12 X2_formula|  
  []
 
@@ -990,7 +990,7 @@ File: Images/PercentPlots_IncPopConTemp_Had.png Graphic file (type bmp)
 File: Images/PercentPlots_IncPopIncTemp_Had.png Graphic file (type bmp)
 <Images/PercentPlots_IncPopIncTemp_Had.png>
 
-LaTeX Warning: Float too large for page by 24.05096pt on input line 526.
+LaTeX Warning: Float too large for page by 24.05096pt on input line 531.
 
 File: Images/ratio_trend_YTF.png Graphic file (type bmp)
 <Images/ratio_trend_YTF.png>
@@ -1007,28 +1007,28 @@ File: Images/Haddock_Estimate_Example.png Graphic file (type bmp)
 File: Images/covariate_plot3.png Graphic file (type bmp)
 <Images/covariate_plot3.png>
 
-Overfull \hbox (3.505pt too wide) in paragraph at lines 578--685
+Overfull \hbox (3.505pt too wide) in paragraph at lines 583--690
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 23.76965pt on input line 685.
+LaTeX Warning: Float too large for page by 23.76965pt on input line 690.
 
 
-Overfull \hbox (3.505pt too wide) in paragraph at lines 691--798
+Overfull \hbox (3.505pt too wide) in paragraph at lines 696--803
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 23.76965pt on input line 798.
+LaTeX Warning: Float too large for page by 23.76965pt on input line 803.
 
 
-Overfull \hbox (60.49501pt too wide) in paragraph at lines 805--831
+Overfull \hbox (60.49501pt too wide) in paragraph at lines 810--836
  [][] 
  []
 
 
-Overfull \hbox (60.49501pt too wide) in paragraph at lines 838--864
+Overfull \hbox (60.49501pt too wide) in paragraph at lines 843--869
  [][] 
  []
 
@@ -1043,6 +1043,6 @@ Here is how much of TeX's memory you used:
  43036 multiletter control sequences out of 15000+600000
  518836 words of font info for 85 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 86i,10n,121p,1991b,916s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 86i,10n,121p,1989b,916s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on Draft2.pdf (39 pages).
