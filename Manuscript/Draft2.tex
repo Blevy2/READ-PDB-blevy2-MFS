@@ -111,8 +111,8 @@
 
 \newpage
 
-\hypertarget{estimating-population-trends-under-the-pressures-of-climate-change}{%
-\section{Estimating Population Trends Under the Pressures of Climate Change}\label{estimating-population-trends-under-the-pressures-of-climate-change}}
+\hypertarget{how-might-climate-change-affect-indices-of-abundance-a-simulation-study-starting-point.}{%
+\section{How might climate change affect indices of abundance? A simulation study starting point.}\label{how-might-climate-change-affect-indices-of-abundance-a-simulation-study-starting-point.}}
 
 Benjamin A. Levy\textsuperscript{1}, Christopher M. Legault\textsuperscript{2}, Timothy J. Miller\textsuperscript{2}, Elizabeth N. Brooks\textsuperscript{2}
 
@@ -220,15 +220,6 @@ The habitat input for each species in MFS should represent spatial habitat prefe
 
 Each species is assumed to have normally distributed temperature preferences \(N(\mu,\sigma)\), with mean \(\mu\) and standard deviation \(\sigma\). Temperature values are in degrees Celcius. Values were chosen by combining information in the literature with temperatures recorded in the bottom trawl survey. We assume Yellowtail's preferences are \(N(8.75,4.25)\), while Haddock and Cod have preferences \(N(9,4)\). Weekly estimated temperature data for the region for 2012 was obtained from FVCOM (Chen et al. 2006). We chose to repeat temperature estimates for a single year rather than use data for consecutive years to reduce the number of factors impacting model dynamics while still incorporating real data. The 2012 data was chosen because it displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values, allowing for a smooth repeating yearly temperature pattern for the constant temperature scenario. The 2012 temperature data was also transformed to create an oscillating pattern that increases 5 degrees Celsius on average over the duration of the simulation. We chose a 5 degree increase over a 20 year simulation to allow temperature change to have a meaningful impact on spatial patterns while remaining within reasonable computational limits in terms of the length of the simulation. Figure \ref{fig:temp-scenarios} depicts mean trends for the temperature scenarios used in our population models. \textbf{dont forget to include animated gif in final submission}
 
-\begin{figure}
-
-{\centering \includegraphics[width=0.95\linewidth]{Images/TempScenarios} 
-
-}
-
-\caption{Mean trends of temperature data used in our MixFishSim population model.}\label{fig:temp-scenarios}
-\end{figure}
-
 In equation (1), \(Hab^2_{J,s}\) remains constant for each species for the duration of the simulation, while \(Tol_{c,s,wk}\) changes each week with temperature fluctuations. Using a temperature gradient that repeats every 52 weeks produces the same spatial preferences in a given week each year, resulting in relatively consistent spatial biomass patterns. Scenarios where the temperature increases over time creates spatial preferences that evolve as the water warms, producing spatial biomass patterns that shift in a given week over the duration of the simulation.
 
 We carry out 20 year simulations for each of our three species under various population scenarios. Historically, Cod has seen significant decline over the last 50 years while Haddock has increased in abundance in recent years ((NEFSC) 2022). For this reason we compare survey index estimates using SRS from decreasing population scenarios for Cod and increasing population scenarios for Haddock. To consider a wide range of possibilities, we include increasing, decreasing, and constant population trends for Yellowtail. The specific population trends used in our analyses can be see in Figure \ref{fig:pop-scenarios}. Each of these scenarios is simulated twice: first with with an oscillating temperature gradient that repeats and second with a temperature gradient that increases roughly 5 degrees Celsius over the duration of the 20 year simulation, for a total of 10 simulated spatial data sets.
@@ -324,7 +315,7 @@ Of the scenarios without covariates, \(10/16\approx63\)\% had a VAST fit with a 
 
 \section{Discussion}
 
-Our analysis showed that both the design-based and model-based approaches are each capable of providing biomass estimates that track the true biomass trend. While VAST estimates tended to provide lower absolute error values compared to the stratified mean, especially when covariate information was included in the models, VAST Settings A and B also combined to produce over 30 biomass estimates with larger error values than the largest stratified mean error. These facts demonstrate the power of model-based estimates while also highlighting how sensitive they are to the choices made regarding settings and data used in analyses. Users often rely on traditional model-building processes and diagnostic techniques such as AIC to guide their choices, but successfully navigating the many decisions depends on the background of the given user and care should be taken in determining which diagnostic tools are used. For example, a recent simulation study showed that the existing diagnostic tools available in VAST sometimes guide users towards using settings that decrease the accuracy of the model \textbf{cite Chris C paper}. The value of model-based approaches such as VAST are clear- they allow users to overcome issues related to the input data to account for factors such as environmental change. However, the many consequential decisions that must be made in a given model and the lack of clear criteria for making these decisions makes it challenging to make these choices and even more difficult to determine whether the choices are correct.
+Our analysis showed that both the design-based and model-based approaches are each capable of providing biomass estimates that track the true biomass trend. While VAST estimates tended to provide lower absolute error values compared to the stratified mean, especially when covariate information was included in the models, VAST Settings A and B also combined to produce over 30 biomass estimates with larger error values than the largest stratified mean error. These facts demonstrate the power of model-based estimates while also highlighting how sensitive they are to the choices made regarding settings and data used in analyses. Users often rely on traditional model-building processes and diagnostic techniques such as AIC to guide their choices, but successfully navigating the many decisions depends on the background of the given user and care should be taken in determining which diagnostic tools are used. For example, a recent simulation study showed that the existing diagnostic tools available in VAST sometimes guide users towards using settings that decrease the accuracy of the model (Christopher Cacciapaglia 2023). The value of model-based approaches such as VAST are clear- they allow users to overcome issues related to the input data to account for factors such as environmental change. However, the many consequential decisions that must be made in a given model and the lack of clear criteria for making these decisions makes it challenging to make these choices and even more difficult to determine whether the choices are correct.
 
 Seasonal differences in spatial biomass patterns in our population models led to seasonal differences in biomass estimates, with most estimates producing a higher error in the fall. This may have to do with the fact that our species spawn during weeks 9-14, which coincides with the spring sampling weeks 13 and 14. Spawning in our population models concentrates much of each species in the spawning grounds towards the center of the domain where more samples occur. The populations are more spread out during the fall survey in weeks 37 and 38 and since the water temperature is warmer during these months biomass shifts towards the deeper strata, which tend to be less sampled. We explored this through biomass estimate ratios which revealed how the model-based estimates had a larger change in average ratio between seasonal estimates compared to the design-based estimates.
 
@@ -362,6 +353,9 @@ Buller, I.D. 2022. Envi: Environmental interpolation using spatial kernel densit
 \leavevmode\vadjust pre{\hypertarget{ref-chen2006unstructured}{}}%
 Chen, C., Beardsley, R.C., Cowles, G., Qi, J., Lai, Z., Gao, G., and others. 2006. An unstructured grid, finite-volume coastal ocean model: FVCOM user manual. SMAST/UMASSD: 6--8.
 
+\leavevmode\vadjust pre{\hypertarget{ref-ChrisC}{}}%
+Christopher Cacciapaglia, C.F.A., Elizabeth N. Brooks. 2023. Developing workflow and diagnostics for model selection of a vector autoregressive spatiotemporal (VAST) model. Fisheries Research \textbf{In Press}. Elsevier.
+
 \leavevmode\vadjust pre{\hypertarget{ref-deville1992calibration}{}}%
 Deville, J.-C., and Särndal, C.-E. 1992. Calibration estimators in survey sampling. Journal of the American statistical Association \textbf{87}(418): 376--382. Taylor \& Francis.
 
@@ -395,12 +389,6 @@ McMullen, K., Paskevich, V., and Poppe, L. (n.d.). USGS east-coast sediment anal
 \leavevmode\vadjust pre{\hypertarget{ref-ManagTrack}{}}%
 (NEFSC), N.F.S.C. 2022. Management track assessments fall 2022. NOAA technical memorandum NMFS-NE ; 305.
 
-\leavevmode\vadjust pre{\hypertarget{ref-nefsc1218}{}}%
-NEFSC. 2012. {54th Northeast Regional Stock Assessment Workshop (54th SAW) Assessment Report}. {Northeast Fish. Sci. Cent. Ref. Doc. 12-18; 604 p. Available from: National Marine Fisheries Service, 166 Water Street, Woods Hole, MA 02543-1026, or online at http://www.nefsc.noaa.gov/nefsc/publications/}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-nefsc1311}{}}%
-NEFSC. 2013. {55th Northeast Regional Stock Assessment Workshop (55th SAW) Assessment Report}. {Northeast Fish. Sci. Cent. Ref. Doc. 13-11; 849 p. Available from: National Marine Fisheries Service, 166 Water Street, Woods Hole, MA 02543-1026, or online at http://www.nefsc.noaa.gov/nefsc/publications/}.
-
 \leavevmode\vadjust pre{\hypertarget{ref-nye2009changing}{}}%
 Nye, J.A., Link, J.S., Hare, J.A., and Overholtz, W.J. 2009. Changing spatial distribution of fish stocks in relation to climate and population size on the northeast united states continental shelf. Marine Ecology Progress Series \textbf{393}: 111--129.
 
@@ -428,7 +416,7 @@ Walsh, H.J., Richardson, D.E., Marancik, K.E., and Hare, J.A. 2015. Long-term ch
 
 \pagebreak
 
-Table 1. Parameters used in all population models. SAW 1: (NEFSC 2012), SAW 2: (NEFSC 2013), SAW 3: not out yet???
+Table 1. Parameters used in all population models.
 
 \begin{longtable}[]{@{}lllllll@{}}
 \toprule
@@ -437,13 +425,13 @@ Parameter & Description & Unit & Yellowtail & Cod & Haddock & Source \\
 \endhead
 \(\rho\) & Ford's growth coefficient & wk\(^{-1}\) & 4.48 & 4.43 & 4.49 & (Thorson 2020) \\
 \(M\) & Natural Mortality & wk\(^{-1}\) & 0.2064 & 0.2728 & 0.3340 & (Thorson 2020) \\
-\(F\) & Fishing Mortality & wk\(^{-1}\) & 0.358 & 0.511 & 0.45 & SAW 1, 2, 3 \\
-\(W_R\) & Weight of fully recruited fish & kg & 0.39 & 2.95 & 1.12 & SAW 1, 2, 3 \\
-\(W_{R-1}\) & Weight of pre-recruit fish & kg & 0.13 & 0.39 & 0.19 & SAW 1, 2, 3 \\
+\(F\) & Fishing Mortality & wk\(^{-1}\) & 0.358 & 0.511 & 0.45 & ((NEFSC) 2022) \\
+\(W_R\) & Weight of fully recruited fish & kg & 0.39 & 2.95 & 1.12 & ((NEFSC) 2022) \\
+\(W_{R-1}\) & Weight of pre-recruit fish & kg & 0.13 & 0.39 & 0.19 & ((NEFSC) 2022) \\
 \(\sigma^2\) & Variance in recruited fish & kg\(^2\) & 0.55 & 0.55 & 0.55 & assumed \\
 \(\lambda\) & Decay rate for movement & - & 0.7 & 0.7 & 0.7 & assumed \\
-\(Spwn_s\) & Spawning weeks for species \(s\) & wk & 9-12 & 8-13 & 11-14 & SAW 1, 2, 3 \\
-\(Rec_s\) & Recruitment weeks for species \(s\) & wk & 9-12 & 8-13 & 11-14 & SAW 1, 2, 3 \\
+\(Spwn_s\) & Spawning weeks for species \(s\) & wk & 9-12 & 8-13 & 11-14 & ((NEFSC) 2022) \\
+\(Rec_s\) & Recruitment weeks for species \(s\) & wk & 9-12 & 8-13 & 11-14 & ((NEFSC) 2022) \\
 \bottomrule
 \end{longtable}
 

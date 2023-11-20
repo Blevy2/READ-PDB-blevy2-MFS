@@ -42,8 +42,8 @@ library("dplyr")
 library("readr")
 library("tidyr")
 library("forcats")
-
-
+#library("embedr")
+library("vembedr")
 knitr::opts_chunk$set(echo = FALSE)
 if(!require(kableExtra)) {  
   install.packages("kableExtra")
@@ -60,7 +60,7 @@ if(!require(kableExtra)) {
 
 \newpage
 
-# Estimating Population Trends Under the Pressures of Climate Change
+# How might climate change affect indices of abundance? A simulation study starting point.
 
   
 Benjamin A. Levy^1^, Christopher M. Legault^2^, Timothy J. Miller^2^, Elizabeth N. Brooks^2^
@@ -205,11 +205,6 @@ knitr::include_graphics(c("Images/Habitat_3species.png"))
 <font size="5">*Temperature Input*</font>
 
 Each species is assumed to have normally distributed temperature preferences $N(\mu,\sigma)$, with mean $\mu$ and standard deviation $\sigma$. Temperature values are in degrees Celcius. Values were chosen by combining information in the literature with temperatures recorded in the bottom trawl survey. We assume Yellowtail's preferences are $N(8.75,4.25)$, while Haddock and Cod have preferences $N(9,4)$. Weekly estimated temperature data for the region for 2012 was obtained from FVCOM [@chen2006unstructured]. We chose to repeat temperature estimates for a single year rather than use data for consecutive years to reduce the number of factors impacting model dynamics while still incorporating real data. The 2012 data was chosen because it displayed an average temperature pattern that consistently oscillated between maximum and minimum temperature values, allowing for a smooth repeating yearly temperature pattern for the constant temperature scenario. The 2012 temperature data was also transformed to create an oscillating pattern that increases 5 degrees Celsius on average over the duration of the simulation. We chose a 5 degree increase over a 20 year simulation to allow temperature change to have a meaningful impact on spatial patterns while remaining within reasonable computational limits in terms of the length of the simulation. Figure \@ref(fig:temp-scenarios) depicts mean trends for the temperature scenarios used in our population models. **dont forget to include animated gif in final submission**
-
-```{r temp-scenarios, echo=FALSE,out.width="95%",fig.show='hold', fig.align='center', fig.cap="Mean trends of temperature data used in our MixFishSim population model."}
-knitr::include_graphics(c("Images/TempScenarios.png"))
-```
-
 
 
 <!-- --Describe difference between increasing and constant temperature scenarios (images?) -->
@@ -373,7 +368,7 @@ Of the scenarios without covariates, $10/16\approx63$\% had a VAST fit with a lo
 
 <!-- To test the impact of shifting populations on biomass estimates, we simulated population data that included environmental forcing and compared biomass estimates derived from SRS to the known true values. We carried out simulations for 3 species on Georges Bank that took into account different population trends, temperature scenarios, noise in survey samples, and seasonal variation. We compared a design-based estimation approach (stratified mean) with a model-based approach that allows for the inclusion of environmental covariates (VAST) when the entire domain was sampled as well as when a reduced number of strata were included to simulate our species shifting into a new habitat. Our analysis included a comparison of absolute error values between 20-year estimates and consideration of the year-to-year variation displayed by each approach as well as the variation between each 20-year estimate. -->
 
-Our analysis showed that both the design-based and model-based approaches are each capable of providing biomass estimates that track the true biomass trend. While VAST estimates tended to provide lower absolute error values compared to the stratified mean, especially when covariate information was included in the models, VAST Settings A and B also combined to produce over 30 biomass estimates with larger error values than the largest stratified mean error. These facts demonstrate the power of model-based estimates while also highlighting how sensitive they are to the choices made regarding settings and data used in analyses. Users often rely on traditional model-building processes and diagnostic techniques such as AIC to guide their choices, but successfully navigating the many decisions depends on the background of the given user and care should be taken in determining which diagnostic tools are used. For example, a recent simulation study showed that the existing diagnostic tools available in VAST sometimes guide users towards using settings that decrease the accuracy of the model **cite Chris C paper**. The value of model-based approaches such as VAST are clear- they allow users to overcome issues related to the input data to account for factors such as environmental change. However, the many consequential decisions that must be made in a given model and the lack of clear criteria for making these decisions makes it challenging to make these choices and even more difficult to determine whether the choices are correct.
+Our analysis showed that both the design-based and model-based approaches are each capable of providing biomass estimates that track the true biomass trend. While VAST estimates tended to provide lower absolute error values compared to the stratified mean, especially when covariate information was included in the models, VAST Settings A and B also combined to produce over 30 biomass estimates with larger error values than the largest stratified mean error. These facts demonstrate the power of model-based estimates while also highlighting how sensitive they are to the choices made regarding settings and data used in analyses. Users often rely on traditional model-building processes and diagnostic techniques such as AIC to guide their choices, but successfully navigating the many decisions depends on the background of the given user and care should be taken in determining which diagnostic tools are used. For example, a recent simulation study showed that the existing diagnostic tools available in VAST sometimes guide users towards using settings that decrease the accuracy of the model [@ChrisC]. The value of model-based approaches such as VAST are clear- they allow users to overcome issues related to the input data to account for factors such as environmental change. However, the many consequential decisions that must be made in a given model and the lack of clear criteria for making these decisions makes it challenging to make these choices and even more difficult to determine whether the choices are correct.
 
 Seasonal differences in spatial biomass patterns in our population models led to seasonal differences in biomass estimates, with most estimates producing a higher error in the fall. This may have to do with the fact that our species spawn during weeks 9-14, which coincides with the spring sampling weeks 13 and 14. Spawning in our population models concentrates much of each species in the spawning grounds towards the center of the domain where more samples occur. The populations are more spread out during the fall survey in weeks 37 and 38 and since the water temperature is warmer during these months biomass shifts towards the deeper strata, which tend to be less sampled. We explored this through biomass estimate ratios which revealed how the model-based estimates had a larger change in average ratio between seasonal estimates compared to the design-based estimates.
 
@@ -434,7 +429,7 @@ All data and code used in this work are available at https://github.com/Blevy2/R
 
 
 
-<div align="center">Table 1. Parameters used in all population models. SAW 1: [@nefsc1218], SAW 2: [@nefsc1311], SAW 3: not out yet??? </div>
+<div align="center">Table 1. Parameters used in all population models. </div>
 
 ```{r paramsALL, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 
@@ -443,13 +438,13 @@ tabl <- "
 |:---	|:------- |:-- |:--- |:-- |:-- |:--
 | $\\rho$ | Ford's growth coefficient | wk$^{-1}$  | 4.48 | 4.43 | 4.49 | [@thorson2020predicting] |
 | $M$ | Natural Mortality| wk$^{-1}$  | 0.2064 | 0.2728 | 0.3340 | [@thorson2020predicting]|
-| $F$ | Fishing Mortality| wk$^{-1}$  | 0.358 | 0.511 | 0.45 | SAW 1, 2, 3 |
-| $W_R$ |Weight of fully recruited fish| kg | 0.39 | 2.95 | 1.12 | SAW 1, 2, 3 |
-| $W_{R-1}$ | Weight of pre-recruit fish| kg | 0.13 | 0.39 | 0.19 | SAW 1, 2, 3 |
+| $F$ | Fishing Mortality| wk$^{-1}$  | 0.358 | 0.511 | 0.45 | [@ManagTrack] |
+| $W_R$ |Weight of fully recruited fish| kg | 0.39 | 2.95 | 1.12 | [@ManagTrack] |
+| $W_{R-1}$ | Weight of pre-recruit fish| kg | 0.13 | 0.39 | 0.19 | [@ManagTrack] |
 | $\\sigma^2$ | Variance in recruited fish | kg$^2$ | 0.55 | 0.55 | 0.55 |assumed|
 | $\\lambda$ | Decay rate for movement | - | 0.7 | 0.7 | 0.7 |assumed|
-| $Spwn_s$ | Spawning weeks for species $s$ | wk | 9-12 | 8-13 | 11-14 |SAW 1, 2, 3|
-| $Rec_s$ | Recruitment weeks for species $s$ | wk | 9-12 | 8-13 | 11-14 |SAW 1, 2, 3|
+| $Spwn_s$ | Spawning weeks for species $s$ | wk | 9-12 | 8-13 | 11-14 |[@ManagTrack]|
+| $Rec_s$ | Recruitment weeks for species $s$ | wk | 9-12 | 8-13 | 11-14 |[@ManagTrack]|
 "
 cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 
@@ -780,7 +775,7 @@ summary_tab_all <- result_table %>%
 #   arrange(Scenario) %>%
 #   select(Scenario, everything())
 
-
+# COLORs DEFINED BY ROW_SPEC ONLY WORK FOR PDF FORMAT
 # Create table to present the data]
 Fig_5a <- kable(summary_tab_all[, -1],
       align = c("l", "l", "l", "l", "c", "c", "c"),
@@ -794,6 +789,15 @@ Fig_5a <- kable(summary_tab_all[, -1],
   row_spec(seq(2,96,4), bold = T, color = "white", background = "#5C5E60")%>%
   row_spec(seq(3,96,4), bold = T, color = "white", background = "#A4A4A4")%>%
   row_spec(seq(4,96,4), bold = T, color = "white", background = "#D2D2D2")
+
+# COLORs DEFINED BY ROW_SPEC ONLY WORK FOR HTML FORMAT
+# Fig_5a <- kable(summary_tab_all[, -1],
+#       align = c("l", "l", "l", "l", "c", "c", "c"),
+#   caption = "Yellowtail Flounder absolute error results with all strata included in calculations. Row colors correspond to the same settings applied in different seasons.") %>%
+#   row_spec(0,bold = TRUE)%>% #bold column titles
+#   kable_styling(font_size = 10)  %>%
+#   pack_rows(tab_kable(), colnum = 1,
+#     index = table(fct_inorder(summary_tab_all$Scenario), useNA = "no"))
   
 ```
 
@@ -820,7 +824,8 @@ summary_tab_exclude <- result_table %>%
 
 #COLOR INDIVIDUAL ROWS BY CATEGORY
 #define colors
-
+# 
+#  COLORS DEFINED BY ROW_SPEC ONLY WORK FOR PDF FORMAT
 
 Fig_5b <- kable(summary_tab_exclude[, -1],
       align = c("l", "l", "l", "l", "c", "c", "c"),
@@ -835,6 +840,16 @@ Fig_5b <- kable(summary_tab_exclude[, -1],
   row_spec(seq(3,96,4), bold = T, color = "white", background = "#A4A4A4")%>%
   row_spec(seq(4,96,4), bold = T, color = "white", background = "#D2D2D2");
 
+
+#COLORS BELOW DEFINED BY ROW_SPEC ARE FOR HTML OUTPUT
+
+# Fig_5b <- kable(summary_tab_exclude[, -1],
+#       align = c("l", "l", "l", "l", "c", "c", "c"),
+#   caption = "Yellowtail Flounder absoloute error results with certain strata excluded from calculations. Row colors correspond to the same settings applied in different seasons.") %>%
+#   row_spec(0,bold = TRUE)%>% #bold column titles
+#   kable_styling(font_size = 10)  %>%
+#   pack_rows(tab_kable(), colnum = 1,
+#     index = table(fct_inorder(summary_tab_exclude$Scenario), useNA = "no"))
 
 ```
 
